@@ -1,0 +1,542 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8"/>
+        <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+        <title>Voucher Management - HeavenScape</title>
+        <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+        <script>
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        colors: {
+                            "primary": "#004d99", "on-primary": "#ffffff",
+                            "surface-tint": "#005db7", "primary-fixed": "#d6e3ff",
+                            "background": "#f3faff", "background-alt": "#F5F7F9",
+                            "surface": "#FFFFFF", "surface-variant": "#cfe6f2",
+                            "surface-container": "#dbf1fe", "surface-container-low": "#e6f6ff",
+                            "surface-container-high": "#d5ecf8",
+                            "on-surface": "#071e27", "on-surface-variant": "#424752",
+                            "outline": "#727783", "outline-variant": "#c2c6d4",
+                            "inverse-surface": "#1e333c",
+                            "error": "#D32F2F", "error-container": "#ffdad6",
+                            "success": "#2E7D32", "warning": "#FFA000",
+                        },
+                        fontFamily: {"sans": ["Inter", "sans-serif"]},
+                        boxShadow: {
+                            "card": "0 4px 20px rgba(21,101,192,0.08)",
+                            "card-hover": "0 8px 32px rgba(21,101,192,0.14)",
+                        }
+                    }
+                }
+            }
+        </script>
+        <style>
+            body {
+                font-family: 'Inter', sans-serif;
+            }
+            .material-symbols-outlined {
+                font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+                vertical-align: middle;
+            }
+            .icon-fill {
+                font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            }
+            .sidebar-link {
+                display: flex;
+                align-items: center;
+                padding: 10px 16px;
+                margin: 0 8px;
+                border-radius: 10px;
+                color: #424752;
+                font-size: 14px;
+                font-weight: 500;
+                text-decoration: none;
+                transition: all 0.2s ease;
+                gap: 10px;
+            }
+            .sidebar-link:hover {
+                background: #dbf1fe;
+                color: #004d99;
+            }
+            .sidebar-link.active {
+                background: #cfe6f2;
+                color: #004d99;
+                font-weight: 700;
+            }
+            .sidebar-link.active .material-symbols-outlined {
+                font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            }
+            .user-popup {
+                display: none;
+                position: absolute;
+                bottom: 70px;
+                left: 12px;
+                right: 12px;
+                background: white;
+                border: 1px solid #c2c6d4;
+                border-radius: 12px;
+                box-shadow: 0 8px 24px rgba(21,101,192,0.12);
+                z-index: 100;
+                overflow: hidden;
+            }
+            .user-popup.open {
+                display: block;
+                animation: popupIn 0.15s ease;
+            }
+            @keyframes popupIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(8px);
+                }
+                to   {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+            .user-popup a {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 10px 16px;
+                font-size: 14px;
+                color: #424752;
+                text-decoration: none;
+                transition: background 0.15s;
+            }
+            .user-popup a:hover {
+                background: #e6f6ff;
+                color: #004d99;
+            }
+            .user-popup a.danger:hover {
+                background: #ffdad6;
+                color: #D32F2F;
+            }
+            .user-popup .divider {
+                height: 1px;
+                background: #c2c6d4;
+                margin: 4px 0;
+            }
+            .user-trigger {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 10px 12px;
+                margin: 0 8px 8px;
+                border-radius: 10px;
+                cursor: pointer;
+                transition: background 0.2s;
+            }
+            .user-trigger:hover {
+                background: #dbf1fe;
+            }
+            .modal-backdrop {
+                backdrop-filter: blur(4px);
+            }
+            .code-badge {
+                font-family: 'Courier New', monospace;
+                letter-spacing: 0.05em;
+            }
+            tbody tr {
+                transition: background 0.15s;
+            }
+            #toast {
+                transition: all 0.3s ease;
+            }
+        </style>
+    </head>
+    <body class="bg-background text-on-surface flex min-h-screen">
+        <%@ include file="/views/layout/dashboard/sidebar.jsp" %>
+
+        <%-- ===== MAIN ===== --%>
+        <main class="ml-64 flex-1 flex flex-col min-h-screen">
+
+            <%-- Header --%>
+            <header class="bg-white border-b h-14 sticky top-0 z-30 flex items-center px-6" style="border-color:#c2c6d4;">
+                <h2 class="font-semibold text-base" style="color:#071e27;">Voucher Management</h2>
+            </header>
+
+            <%-- Content --%>
+            <div class="p-6 flex-1 space-y-6 max-w-screen-xl mx-auto w-full">
+
+                <%-- Page title --%>
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h1 class="text-2xl font-bold" style="color:#071e27;">Promotional Vouchers</h1>
+                        <p class="text-sm mt-0.5" style="color:#424752;">Manage discount codes and promotions.</p>
+                    </div>
+                    <button onclick="openModal()"
+                            class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-white text-sm font-semibold shadow-card active:scale-95 transition-all"
+                            style="background:#004d99;">
+                        <span class="material-symbols-outlined" style="font-size:18px;">add</span>
+                        Add Voucher
+                    </button>
+                </div>
+
+                <%-- Stats --%>
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-white rounded-2xl shadow-card p-5 flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style="background:#e8f0fe;">
+                            <span class="material-symbols-outlined" style="color:#004d99;font-size:24px;">local_activity</span>
+                        </div>
+                        <div>
+                            <p class="text-xs" style="color:#424752;">Total Vouchers</p>
+                            <p class="text-xl font-bold" style="color:#071e27;">${not empty totalVouchers ? totalVouchers : 0}</p>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-2xl shadow-card p-5 flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style="background:#e8f5e9;">
+                            <span class="material-symbols-outlined" style="color:#2E7D32;font-size:24px;">check_circle</span>
+                        </div>
+                        <div>
+                            <p class="text-xs" style="color:#424752;">Active</p>
+                            <p class="text-xl font-bold" style="color:#071e27;">${not empty activeVouchers ? activeVouchers : 0}</p>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-2xl shadow-card p-5 flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style="background:#fff8e1;">
+                            <span class="material-symbols-outlined" style="color:#FFA000;font-size:24px;">schedule</span>
+                        </div>
+                        <div>
+                            <p class="text-xs" style="color:#424752;">Expired</p>
+                            <p class="text-xl font-bold" style="color:#071e27;">${not empty expiredVouchers ? expiredVouchers : 0}</p>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-2xl shadow-card p-5 flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style="background:#e3f2fd;">
+                            <span class="material-symbols-outlined" style="color:#004d99;font-size:24px;">people</span>
+                        </div>
+                        <div>
+                            <p class="text-xs" style="color:#424752;">Total Uses</p>
+                            <p class="text-xl font-bold" style="color:#071e27;">${not empty totalUsed ? totalUsed : 0}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <%-- Table panel --%>
+                <div class="bg-white rounded-2xl shadow-card overflow-hidden">
+
+                    <%-- Filter --%>
+                    <div class="p-4 border-b flex flex-col md:flex-row gap-3 justify-between items-center"
+                         style="border-color:#c2c6d4; background:#F5F7F9;">
+                        <form method="get" action="${pageContext.request.contextPath}/dashboard/voucher-management"
+                              class="flex flex-col md:flex-row gap-3 w-full">
+                           
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-medium whitespace-nowrap" style="color:#424752;">Status:</span>
+                                <select name="status" class="border rounded-lg text-sm py-2 pl-3 pr-8 bg-white appearance-none focus:outline-none focus:ring-2"
+                                        style="border-color:#c2c6d4;">
+                                    <option value=""       ${empty param.status              ? 'selected' : ''}>All</option>
+                                    <option value="active"  ${param.status == 'active'        ? 'selected' : ''}>Active</option>
+                                    <option value="inactive"${param.status == 'inactive'      ? 'selected' : ''}>Inactive</option>
+                                    <option value="expired" ${param.status == 'expired'       ? 'selected' : ''}>Expired</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="px-4 py-2 rounded-lg text-white text-sm font-medium whitespace-nowrap"
+                                    style="background:#004d99;">Filter</button>
+                        </form>
+                    </div>
+
+                    <%-- Table --%>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr class="border-b" style="background:#F5F7F9; border-color:#c2c6d4;">
+                                    <th class="py-3 px-5 text-xs font-semibold" style="color:#424752;">Code</th>
+                                    <th class="py-3 px-5 text-xs font-semibold" style="color:#424752;">Discount</th>
+                                    <th class="py-3 px-5 text-xs font-semibold" style="color:#424752;">Remaining / Total</th>
+                                    <th class="py-3 px-5 text-xs font-semibold" style="color:#424752;">Used</th>
+                                    <th class="py-3 px-5 text-xs font-semibold" style="color:#424752;">Validity</th>
+                                    <th class="py-3 px-5 text-xs font-semibold" style="color:#424752;">Status</th>
+                                    <th class="py-3 px-5 text-xs font-semibold text-right" style="color:#424752;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y" style="border-color:#f0f0f0;">
+                                <c:choose>
+                                    <c:when test="${empty voucherList}">
+                                        <tr>
+                                            <td colspan="7" class="py-16 text-center text-sm" style="color:#424752;">
+                                                <span class="material-symbols-outlined block mb-2" style="font-size:40px;color:#c2c6d4;">sell</span>
+                                                No vouchers found
+                                            </td>
+                                        </tr>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <c:forEach items="${voucherList}" var="v">
+                                            <tr class="hover:bg-surface-container-low group">
+                                                <%-- Code --%>
+                                                <td class="py-3.5 px-5">
+                                                    <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-md border code-badge text-sm font-semibold"
+                                                         style="background:#dbf1fe; border-color:#c2c6d4; color:#004d99;">
+                                                        ${v.code}
+                                                        <button onclick="copyCode('${v.code}')" title="Copy"
+                                                                class="hover:opacity-70 transition-opacity">
+                                                            <span class="material-symbols-outlined" style="font-size:15px;">content_copy</span>
+                                                        </button>
+                                                    </div>
+                                                </td>
+
+                                                <%-- Discount --%>
+                                                <td class="py-3.5 px-5 text-sm font-semibold" style="color:#071e27;">
+                                                    <fmt:formatNumber value="${v.discountPercent}" maxFractionDigits="0"/>%
+                                                </td>
+
+                                                <%-- Remaining / Total --%>
+                                                <td class="py-3.5 px-5 text-sm" style="color:#424752;">
+                                                    <c:choose>
+                                                        <c:when test="${v.quantity != null and v.quantity > 0}">
+                                                            <span class="font-medium" style="color:#071e27;">${v.quantity - v.usedCount}</span>
+                                                            / ${v.quantity}
+                                                        </c:when>
+                                                        <c:otherwise><span class="font-medium">Unlimited</span></c:otherwise>
+                                                    </c:choose>
+                                                </td>
+
+                                                <%-- Used --%>
+                                                <td class="py-3.5 px-5 text-sm" style="color:#071e27;">
+                                                    ${v.usedCount}
+                                                    <span class="text-xs" style="color:#424752;">uses</span>
+                                                </td>
+
+                                                <%-- Validity --%>
+                                                <td class="py-3.5 px-5 text-sm">
+                                                    <c:choose>
+                                                        <c:when test="${v.startDate != null}">
+                                                            <div style="color:#071e27;">
+                                                                <fmt:formatDate value="${v.startDate}" pattern="dd/MM/yyyy"/>
+                                                            </div>
+                                                            <div class="text-xs" style="color:#727783;">
+                                                                to <fmt:formatDate value="${v.endDate}" pattern="dd/MM/yyyy"/>
+                                                            </div>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span class="text-xs" style="color:#727783;">Unlimited</span>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </td>
+
+                                                <%-- Status --%>
+                                                <td class="py-3.5 px-5">
+                                                    <c:choose>
+                                                        <c:when test="${v.status == 'active'}">
+                                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium"
+                                                                  style="background:#e8f5e9; color:#2E7D32;">
+                                                                <span class="w-1.5 h-1.5 rounded-full" style="background:#2E7D32;"></span>
+                                                                Active
+                                                            </span>
+                                                        </c:when>
+                                                        <c:when test="${v.status == 'inactive'}">
+                                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium"
+                                                                  style="background:#f0f0f0; color:#424752;">
+                                                                <span class="w-1.5 h-1.5 rounded-full" style="background:#727783;"></span>
+                                                                Inactive
+                                                            </span>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium"
+                                                                  style="background:#ffdad6; color:#D32F2F;">
+                                                                <span class="w-1.5 h-1.5 rounded-full" style="background:#D32F2F;"></span>
+                                                                Expired
+                                                            </span>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </td>
+
+                                                <%-- Actions --%>
+                                                <td class="py-3.5 px-5 text-right">
+                                                    <div class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <button onclick="openEditModal(${v.voucherID}, '${v.code}', ${v.discountPercent}, ${v.quantity != null ? v.quantity : 0}, '${v.startDate}', '${v.endDate}', '${v.status}', ${v.minOrderValue != null ? v.minOrderValue : 0}, ${v.maxDiscountValue != null ? v.maxDiscountValue : 0})"
+                                                                class="p-1.5 rounded hover:bg-surface-container transition-colors"
+                                                                style="color:#424752;" title="Edit">
+                                                            <span class="material-symbols-outlined" style="font-size:18px;">edit</span>
+                                                        </button>
+
+                                                        <c:choose>
+                                                            <c:when test="${v.status == 'active'}">
+                                                                <form method="post" action="${pageContext.request.contextPath}/dashboard/voucher-management" style="display:inline;">
+                                                                    <input type="hidden" name="action" value="toggle"/>
+                                                                    <input type="hidden" name="voucherID" value="${v.voucherID}"/>
+                                                                    <input type="hidden" name="newStatus" value="inactive"/>
+                                                                    <button type="submit" class="p-1.5 rounded hover:bg-surface-container transition-colors"
+                                                                            style="color:#FFA000;" title="Disable">
+                                                                        <span class="material-symbols-outlined" style="font-size:18px;">block</span>
+                                                                    </button>
+                                                                </form>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <form method="post" action="${pageContext.request.contextPath}/dashboard/voucher-management" style="display:inline;">
+                                                                    <input type="hidden" name="action" value="toggle"/>
+                                                                    <input type="hidden" name="voucherID" value="${v.voucherID}"/>
+                                                                    <input type="hidden" name="newStatus" value="active"/>
+                                                                    <button type="submit" class="p-1.5 rounded hover:bg-surface-container transition-colors"
+                                                                            style="color:#2E7D32;" title="Activate">
+                                                                        <span class="material-symbols-outlined" style="font-size:18px;">play_circle</span>
+                                                                    </button>
+                                                                </form>
+                                                            </c:otherwise>
+                                                        </c:choose>
+
+                                                        <button onclick="confirmDelete(${v.voucherID}, '${v.code}')"
+                                                                class="p-1.5 rounded transition-colors"
+                                                                style="color:#424752;" title="Delete"
+                                                                onmouseover="this.style.background = '#ffdad6';this.style.color = '#D32F2F';"
+                                                                onmouseout="this.style.background = '';this.style.color = '#424752';">
+                                                            <span class="material-symbols-outlined" style="font-size:18px;">delete</span>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </c:forEach>
+                                    </c:otherwise>
+                                </c:choose>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <%-- Pagination (dùng chung) --%>
+                    <%@ include file="/views/layout/common/pagination.jsp" %>
+                </div>
+            </div>
+
+            <%@ include file="/views/layout/dashboard/footer.jsp" %>
+        </main>
+
+        <%@ include file="/views/admin/voucher/voucher-modal.jsp" %>
+
+        <%-- ===== TOAST (dùng chung) ===== --%>
+        <%@ include file="/views/layout/common/toast.jsp" %>
+
+        <script>
+            // ---- Sidebar popup ----
+            function toggleUserPopup() {
+                const popup = document.getElementById('userPopup');
+                const chevron = document.getElementById('userChevron');
+                popup.classList.toggle('open');
+                chevron.textContent = popup.classList.contains('open') ? 'expand_less' : 'expand_more';
+            }
+            document.addEventListener('click', function (e) {
+                const trigger = document.getElementById('userTrigger');
+                const popup = document.getElementById('userPopup');
+                if (trigger && popup && !trigger.contains(e.target) && !popup.contains(e.target)) {
+                    popup.classList.remove('open');
+                    const chevron = document.getElementById('userChevron');
+                    if (chevron)
+                        chevron.textContent = 'expand_more';
+                }
+            });
+
+            // ---- Helpers ----
+            function todayStr() {
+                return new Date().toISOString().split('T')[0];
+            }
+
+            // ---- Modal: TẠO MỚI ----
+            function openModal() {
+                document.getElementById('modalTitle').textContent = 'Add New Voucher';
+                document.getElementById('formAction').value = 'add';
+                document.getElementById('formVoucherID').value = '';
+                document.getElementById('voucherForm').reset();
+
+                // Giới hạn startDate không được chọn quá khứ
+                document.getElementById('inputStartDate').min = todayStr();
+                document.getElementById('inputEndDate').min   = todayStr();
+
+                // Ẩn toggle trạng thái — tạo mới luôn active
+                document.getElementById('statusSection').classList.add('hidden');
+
+                updatePreview();
+                document.getElementById('voucherModal').classList.remove('hidden');
+            }
+
+            // ---- Modal: CHỈNH SỬA ----
+            function openEditModal(id, code, discount, quantity, startDate, endDate, status, minOrder, maxDisc) {
+                document.getElementById('modalTitle').textContent = 'Edit Voucher';
+                document.getElementById('formAction').value = 'edit';
+                document.getElementById('formVoucherID').value = id;
+                document.getElementById('inputCode').value     = code;
+                document.getElementById('inputDiscount').value = discount;
+                document.getElementById('inputQuantity').value = quantity > 0 ? quantity : '';
+                document.getElementById('inputStartDate').value = startDate ? startDate.substring(0, 10) : '';
+                document.getElementById('inputEndDate').value   = endDate   ? endDate.substring(0, 10)   : '';
+                document.getElementById('inputMinOrder').value    = minOrder > 0 ? minOrder : '';
+                document.getElementById('inputMaxDiscount').value = maxDisc  > 0 ? maxDisc  : '';
+
+                // Bỏ giới hạn min khi edit
+                document.getElementById('inputStartDate').min = '';
+                document.getElementById('inputEndDate').min   = '';
+
+                // Hiện toggle trạng thái khi edit
+                document.getElementById('statusSection').classList.remove('hidden');
+                const isActive = status === 'active';
+                document.getElementById('inputStatus').checked = isActive;
+                document.getElementById('toggleBg').style.background = isActive ? '#2E7D32' : '#c2c6d4';
+                document.getElementById('statusLabel').textContent    = isActive ? 'Active' : 'Disable';
+
+                updatePreview();
+                document.getElementById('voucherModal').classList.remove('hidden');
+            }
+
+            function closeModal() {
+                document.getElementById('voucherModal').classList.add('hidden');
+            }
+
+            // ---- Delete ----
+            function confirmDelete(id, code) {
+                document.getElementById('deleteVoucherID').value = id;
+                document.getElementById('deleteCodeLabel').textContent = code;
+                document.getElementById('deleteDialog').classList.remove('hidden');
+            }
+            function closeDeleteDialog() {
+                document.getElementById('deleteDialog').classList.add('hidden');
+            }
+
+            // ---- Preview ----
+            function updatePreview() {
+                const code     = (document.getElementById('inputCode').value    || 'CODE').toUpperCase();
+                const discount = document.getElementById('inputDiscount').value || '?';
+                const endDate  = document.getElementById('inputEndDate').value;
+                const minOrder = document.getElementById('inputMinOrder').value;
+                const maxDisc  = document.getElementById('inputMaxDiscount').value;
+
+                document.getElementById('previewCode').textContent     = code;
+                document.getElementById('previewDiscount').textContent = 'Save ' + discount + '%';
+                document.getElementById('previewDate').textContent     = endDate
+                    ? 'Expires: ' + new Date(endDate).toLocaleDateString('en-US')
+                    : 'Expires: No limit';
+                document.getElementById('previewMinOrder').textContent = minOrder
+                    ? 'Minimum order: ' + Number(minOrder).toLocaleString('en-US') + ' VND'
+                    : '';
+                document.getElementById('previewMaxDiscount').textContent = maxDisc
+                    ? 'Maximum discount: ' + Number(maxDisc).toLocaleString('en-US') + ' VND'
+                    : '';
+            }
+
+            // ---- Random code ----
+            function randomCode() {
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+                let r = 'HS';
+                for (let i = 0; i < 6; i++)
+                    r += chars.charAt(Math.floor(Math.random() * chars.length));
+                document.getElementById('inputCode').value = r;
+                updatePreview();
+            }
+
+            // ---- Copy ----
+            function copyCode(code) {
+                navigator.clipboard.writeText(code).then(() => showToast('Copied code: ' + code));
+            }
+
+            // ---- Toggle style (chỉ dùng khi edit) ----
+            document.getElementById('inputStatus').addEventListener('change', function () {
+                document.getElementById('toggleBg').style.background = this.checked ? '#2E7D32' : '#c2c6d4';
+                document.getElementById('statusLabel').textContent    = this.checked ? 'Active' : 'Disable';
+            });
+
+        </script>
+    </body>
+</html>
