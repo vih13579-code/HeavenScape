@@ -1,0 +1,25 @@
+# Build output
+/target/
+*.class
+
+# NetBeans
+/nbproject/private/
+nb-configuration.xml.bak
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Local config / secrets (do not commit real credentials)
+*.env

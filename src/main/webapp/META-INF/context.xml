@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context path="">
+<context-param>
+    <param-name>GOOGLE_CLIENT_ID</param-name>
+    <param-value>${GOOGLE_CLIENT_ID}</param-value>
+</context-param>
+
+<context-param>
+    <param-name>GOOGLE_CLIENT_SECRET</param-name>
+    <param-value>${GOOGLE_CLIENT_SECRET}</param-value>
+</context-param>
+</Context>
