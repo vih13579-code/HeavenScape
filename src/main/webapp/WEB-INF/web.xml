@@ -84,6 +84,10 @@
         <servlet-class>controller.AccountDetailController</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>VoucherController</servlet-name>
+        <servlet-class>controller.VoucherController</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>OrderConfirmationController</servlet-name>
         <servlet-class>controller.OrderConfirmationController</servlet-class>
     </servlet>
@@ -213,6 +217,10 @@
     <servlet-mapping>
         <servlet-name>ReviewController</servlet-name>
         <url-pattern>/review</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>VoucherController</servlet-name>
+        <url-pattern>/dashboard/voucher-management</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>OrderConfirmationController</servlet-name>
