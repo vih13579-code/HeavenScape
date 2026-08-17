@@ -1,6 +1,13 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%--
+    View Address List + Create/Update/Delete Address (Iteration 1)
+    Data từ AddressManagementController.doGet: ${addresses}, ${customer}
+    Create/Update: JS fetch POST action=addAddressAjax | updateAddressAjax (JSON)
+    Delete / Set Default: form POST thường rồi redirect
+    Tỉnh/phường load từ API provinces.open-api.vn (không lưu DB danh mục hành chính)
+--%>
 <%@ include file="/views/layout/homepage/header.jsp" %>
 <style>
     .address-list{
@@ -153,6 +160,7 @@
                 <c:remove var="error" scope="session"/>
             </c:if>
 
+            <%-- Flash message sau Delete / Set Default (session rồi remove để F5 không hiện lại) --%>
             <div class="profile-card p-8">
                 <div class="address-header-row">
                     <div>
@@ -168,6 +176,7 @@
                 </div>
 
                 <c:choose>
+                    <%-- View Address List: loop từng Address, ẩn field để JS Edit đọc lại --%>
                     <c:when test="${not empty addresses}">
                         <div class="address-list">
                         <c:forEach var="address" items="${addresses}">
@@ -237,6 +246,7 @@
     </div>
 </div>
 
+<%-- Modal Create + Update Address: cùng 1 form, phân biệt bằng modalMode add|edit --%>
 <div id="editAddressModal" class="modal-overlay hidden">
     <div class="address-modal">
         <h2 class="modal-title" id="addressModalTitle">Edit Address</h2>
@@ -302,6 +312,7 @@
 <%@ include file="/views/layout/common/toast.jsp" %>
 
 <script>
+    // Cache JSON tỉnh/thành sau lần fetch đầu, tránh gọi API mỗi lần mở modal
     var vietnamProvinces = [];
     var pendingDeleteAddressForm = null;
 
@@ -449,6 +460,7 @@
         document.getElementById('editAddressModal').classList.add('hidden');
     }
 
+    // Validate client rồi POST AJAX; add thì reload list, edit thì cập nhật DOM tại chỗ
     function saveAddressModal() {
         var mode = document.getElementById('modalMode').value;
         var addressID = document.getElementById('modalAddressID').value;
