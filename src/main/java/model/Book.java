@@ -31,7 +31,6 @@ public class Book {
     private int originID;
     private String originName;
 
-
     private double avgRating;
     private int reviewCount;
     private boolean featured;
@@ -40,7 +39,6 @@ public class Book {
 
     private Timestamp createdAt;
     private Timestamp updatedAt;
-
 
     public int getBookID() {
         return bookID;
@@ -241,7 +239,6 @@ public class Book {
         int idx = thumbnail.indexOf('|');
         return idx >= 0 ? thumbnail.substring(0, idx).trim() : thumbnail.trim();
     }
-
 
     public java.util.List<String> getAllImages() {
         java.util.List<String> list = new java.util.ArrayList<>();
