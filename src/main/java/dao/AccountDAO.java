@@ -12,13 +12,73 @@ import java.util.List;
 public class AccountDAO {
 
     public Account checkLogin(String email, String password) {
-        // TODO: implement
+        String hashedPassword = HashMD5.hash(password);
+        DBContext db = new DBContext();
+
+        // Kiểm tra bảng Customer
+        String sqlCustomer = "SELECT customerID, fullname, email, phone, role, status "
+                + "FROM Customer WHERE email = ? AND password = ?";
+        try (Connection conn = db.getConnection(); PreparedStatement ps = conn.prepareStatement(sqlCustomer)) {
+            ps.setString(1, email);
+            ps.setString(2, hashedPassword);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new Account(
+                            rs.getInt("customerID"),
+                            rs.getString("fullname"),
+                            rs.getString("email"),
+                            rs.getString("phone"),
+                            "customer",
+                            rs.getString("status")
+                    );
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // Kiểm tra bảng Account 
+        String sqlAccount = "SELECT accountID, fullname, email, phone, role, status "
+                + "FROM Account WHERE email = ? AND password = ?";
+        try (Connection conn = db.getConnection(); PreparedStatement ps = conn.prepareStatement(sqlAccount)) {
+            ps.setString(1, email);
+            ps.setString(2, hashedPassword);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new Account(
+                            rs.getInt("accountID"),
+                            rs.getString("fullname"),
+                            rs.getString("email"),
+                            rs.getString("phone"),
+                            rs.getString("role"),
+                            rs.getString("status")
+                    );
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
     public List<Account> getAllStaffs() {
-        // TODO: implement
-        return new ArrayList<Account>();
+        List<Account> list = new ArrayList<>();
+        String sql = "SELECT * FROM Account";
+        try (Connection conn = new DBContext().getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                list.add(new Account(
+                        rs.getInt("accountID"),
+                        rs.getString("fullname"),
+                        rs.getString("email"),
+                        rs.getString("phone"),
+                        rs.getString("role"),
+                        rs.getString("status")
+                ));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 
     // Các giá trị status hợp lệ cho Account (staff/admin). Kiểm tra ở đây để
@@ -28,39 +88,134 @@ public class AccountDAO {
 
     // cập nhật trạng thái của staff 
     public boolean toggleStaffStatus(int accountID, String status) {
-        // TODO: implement
+        if (status == null || !VALID_ACCOUNT_STATUSES.contains(status.toLowerCase())) {
+            System.out.println("toggleStaffStatus: invalid status = " + status);
+            return false;
+        }
+        String sql = "UPDATE Account SET status = ? WHERE accountID = ?";
+        try (Connection conn = new DBContext().getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ps.setInt(2, accountID);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return false;
     }
 
     // thêm phân trang
     public int countStaffs() {
-        // TODO: implement
+        String sql = "SELECT COUNT(*) FROM Account";
+        try (Connection conn = new DBContext().getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return 0;
     }
 
     public List<Account> getStaffsPaging(int offset, int pageSize) {
-        // TODO: implement
-        return new ArrayList<Account>();
+        List<Account> list = new ArrayList<>();
+        String sql
+                = "SELECT * FROM ("
+                + " SELECT *, ROW_NUMBER() OVER(ORDER BY accountID DESC) AS rn "
+                + " FROM Account "
+                + ") t "
+                + "WHERE rn > ? AND rn <= ?";
+
+        try (Connection conn = new DBContext().getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, offset);
+            ps.setInt(2, offset + pageSize);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                list.add(
+                        new Account(
+                                rs.getInt("accountID"),
+                                rs.getString("fullname"),
+                                rs.getString("email"),
+                                rs.getString("phone"),
+                                rs.getString("role"),
+                                rs.getString("status")
+                        )
+                );
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 
     public Account getStaffById(int id) {
-        // TODO: implement
+        String sql = "SELECT * FROM Account WHERE accountID = ?";
+        try (Connection conn = new DBContext().getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return new Account(
+                        rs.getInt("accountID"),
+                        rs.getString("fullname"),
+                        rs.getString("email"),
+                        rs.getString("phone"),
+                        rs.getString("role"),
+                        rs.getString("status")
+                );
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         return null;
     }
 
     // Update email sau khi đã xác thực OTP thành công (dùng cho cả staff và admin)
     public boolean updateEmail(int id, String newEmail) {
-        // TODO: implement
+        String sql = "UPDATE Account SET email = ? WHERE accountID = ?";
+        try (Connection conn = new DBContext().getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, newEmail);
+            ps.setInt(2, id);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return false;
     }
 
     public boolean isStaffEmailExists(String email) {
-        // TODO: implement
+        String sql = "SELECT 1 FROM Account WHERE email = ?";
+        try (Connection conn = new DBContext().getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, email);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return false;
     }
 
     public boolean isEmailExists(String email) {
-        // TODO: implement
+        String sql1 = "SELECT 1 FROM Account WHERE email = ?";
+        try (Connection conn = new DBContext().getConnection(); PreparedStatement ps = conn.prepareStatement(sql1)) {
+            ps.setString(1, email);
+            if (ps.executeQuery().next()) {
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        String sql2 = "SELECT 1 FROM Customer WHERE email = ?";
+        try (Connection conn = new DBContext().getConnection(); PreparedStatement ps = conn.prepareStatement(sql2)) {
+            ps.setString(1, email);
+            if (ps.executeQuery().next()) {
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         return false;
     }
 
@@ -92,22 +247,63 @@ public class AccountDAO {
             String email,
             String phone,
             String role) {
-        // TODO: implement
+        String sql = "UPDATE Account "
+                + "SET fullname = ?, "
+                + "email = ?, "
+                + "phone = ?, "
+                + "role = ? "
+                + "WHERE accountID = ?";
+        try (Connection conn = new DBContext().getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, fullname);
+            ps.setString(2, email);
+            ps.setString(3, phone);
+            ps.setString(4, role);
+            ps.setInt(5, id);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return false;
     }
 
     public boolean updateStaffByAdmin(int id, String fullname, String phone, String role, String status) {
-        // TODO: implement
+        String sql = "UPDATE Account SET fullname=?, phone=?, role=?, status=? WHERE accountID=?";
+        try (Connection conn = new DBContext().getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, fullname);
+            ps.setString(2, phone);
+            ps.setString(3, role);
+            ps.setString(4, status);
+            ps.setInt(5, id);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return false;
     }
 
     public boolean updateCustomerByAdmin(int id, String fullname, String phone, String status) {
-        // TODO: implement
+        String sql = "UPDATE Customer SET fullname=?, phone=?, status=? WHERE customerID=?";
+        try (Connection conn = new DBContext().getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, fullname);
+            ps.setString(2, phone);
+            ps.setString(3, status);
+            ps.setInt(4, id);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return false;
     }
 
     public boolean resetPasswordByEmail(String email, String newPassword) {
-        // TODO: implement
+        String sql = "UPDATE Account SET password = ? WHERE email = ?";
+        try (Connection conn = new DBContext().getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, HashMD5.hash(newPassword));
+            ps.setString(2, email);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return false;
     }
 
@@ -116,7 +312,25 @@ public class AccountDAO {
             String currentPassword,
             String newPassword
     ) {
-        // TODO: implement
+        String sql
+                = "UPDATE Account "
+                + "SET password = ? "
+                + "WHERE accountID = ? "
+                + "AND password = ?";
+
+        try (
+                Connection conn = new DBContext().getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, HashMD5.hash(newPassword));
+            ps.setInt(2, accountId);
+            ps.setString(3, HashMD5.hash(currentPassword));
+
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         return false;
     }
 
@@ -191,12 +405,69 @@ public class AccountDAO {
             String keyword,
             String role,
             String status) {
-        // TODO: implement
+
+        StringBuilder sql = new StringBuilder(
+                "SELECT COUNT(*) "
+                + "FROM Account "
+                + "WHERE (fullname LIKE ? OR email LIKE ?)"
+        );
+
+        if (!role.isEmpty()) {
+            sql.append(" AND role = ?");
+        }
+
+        if (!status.isEmpty()) {
+            sql.append(" AND status = ?");
+        }
+
+        try (Connection conn = new DBContext().getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+
+            int i = 1;
+
+            ps.setString(i++, "%" + keyword + "%");
+            ps.setString(i++, "%" + keyword + "%");
+
+            if (!role.isEmpty()) {
+                ps.setString(i++, role);
+            }
+
+            if (!status.isEmpty()) {
+                ps.setString(i++, status);
+            }
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         return 0;
     }
 
     public Account getAccountByEmail(String email) {
-        // TODO: implement
+        String sql = "SELECT accountID, fullname, email, phone, role, status "
+                + "FROM Account WHERE email = ?";
+        try (Connection conn = new DBContext().getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, email);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new Account(
+                            rs.getInt("accountID"),
+                            rs.getString("fullname"),
+                            rs.getString("email"),
+                            rs.getString("phone") != null ? rs.getString("phone") : "",
+                            rs.getString("role"),
+                            rs.getString("status")
+                    );
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return null;
     }
 }

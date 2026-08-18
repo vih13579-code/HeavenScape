@@ -9,88 +9,276 @@ import java.util.List;
 public class VoucherDAO {
 
     public int autoExpireVouchers() {
-        // TODO: implement
+        String sql = "UPDATE Voucher SET status = 'expired' "
+                + "WHERE end_date < GETDATE() "
+                + "AND status NOT IN ('expired') "
+                + "AND is_deleted = 0";
+        try (Connection conn = new DBContext().getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            return ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return 0;
     }
 
     private String buildWhere(String keyword, String status) {
-        // TODO: implement
-        return null;
+        StringBuilder w = new StringBuilder("WHERE v.is_deleted = 0 ");
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            w.append("AND v.code LIKE ? ");
+        }
+        if (status != null && !status.trim().isEmpty()) {
+            w.append("AND v.status = ? ");
+        }
+        return w.toString();
     }
 
     private int bindParams(PreparedStatement ps, String keyword, String status, int idx)
             throws SQLException {
-        // TODO: implement
-        return 0;
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            ps.setString(idx++, "%" + keyword.trim() + "%");
+        }
+        if (status != null && !status.trim().isEmpty()) {
+            ps.setString(idx++, status.trim());
+        }
+        return idx;
     }
 
     public List<Voucher> getAllVouchers(String keyword, String status, int offset, int pageSize) {
-        // TODO: implement
-        return new ArrayList<Voucher>();
+        List<Voucher> list = new ArrayList<>();
+        String sql
+                = "SELECT voucherID, code, discount_percent, quantity, "
+                + "start_date, end_date, status, is_deleted, usedCount, "
+                + "min_order_value, max_discount_value "
+                + "FROM ("
+                + "  SELECT v.voucherID, v.code, v.discount_percent, v.quantity,"
+                + "         v.start_date, v.end_date, v.status, v.is_deleted,"
+                + "         v.min_order_value, v.max_discount_value,"
+                + "         COUNT(cv.customerVoucherID) AS usedCount,"
+                + "         ROW_NUMBER() OVER (ORDER BY v.voucherID DESC) AS rn"
+                + "  FROM Voucher v"
+                + "  LEFT JOIN CustomerVoucher cv "
+                + "       ON v.voucherID = cv.voucherID AND cv.is_used = 1"
+                + "  " + buildWhere(keyword, status)
+                + "  GROUP BY v.voucherID, v.code, v.discount_percent, v.quantity,"
+                + "           v.start_date, v.end_date, v.status, v.is_deleted,"
+                + "           v.min_order_value, v.max_discount_value"
+                + ") t "
+                + "WHERE t.rn > ? AND t.rn <= ?";
+
+        try (Connection conn = new DBContext().getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            int idx = bindParams(ps, keyword, status, 1);
+            ps.setInt(idx++, offset);
+            ps.setInt(idx, offset + pageSize);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapRow(rs));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 
     public int countFiltered(String keyword, String status) {
-        // TODO: implement
+        String sql = "SELECT COUNT(*) FROM Voucher v " + buildWhere(keyword, status);
+        try (Connection conn = new DBContext().getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            bindParams(ps, keyword, status, 1);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return 0;
     }
 
     public boolean addVoucher(String code, double discountPercent, Integer quantity,
             Timestamp startDate, Timestamp endDate, String status,
             Double minOrderValue, Double maxDiscountValue) {
-        // TODO: implement
+        String sql = "INSERT INTO Voucher "
+                + "(code, discount_percent, quantity, start_date, end_date, status, "
+                + " min_order_value, max_discount_value)"
+                + " VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        try (Connection conn = new DBContext().getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, code.toUpperCase().trim());
+            ps.setDouble(2, discountPercent);
+            setQuantityParam(ps, 3, quantity);
+            ps.setTimestamp(4, startDate);
+            ps.setTimestamp(5, endDate);
+            ps.setString(6, status);
+            setDoubleParam(ps, 7, minOrderValue);
+            setDoubleParam(ps, 8, maxDiscountValue);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return false;
     }
 
     public boolean updateVoucher(int voucherID, String code, double discountPercent,
             Integer quantity, Timestamp startDate, Timestamp endDate,
             String status, Double minOrderValue, Double maxDiscountValue) {
-        // TODO: implement
+        if (isCodeExistsForOther(code, voucherID)) {
+            return false;
+        }
+
+        String sql = "UPDATE Voucher SET code=?, discount_percent=?, quantity=?,"
+                + " start_date=?, end_date=?, status=?,"
+                + " min_order_value=?, max_discount_value=?"
+                + " WHERE voucherID=? AND is_deleted=0";
+        try (Connection conn = new DBContext().getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, code.toUpperCase().trim());
+            ps.setDouble(2, discountPercent);
+            setQuantityParam(ps, 3, quantity);
+            ps.setTimestamp(4, startDate);
+            ps.setTimestamp(5, endDate);
+            ps.setString(6, status);
+            setDoubleParam(ps, 7, minOrderValue);
+            setDoubleParam(ps, 8, maxDiscountValue);
+            ps.setInt(9, voucherID);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return false;
     }
 
     private boolean isCodeExistsForOther(String code, int excludeVoucherID) {
-        // TODO: implement
+        String sql = "SELECT COUNT(*) FROM Voucher "
+                + "WHERE UPPER(code) = ? AND voucherID != ? AND is_deleted = 0";
+        try (Connection conn = new DBContext().getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, code.toUpperCase().trim());
+            ps.setInt(2, excludeVoucherID);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return false;
     }
 
     public int deleteVoucher(int voucherID) {
-        // TODO: implement
+        String checkUsed = "SELECT COUNT(*) FROM CustomerVoucher WHERE voucherID = ? AND is_used = 1";
+        String doDelete = "UPDATE Voucher SET is_deleted = 1 WHERE voucherID = ? AND is_deleted = 0";
+
+        Connection conn = null;
+        try {
+            conn = new DBContext().getConnection();
+            conn.setAutoCommit(false);
+
+            try (PreparedStatement psCheck = conn.prepareStatement(checkUsed)) {
+                psCheck.setInt(1, voucherID);
+                try (ResultSet rs = psCheck.executeQuery()) {
+                    if (rs.next() && rs.getInt(1) > 0) {
+                        conn.rollback();
+                        return -1;
+                    }
+                }
+            }
+
+            try (PreparedStatement psDel = conn.prepareStatement(doDelete)) {
+                psDel.setInt(1, voucherID);
+                int rows = psDel.executeUpdate();
+                conn.commit();
+                return rows > 0 ? 1 : 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }
         return 0;
     }
 
     public boolean toggleStatus(int voucherID, String newStatus) {
-        // TODO: implement
+        String sql = "UPDATE Voucher SET status=? "
+                + "WHERE voucherID=? AND is_deleted=0 AND status != 'expired'";
+        try (Connection conn = new DBContext().getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, newStatus);
+            ps.setInt(2, voucherID);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return false;
     }
 
     public int countTotal() {
-        // TODO: implement
-        return 0;
+        return countBySQL("SELECT COUNT(*) FROM Voucher WHERE is_deleted = 0");
     }
 
     public int countActive() {
-        // TODO: implement
-        return 0;
+        return countBySQL(
+                "SELECT COUNT(*) FROM Voucher v "
+                + "WHERE v.is_deleted = 0 AND v.status = 'active' "
+                + "AND (v.start_date IS NULL OR v.start_date <= GETDATE()) "
+                + "AND (v.end_date   IS NULL OR v.end_date   >= GETDATE()) "
+                + "AND (v.quantity IS NULL OR v.quantity > ("
+                + "      SELECT COUNT(*) FROM CustomerVoucher cv "
+                + "      WHERE cv.voucherID = v.voucherID AND cv.is_used = 1"
+                + "    ))");
     }
 
     public int countExpired() {
-        // TODO: implement
-        return 0;
+        return countBySQL(
+                "SELECT COUNT(*) FROM Voucher WHERE is_deleted = 0 AND status = 'expired'");
     }
 
     public int countTotalUsed() {
-        // TODO: implement
-        return 0;
+        return countBySQL("SELECT COUNT(*) FROM CustomerVoucher WHERE is_used = 1");
     }
 
     private int countBySQL(String sql) {
-        // TODO: implement
+        try (Connection conn = new DBContext().getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return 0;
     }
 
     private Voucher mapRow(ResultSet rs) throws SQLException {
-        // TODO: implement
-        return null;
+        double minOrd = rs.getDouble("min_order_value");
+        Double minOrderValue = rs.wasNull() ? null : minOrd;
+
+        double maxDisc = rs.getDouble("max_discount_value");
+        Double maxDiscountValue = rs.wasNull() ? null : maxDisc;
+
+        return new Voucher(
+                rs.getInt("voucherID"),
+                rs.getString("code"),
+                rs.getDouble("discount_percent"),
+                rs.getObject("quantity") != null ? rs.getInt("quantity") : null,
+                rs.getTimestamp("start_date"),
+                rs.getTimestamp("end_date"),
+                rs.getString("status"),
+                rs.getInt("usedCount"),
+                rs.getBoolean("is_deleted"),
+                minOrderValue,
+                maxDiscountValue
+        );
     }
 
     // =================================================================
@@ -101,7 +289,20 @@ public class VoucherDAO {
      * Lấy voucher theo code (chưa bị xoá mềm). Trả về null nếu không tồn tại.
      */
     public Voucher getVoucherByCode(String code) {
-        // TODO: implement
+        // Add "0 AS usedCount" để tái dùng mapRow() chung, tránh lặp lại logic map thủ công (DRY)
+        String sql = "SELECT voucherID, code, discount_percent, quantity, start_date, end_date, "
+                + "status, is_deleted, min_order_value, max_discount_value, 0 AS usedCount "
+                + "FROM Voucher WHERE UPPER(code) = ? AND is_deleted = 0";
+        try (Connection conn = new DBContext().getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, code.trim().toUpperCase());
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapRow(rs);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
@@ -110,7 +311,17 @@ public class VoucherDAO {
      * giới hạn.
      */
     public int getUsedCount(int voucherID) {
-        // TODO: implement
+        String sql = "SELECT COUNT(*) FROM CustomerVoucher WHERE voucherID = ? AND is_used = 1";
+        try (Connection conn = new DBContext().getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, voucherID);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return 0;
     }
 
@@ -118,7 +329,18 @@ public class VoucherDAO {
      * Customer này đã sử dụng voucher này (is_used = 1) hay chưa.
      */
     public boolean hasCustomerUsedVoucher(int customerID, int voucherID) {
-        // TODO: implement
+        String sql = "SELECT COUNT(*) FROM CustomerVoucher WHERE customerID = ? AND voucherID = ? AND is_used = 1";
+        try (Connection conn = new DBContext().getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, customerID);
+            ps.setInt(2, voucherID);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return false;
     }
 
@@ -131,8 +353,44 @@ public class VoucherDAO {
      * rồi)
      */
     public List<Voucher> getActiveVouchers(int customerID) {
-        // TODO: implement
-        return new ArrayList<Voucher>();
+        List<Voucher> list = new ArrayList<>();
+        String sql
+                = "SELECT v.voucherID, v.code, v.discount_percent, v.quantity, "
+                + "       v.start_date, v.end_date, v.status, v.is_deleted, "
+                + "       v.min_order_value, v.max_discount_value, "
+                + "       COUNT(cv.customerVoucherID) AS usedCount "
+                + "FROM Voucher v "
+                + "LEFT JOIN CustomerVoucher cv "
+                + "       ON v.voucherID = cv.voucherID AND cv.is_used = 1 "
+                + "WHERE v.is_deleted = 0 "
+                + "  AND v.status = 'active' "
+                + "  AND (v.start_date IS NULL OR v.start_date <= GETDATE()) "
+                + "  AND (v.end_date IS NULL OR v.end_date >= GETDATE()) "
+                // Loại bỏ voucher khách hàng này đã sử dụng rồi
+                + "  AND NOT EXISTS ( "
+                + "      SELECT 1 FROM CustomerVoucher used "
+                + "      WHERE used.voucherID = v.voucherID "
+                + "        AND used.customerID = ? "
+                + "        AND used.is_used = 1 "
+                + "  ) "
+                + "GROUP BY v.voucherID, v.code, v.discount_percent, v.quantity, "
+                + "         v.start_date, v.end_date, v.status, v.is_deleted, "
+                + "         v.min_order_value, v.max_discount_value "
+                // Chỉ lấy voucher còn lượt (quantity NULL = không giới hạn)
+                + "HAVING v.quantity IS NULL OR COUNT(cv.customerVoucherID) < v.quantity "
+                + "ORDER BY v.end_date ASC";
+
+        try (Connection conn = new DBContext().getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, customerID);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapRow(rs));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 
     /**
@@ -160,17 +418,94 @@ public class VoucherDAO {
      * USAGE_ERROR
      */
     public int insertVoucherUsage(int customerID, int voucherID, Integer quantity) {
-        // TODO: implement
-        return 0;
+        String checkCustomerUsed
+                = "SELECT COUNT(*) FROM CustomerVoucher WITH (UPDLOCK, HOLDLOCK) "
+                + "WHERE customerID = ? AND voucherID = ? AND is_used = 1";
+        String checkQuantity
+                = "SELECT COUNT(*) FROM CustomerVoucher WITH (UPDLOCK, HOLDLOCK) "
+                + "WHERE voucherID = ? AND is_used = 1";
+        String insert
+                = "INSERT INTO CustomerVoucher (customerID, voucherID, is_used) VALUES (?, ?, 1)";
+
+        Connection conn = null;
+        try {
+            conn = new DBContext().getConnection();
+            conn.setAutoCommit(false);
+            conn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+
+            try (PreparedStatement ps = conn.prepareStatement(checkCustomerUsed)) {
+                ps.setInt(1, customerID);
+                ps.setInt(2, voucherID);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next() && rs.getInt(1) > 0) {
+                        conn.rollback();
+                        return USAGE_ALREADY_USED;
+                    }
+                }
+            }
+
+            if (quantity != null) {
+                try (PreparedStatement ps = conn.prepareStatement(checkQuantity)) {
+                    ps.setInt(1, voucherID);
+                    try (ResultSet rs = ps.executeQuery()) {
+                        if (rs.next() && rs.getInt(1) >= quantity) {
+                            conn.rollback();
+                            return USAGE_OUT_OF_QUANTITY;
+                        }
+                    }
+                }
+            }
+
+            try (PreparedStatement ps = conn.prepareStatement(insert)) {
+                ps.setInt(1, customerID);
+                ps.setInt(2, voucherID);
+                ps.executeUpdate();
+            }
+
+            conn.commit();
+            return USAGE_OK;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+            // SQLState bắt đầu bằng "23" = integrity constraint violation (vi phạm UNIQUE)
+            if (e.getSQLState() != null && e.getSQLState().startsWith("23")) {
+                return USAGE_ALREADY_USED;
+            }
+            return USAGE_ERROR;
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }
     }
 
     private void setQuantityParam(PreparedStatement ps, int idx, Integer quantity)
             throws SQLException {
-        // TODO: implement
+        if (quantity == null) {
+            ps.setNull(idx, Types.INTEGER);
+        } else {
+            ps.setInt(idx, quantity);
+        }
     }
 
     private void setDoubleParam(PreparedStatement ps, int idx, Double value)
             throws SQLException {
-        // TODO: implement
+        if (value == null) {
+            ps.setNull(idx, Types.DECIMAL);
+        } else {
+            ps.setDouble(idx, value);
+        }
     }
 }
