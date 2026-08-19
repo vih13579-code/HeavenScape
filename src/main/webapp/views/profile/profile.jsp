@@ -89,7 +89,16 @@
                                 class="input-style">
                             <p id="phoneError" class="text-red-500 text-sm mt-1 hidden"></p>
                         </div>
-
+                        <div>
+                            <label class="block mb-2 font-medium">
+                                Status
+                            </label>
+                            <input
+                                type="text"
+                                value="${customer.status}"
+                                disabled
+                                class="input-style bg-gray-100">
+                        </div>
                         <div>
                             <label class="block mb-2 font-medium">
                                 Gender
