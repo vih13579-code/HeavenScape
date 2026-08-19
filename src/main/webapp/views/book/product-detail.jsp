@@ -773,8 +773,7 @@
                                             <span
                                                 class="font-bold text-primary">HeavenScape</span>
                                         </div>
-                                        <p class="text-gray-700 text-sm leading-relaxed">
-                                            ${review.adminReply}</p>
+                                        <p class="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap break-words"><c:out value="${review.adminReply}"/></p>
                                             <c:if test="${review.adminReplyDate != null}">
                                             <div class="text-xs text-gray-400 mt-2">
                                                 <fmt:formatDate

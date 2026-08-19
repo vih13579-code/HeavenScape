@@ -171,18 +171,6 @@ public class VoucherController extends HttpServlet {
         response.sendRedirect(request.getContextPath() + "/dashboard/voucher-management");
     }
 
-    private static class VoucherInput {
-        String    code;
-        double    discount;
-        Integer   quantity;
-        Timestamp startDate;
-        Timestamp endDate;
-        String    status;
-        Double    minOrderValue;
-        Double    maxDiscountValue;
-        String    errorMsg;
-    }
-
     private VoucherInput validateVoucherInput(HttpServletRequest request, boolean isCreate) {
         VoucherInput v = new VoucherInput();
 

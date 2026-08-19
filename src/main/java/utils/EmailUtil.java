@@ -15,8 +15,8 @@ import java.util.Properties;
  */
 public class EmailUtil {
 
-    private static final String FROM_EMAIL = "khangnpce181578@fpt.edu.vn";
-    private static final String APP_PASSWORD = "cdln botz auro shjm";
+    private static final String FROM_EMAIL = "minhnldce181159@fpt.edu.vn";
+    private static final String APP_PASSWORD = "ktue pxfq dwib djds";
 
     public static void sendOtp(String toEmail, String otp) throws MessagingException, UnsupportedEncodingException {
         Properties props = new Properties();

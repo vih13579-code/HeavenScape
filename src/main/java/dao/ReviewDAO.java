@@ -257,7 +257,8 @@ public class ReviewDAO {
                 + "SET adminID = ?, "
                 + "adminReply = ?, "
                 + "adminReplyDate = GETDATE() "
-                + "WHERE reviewID = ?";
+                + "WHERE reviewID = ? "
+                + "AND (adminReply IS NULL OR LTRIM(RTRIM(adminReply)) = '')";
 
         try {
 
@@ -280,6 +281,40 @@ public class ReviewDAO {
             e.printStackTrace();
         }
 
+        return false;
+    }
+
+    public boolean updateReplyReview(int reviewID, int adminID, String reply) {
+        String sql = "UPDATE Review "
+                + "SET adminID = ?, adminReply = ?, adminReplyDate = GETDATE() "
+                + "WHERE reviewID = ? "
+                + "AND adminReply IS NOT NULL AND LTRIM(RTRIM(adminReply)) <> ''";
+
+        try (Connection conn = db.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, adminID);
+            ps.setString(2, reply);
+            ps.setInt(3, reviewID);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean deleteReplyReview(int reviewID) {
+        String sql = "UPDATE Review "
+                + "SET adminID = NULL, adminReply = NULL, adminReplyDate = NULL "
+                + "WHERE reviewID = ? "
+                + "AND adminReply IS NOT NULL AND LTRIM(RTRIM(adminReply)) <> ''";
+
+        try (Connection conn = db.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, reviewID);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return false;
     }
 

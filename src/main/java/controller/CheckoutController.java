@@ -119,7 +119,7 @@ public class CheckoutController extends HttpServlet {
         if (voucherIdObj != null) {
             String code = (String) session.getAttribute(SESSION_VOUCHER_CODE);
             VoucherDAO voucherDAO = new VoucherDAO();
-            VoucherResult recheck = validateVoucher(code, account.getId(), total, voucherDAO);
+            VoucherValidationResult recheck = validateVoucher(code, account.getId(), total, voucherDAO);
 
             if (recheck.success) {
                 session.setAttribute(SESSION_VOUCHER_DISCOUNT, recheck.discountAmount);
@@ -234,7 +234,7 @@ public class CheckoutController extends HttpServlet {
         if (appliedVoucherID != null) {
             VoucherDAO voucherDAO = new VoucherDAO();
             String appliedCode = (String) session.getAttribute(SESSION_VOUCHER_CODE);
-            VoucherResult recheck = validateVoucher(appliedCode, account.getId(), total, voucherDAO);
+            VoucherValidationResult recheck = validateVoucher(appliedCode, account.getId(), total, voucherDAO);
 
             if (recheck.success) {
                 finalTotal = total.subtract(BigDecimal.valueOf(recheck.discountAmount));
@@ -395,16 +395,9 @@ public class CheckoutController extends HttpServlet {
     private static final String SESSION_VOUCHER_CODE = "appliedVoucherCode";
     private static final String SESSION_VOUCHER_DISCOUNT = "appliedVoucherDiscount";
 
-    private static class VoucherResult {
-
-        boolean success;
-        String message;
-        Voucher voucher;
-        double discountAmount;
-    }
-
-    private VoucherResult validateVoucher(String code, int customerID, BigDecimal orderTotal, VoucherDAO voucherDAO) {
-        VoucherResult r = new VoucherResult();
+    private VoucherValidationResult validateVoucher(String code, int customerID, BigDecimal orderTotal,
+            VoucherDAO voucherDAO) {
+        VoucherValidationResult r = new VoucherValidationResult();
 
         if (code == null || code.trim().isEmpty()) {
             r.message = "Please enter a voucher code.";
@@ -491,7 +484,7 @@ public class CheckoutController extends HttpServlet {
         BigDecimal total = cartDAO.calcSubtotal(cartItems);
 
         VoucherDAO voucherDAO = new VoucherDAO();
-        VoucherResult result = validateVoucher(code, account.getId(), total, voucherDAO);
+        VoucherValidationResult result = validateVoucher(code, account.getId(), total, voucherDAO);
 
         if (!result.success) {
             response.getWriter().write("{\"success\":false,\"message\":\"" + escapeJson(result.message) + "\"}");

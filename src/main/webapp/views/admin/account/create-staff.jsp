@@ -129,7 +129,7 @@
                                     <label class="text-sm font-semibold text-on-surface">Phone Number</label>
                                     <input id="phone" name="phone"
                                            class="w-full h-12 px-4 rounded-lg border border-outline-variant bg-white text-base"
-                                           placeholder="094 4567 234" type="tel"/>
+                                           placeholder="091 5783 916" type="tel"/>
                                 </div>
                             </div>
                         </div>

@@ -201,7 +201,7 @@
                                             <tr class="hover:bg-surface-container-lowest transition-colors group ${review.isHidden ? 'opacity-50 bg-gray-100' : ''}">
                                                 <td class="px-6 py-5">
                                                     <div class="flex items-center gap-3">
-                                                        <span class="font-label-md text-label-md text-on-surface">${review.customerName}</span>
+                                                        <span class="font-label-md text-label-md text-on-surface"><c:out value="${review.customerName}"/></span>
                                                         <c:if test="${review.isHidden}">
                                                             <span class="text-xs px-2 py-1 bg-gray-400 text-white rounded">Hidden</span>
                                                         </c:if>
@@ -210,7 +210,7 @@
                                                 <td class="px-6 py-5">
                                                     <div class="flex items-center gap-3">
                                                        
-                                                        <span class="font-body-sm text-body-sm text-on-surface max-w-[120px] line-clamp-2">${review.bookTitle}</span>
+                                                        <span class="font-body-sm text-body-sm text-on-surface max-w-[120px] line-clamp-2"><c:out value="${review.bookTitle}"/></span>
                                                     </div>
                                                 </td>
                                                 <td class="px-6 py-5">
@@ -221,7 +221,7 @@
                                                     </div>
                                                 </td>
                                                 <td class="px-6 py-5">
-                                                    <p class="font-body-sm text-body-sm text-on-surface-variant max-w-[200px] line-clamp-2">${review.comment}</p>
+                                                    <p class="font-body-sm text-body-sm text-on-surface-variant max-w-[200px] line-clamp-2"><c:out value="${review.comment}"/></p>
                                                 </td>
                                                 <td class="px-6 py-5">
                                                     <span class="font-body-sm text-body-sm text-on-surface-variant">
@@ -243,10 +243,10 @@
                                                         <c:if test="${review.status != 'Approved' && !review.isHidden && review.customerStatus == 'active'}">
                                                             <button data-reply-btn 
                                                                     data-review-id="${review.reviewID}"
-                                                                    data-customer-name="${review.customerName}"
-                                                                    data-book-title="${review.bookTitle}"
+                                                                    data-customer-name="${fn:escapeXml(review.customerName)}"
+                                                                    data-book-title="${fn:escapeXml(review.bookTitle)}"
                                                                     data-rating="${review.rating}"
-                                                                    data-comment="${review.comment}"
+                                                                    data-comment="${fn:escapeXml(review.comment)}"
                                                                     class="p-2 hover:bg-surface-container-low rounded-lg text-primary transition-all border border-transparent hover:border-primary/20" 
                                                                     title="Reply">
                                                                 <span class="material-symbols-outlined text-[20px]" data-icon="reply">reply</span>
@@ -271,6 +271,47 @@
                                                     </div>
                                                 </td>
                                             </tr>
+                                            <c:if test="${not empty review.adminReply}">
+                                                <tr class="${review.isHidden ? 'opacity-50 bg-gray-100' : 'bg-blue-50/40'}">
+                                                    <td colspan="7" class="px-6 pb-5 pt-0">
+                                                        <div class="ml-6 mt-1 p-4 bg-blue-50 rounded-xl border-l-4 border-primary flex items-start justify-between gap-4">
+                                                            <div class="min-w-0">
+                                                                <div class="flex flex-wrap items-center gap-2 mb-2">
+                                                                    <span class="material-symbols-outlined text-primary text-[19px]">forum</span>
+                                                                    <span class="font-label-md text-primary">Reply Feedback</span>
+                                                                    <c:if test="${review.adminReplyDate != null}">
+                                                                        <span class="text-xs text-on-surface-variant">
+                                                                            <fmt:formatDate value="${review.adminReplyDate}" pattern="dd/MM/yyyy HH:mm"/>
+                                                                        </span>
+                                                                    </c:if>
+                                                                </div>
+                                                                <p class="font-body-sm text-body-sm text-on-surface whitespace-pre-wrap break-words"><c:out value="${review.adminReply}"/></p>
+                                                            </div>
+                                                            <div class="flex shrink-0 gap-2">
+                                                                <button type="button"
+                                                                        data-edit-reply-btn
+                                                                        data-review-id="${review.reviewID}"
+                                                                        data-customer-name="${fn:escapeXml(review.customerName)}"
+                                                                        data-book-title="${fn:escapeXml(review.bookTitle)}"
+                                                                        data-rating="${review.rating}"
+                                                                        data-comment="${fn:escapeXml(review.comment)}"
+                                                                        data-reply="${fn:escapeXml(review.adminReply)}"
+                                                                        class="p-2 bg-white hover:bg-primary/10 rounded-lg text-primary border border-primary/20 transition-all"
+                                                                        title="Edit Reply Feedback">
+                                                                    <span class="material-symbols-outlined text-[19px]">edit</span>
+                                                                </button>
+                                                                <button type="button"
+                                                                        data-delete-reply-btn
+                                                                        data-review-id="${review.reviewID}"
+                                                                        class="p-2 bg-white hover:bg-error/10 rounded-lg text-error border border-error/20 transition-all"
+                                                                        title="Delete Reply Feedback">
+                                                                    <span class="material-symbols-outlined text-[19px]">delete</span>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </c:if>
                                         </c:forEach>
                                     </c:when>
                                     <c:otherwise>
@@ -372,7 +413,7 @@
                         <div class="bg-white w-[600px] rounded-xl p-6 relative max-h-[90vh] overflow-y-auto">
                             <button id="closeReplyModal" class="absolute top-3 right-4 text-2xl hover:text-gray-500">×</button>
                             
-                            <h3 class="text-xl font-bold mb-4">Reply to Review</h3>
+                            <h3 id="replyModalTitle" class="text-xl font-bold mb-4">Reply to Review</h3>
                             
                             <div id="reviewPreview" class="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
                                 <p class="text-sm text-gray-600 mb-2">
@@ -392,7 +433,7 @@
                             
                             <form id="replyForm">
                                 <input type="hidden" id="replyReviewID" name="reviewID" value="">
-                                <input type="hidden" name="action" value="reply">
+                                <input type="hidden" id="replyAction" name="action" value="reply">
                                 
                                 <div class="mb-4">
                                     <label class="block font-semibold mb-2">Your Reply</label>
@@ -411,7 +452,7 @@
                                         Cancel
                                     </button>
                                     <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg hover:opacity-90">
-                                        Send Reply
+                                        <span id="replySubmitText">Send Reply</span>
                                     </button>
                                 </div>
                             </form>
@@ -422,7 +463,7 @@
                 document.body.insertAdjacentHTML('beforeend', modalHTML);
             }
 
-            function openReplyModal(reviewID, customerName, bookTitle, rating, comment) {
+            function openReplyModal(reviewID, customerName, bookTitle, rating, comment, existingReply, editMode) {
                 currentReviewID = reviewID;
 
                 document.getElementById('previewCustomerName').textContent = customerName;
@@ -430,7 +471,10 @@
                 document.getElementById('previewRating').textContent = '⭐'.repeat(rating);
                 document.getElementById('previewComment').textContent = comment;
                 document.getElementById('replyReviewID').value = reviewID;
-                document.getElementById('replyContent').value = '';
+                document.getElementById('replyContent').value = existingReply || '';
+                document.getElementById('replyAction').value = editMode ? 'updateReply' : 'reply';
+                document.getElementById('replyModalTitle').textContent = editMode ? 'Edit Reply Feedback' : 'Reply to Review';
+                document.getElementById('replySubmitText').textContent = editMode ? 'Save Changes' : 'Send Reply';
 
                 replyModal.classList.remove('hidden');
                 replyModal.classList.add('flex');
@@ -484,7 +528,7 @@
                         })
                         .then(data => {
                             if (data.success) {
-                                showToast(data.message || 'Reply sent successfully');
+                                showToast(data.message || 'Reply saved successfully');
                                 closeModal();
 
                                 // Reload trang sau 1 giây
@@ -493,6 +537,35 @@
                                 }, 1000);
                             } else {
                                 showToast(data.message || 'An error occurred', true);
+                            }
+                        })
+                        .catch(err => {
+                            console.error('Error:', err);
+                            showToast('An error occurred', true);
+                        });
+            }
+
+            function deleteReply(reviewID) {
+                const formData = new URLSearchParams();
+                formData.append('action', 'deleteReply');
+                formData.append('reviewID', reviewID);
+
+                fetch(REVIEW_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: formData.toString()
+                })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                showToast(data.message || 'Reply deleted successfully');
+                                setTimeout(() => {
+                                    location.reload();
+                                }, 1000);
+                            } else {
+                                showToast(data.message || 'Could not delete the reply', true);
                             }
                         })
                         .catch(err => {
@@ -586,6 +659,8 @@
                 initReplyModal();
                 initConfirmModal();
                 initReplyButtons();
+                initEditReplyButtons();
+                initDeleteReplyButtons();
                 initHideButtons();
                 initLockButtons();
             });
@@ -601,7 +676,40 @@
                         const rating = this.dataset.rating;
                         const comment = this.dataset.comment;
 
-                        openReplyModal(reviewID, customerName, bookTitle, rating, comment);
+                        openReplyModal(reviewID, customerName, bookTitle, rating, comment, '', false);
+                    });
+                });
+            }
+
+            function initEditReplyButtons() {
+                document.querySelectorAll('[data-edit-reply-btn]').forEach(btn => {
+                    btn.addEventListener('click', function (e) {
+                        e.preventDefault();
+
+                        openReplyModal(
+                                this.dataset.reviewId,
+                                this.dataset.customerName,
+                                this.dataset.bookTitle,
+                                this.dataset.rating,
+                                this.dataset.comment,
+                                this.dataset.reply,
+                                true
+                                );
+                    });
+                });
+            }
+
+            function initDeleteReplyButtons() {
+                document.querySelectorAll('[data-delete-reply-btn]').forEach(btn => {
+                    btn.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        const reviewID = this.dataset.reviewId;
+
+                        openConfirmModal(
+                                'Delete Reply Feedback',
+                                'Are you sure you want to delete this reply? The customer review will remain unchanged.',
+                                () => deleteReply(reviewID)
+                        );
                     });
                 });
             }

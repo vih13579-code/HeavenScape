@@ -123,7 +123,7 @@
                                             </form>
                                         </c:if>
 
-                                        <a href="${pageContext.request.contextPath}/profile/order-history?action=view&orderID=${order.orderID}">
+                                        <a href="${pageContext.request.contextPath}/profile/order-history?action=detail&orderID=${order.orderID}">
                                             <button type="button" class="px-5 py-2 border border-[#17479D] text-[#17479D] rounded-lg text-sm font-medium hover:bg-blue-50 transition-colors">
                                                 Details
                                             </button>

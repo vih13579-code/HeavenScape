@@ -11,6 +11,38 @@ import java.util.List;
 
 public class AccountDAO {
 
+    /**
+     * Reloads the account represented by a session from its source table.
+     * Customer IDs and staff/admin IDs can overlap, so the role is required to
+     * select the correct table.
+     */
+    public Account getAccountById(int id, String role) {
+        boolean customer = "customer".equalsIgnoreCase(role);
+        String sql = customer
+                ? "SELECT customerID AS id, fullname, email, phone, role, status FROM Customer WHERE customerID = ?"
+                : "SELECT accountID AS id, fullname, email, phone, role, status FROM Account WHERE accountID = ?";
+
+        try (Connection conn = new DBContext().getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new Account(
+                            rs.getInt("id"),
+                            rs.getString("fullname"),
+                            rs.getString("email"),
+                            rs.getString("phone"),
+                            customer ? "customer" : rs.getString("role"),
+                            rs.getString("status")
+                    );
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public Account checkLogin(String email, String password) {
         String hashedPassword = HashMD5.hash(password);
         DBContext db = new DBContext();

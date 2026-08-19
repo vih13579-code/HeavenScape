@@ -35,7 +35,6 @@ public class OrderHistoryController extends HttpServlet {
         switch (action) {
             case "view":
                 int viewOrderID = toInt(request.getParameter("orderID"), 0);
-                request.getSession().setAttribute("allowed_order_id", viewOrderID);
                 response.sendRedirect(request.getContextPath() + "/profile/order-history?action=detail&orderID=" + viewOrderID);
                 break;
             case "detail":
@@ -131,11 +130,10 @@ public class OrderHistoryController extends HttpServlet {
 
         Order order = orderDAO.getOrderByID(orderID);
 
-        HttpSession session = request.getSession();
-        Integer allowedOrderID = (Integer) session.getAttribute("allowed_order_id");
-        session.removeAttribute("allowed_order_id");
-
-        if (allowedOrderID == null || allowedOrderID != orderID || order == null || order.getCustomerID() != account.getId()) {
+        // The detail URL must be reloadable and browser-history safe. Access is
+        // authorized by the order owner in the database, not by a one-time
+        // session flag that disappears after the first request.
+        if (orderID <= 0 || order == null || order.getCustomerID() != account.getId()) {
             request.getRequestDispatcher("/views/error/404.jsp").forward(request, response);
             return;
         }
@@ -165,7 +163,6 @@ public class OrderHistoryController extends HttpServlet {
         if ("list".equalsIgnoreCase(redirectTarget)) {
             redirectUrl = request.getContextPath() + "/profile/order-history";
         } else {
-            request.getSession().setAttribute("allowed_order_id", orderID);
             redirectUrl = request.getContextPath() + "/profile/order-history?action=detail&orderID=" + orderID;
         }
 

@@ -90,6 +90,12 @@ public class ReviewController extends HttpServlet {
                 case "reply":
                     handleReplyReview(request, response);
                     break;
+                case "updateReply":
+                    handleUpdateReply(request, response);
+                    break;
+                case "deleteReply":
+                    handleDeleteReply(request, response);
+                    break;
                 case "hide":
                     handleHideReview(request, response);
                     break;
@@ -273,6 +279,76 @@ public class ReviewController extends HttpServlet {
             sendJson(response, "{\"success\":true,\"message\":\"Reply sent successfully\"}");
         } else {
             sendJson(response, "{\"success\":false,\"message\":\"Could not send the reply\"}");
+        }
+    }
+
+    private void handleUpdateReply(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        if (!isAdminOrStaff(request)) {
+            sendJson(response, "{\"success\":false,\"message\":\"You do not have permission to perform this action\"}");
+            return;
+        }
+
+        int reviewID = toInt(request.getParameter("reviewID"), 0);
+        String reply = request.getParameter("reply");
+        if (reviewID <= 0) {
+            sendJson(response, "{\"success\":false,\"message\":\"Invalid review\"}");
+            return;
+        }
+        if (reply == null || reply.trim().isEmpty()) {
+            sendJson(response, "{\"success\":false,\"message\":\"Please enter a reply\"}");
+            return;
+        }
+
+        ReviewDAO dao = new ReviewDAO();
+        Review review = dao.getReviewByID(reviewID);
+        if (review == null) {
+            sendJson(response, "{\"success\":false,\"message\":\"Review does not exist\"}");
+            return;
+        }
+        if (review.getAdminReply() == null || review.getAdminReply().trim().isEmpty()) {
+            sendJson(response, "{\"success\":false,\"message\":\"This review does not have a reply to update\"}");
+            return;
+        }
+
+        Account acc = getAccount(request);
+        boolean success = dao.updateReplyReview(reviewID, acc.getId(), reply.trim());
+        if (success) {
+            sendJson(response, "{\"success\":true,\"message\":\"Reply updated successfully\"}");
+        } else {
+            sendJson(response, "{\"success\":false,\"message\":\"Could not update the reply\"}");
+        }
+    }
+
+    private void handleDeleteReply(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        if (!isAdminOrStaff(request)) {
+            sendJson(response, "{\"success\":false,\"message\":\"You do not have permission to perform this action\"}");
+            return;
+        }
+
+        int reviewID = toInt(request.getParameter("reviewID"), 0);
+        if (reviewID <= 0) {
+            sendJson(response, "{\"success\":false,\"message\":\"Invalid review\"}");
+            return;
+        }
+
+        ReviewDAO dao = new ReviewDAO();
+        Review review = dao.getReviewByID(reviewID);
+        if (review == null) {
+            sendJson(response, "{\"success\":false,\"message\":\"Review does not exist\"}");
+            return;
+        }
+        if (review.getAdminReply() == null || review.getAdminReply().trim().isEmpty()) {
+            sendJson(response, "{\"success\":false,\"message\":\"This review does not have a reply to delete\"}");
+            return;
+        }
+
+        boolean success = dao.deleteReplyReview(reviewID);
+        if (success) {
+            sendJson(response, "{\"success\":true,\"message\":\"Reply deleted successfully\"}");
+        } else {
+            sendJson(response, "{\"success\":false,\"message\":\"Could not delete the reply\"}");
         }
     }
 

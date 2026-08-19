@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.util.Collections;
 import model.Account;
 
 public class AccountManagementController extends HttpServlet {
@@ -45,8 +46,6 @@ public class AccountManagementController extends HttpServlet {
         } catch (Exception ignored) {
         }
 
-        int offset = (currentPage - 1) * pageSize;
-
         boolean queryCustomers = role.isEmpty() || role.equals("customer");
         boolean queryStaffs = role.isEmpty() || role.equals("staff") || role.equals("admin");
 
@@ -61,12 +60,32 @@ public class AccountManagementController extends HttpServlet {
         int totalRecords = totalCustomers + totalStaffs;
         int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
 
-        if (queryCustomers) {
-            request.setAttribute("customers", customerDAO.searchCustomers(keyword, status, offset, pageSize));
+        if (totalPages > 0 && currentPage > totalPages) {
+            currentPage = totalPages;
         }
 
-        if (queryStaffs) {
-            request.setAttribute("staffs", accountDAO.searchStaffs(keyword, staffRoleFilter, status, offset, pageSize));
+        int offset = (currentPage - 1) * pageSize;
+        int remaining = pageSize;
+
+        request.setAttribute("customers", Collections.emptyList());
+        request.setAttribute("staffs", Collections.emptyList());
+
+        // Customer and Account are two physical tables, but the UI presents them as
+        // one continuous list. Consume the global offset from Customer first, then
+        // use any remaining slots (and offset) for Account.
+        int customerOffset = Math.min(offset, totalCustomers);
+        int customerLimit = Math.min(remaining, totalCustomers - customerOffset);
+        if (queryCustomers && customerLimit > 0) {
+            request.setAttribute("customers",
+                    customerDAO.searchCustomers(keyword, status, customerOffset, customerLimit));
+            remaining -= customerLimit;
+        }
+
+        int staffOffset = Math.max(0, offset - totalCustomers);
+        int staffLimit = Math.min(remaining, Math.max(0, totalStaffs - staffOffset));
+        if (queryStaffs && staffLimit > 0) {
+            request.setAttribute("staffs",
+                    accountDAO.searchStaffs(keyword, staffRoleFilter, status, staffOffset, staffLimit));
         }
 
         request.setAttribute("currentPage", currentPage);

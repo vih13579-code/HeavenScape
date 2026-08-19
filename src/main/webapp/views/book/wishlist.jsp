@@ -61,11 +61,11 @@
     }
 </style>
 
-<section class="hero-gradient px-8 py-7 relative overflow-hidden">
+<section class="hs-catalog-hero">
     <div class="relative z-10">
-        <div class="bg-secondary text-primary font-bold text-xs px-3 py-1 rounded-full inline-block mb-2 tracking-wide uppercase">Wishlist</div>
-        <h1 class="text-white text-[28px] font-black">My Wishlist</h1>
-        <p class="text-white/70 text-sm mt-1">${wishlistCount} books in this list</p>
+        <div class="hs-eyebrow mb-2">Wishlist</div>
+        <h1 class="font-headline-md text-[36px] md:text-[44px] font-semibold text-primary leading-tight">My Wishlist</h1>
+        <p class="text-on-surface-variant text-base mt-2">${wishlistCount} books in this list</p>
     </div>
 </section>
 

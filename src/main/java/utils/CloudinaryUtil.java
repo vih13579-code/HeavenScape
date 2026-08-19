@@ -8,10 +8,11 @@ import java.util.Map;
 
 public class CloudinaryUtil {
 
-    private static final String CLOUD_NAME = "duwjwn3lx";
-    private static final String API_KEY = "936219846982452";
-    private static final String API_SECRET = "KA2oDjHCqPVeP4qfr8BFLLap6Ao";
-
+    private static final String CLOUD_NAME = "llfxqkny";
+    private static final String API_KEY = "563459248983587";
+    private static final String API_SECRET ="c9ypetmB_8oAkEypn_EZAyhJknM";
+// API_KEY = "936219846982452";
+// API_SECRET = "KA2oDjHCqPVeP4qfr8BFLLap6Ao";
     private static Cloudinary cloudinary;
 
     static {
