@@ -193,12 +193,12 @@
                                                     <c:when test="${order.status == 'cancelled'}">
                                                         <c:choose>
                                                             <c:when
-                                                                test="${order.paymentMethod == 'vnpay' && order.paymentStatus == 'pending_refund'}">
+                                                                test="${order.paymentMethod == 'cod' && order.paymentStatus == 'pending_refund'}">
                                                             <span
                                                                 class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-700 text-xs font-semibold">Refund Pending</span>
                                                             </c:when>
                                                             <c:when
-                                                                test="${order.paymentMethod == 'vnpay' && order.paymentStatus == 'refunded'}">
+                                                                test="${order.paymentMethod == 'cod' && order.paymentStatus == 'refunded'}">
                                                             <span
                                                                 class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-blue-100 text-[#134aa4] text-xs font-semibold">Refunded</span>
                                                             </c:when>

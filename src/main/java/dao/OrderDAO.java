@@ -237,7 +237,11 @@ public class OrderDAO {
         List<OrderDetail> details = new ArrayList<>();
 
         String sql = "SELECT od.orderDetailID, od.orderID, od.bookID, od.quantity, od.unit_price, "
-                + "       b.title, b.thumbnail "
+                + "       b.title, b.thumbnail, "
+                + "       (SELECT STRING_AGG(a.fullname, ', ') "
+                + "        FROM BookAuthor ba "
+                + "        JOIN Author a ON a.authorID = ba.authorID "
+                + "        WHERE ba.bookID = b.bookID) AS authors "
                 + "FROM OrderDetail od "
                 + "JOIN Book b ON b.bookID = od.bookID "
                 + "WHERE od.orderID = ?";
@@ -256,6 +260,7 @@ public class OrderDAO {
                 d.setUnitPrice(rs.getBigDecimal("unit_price"));
                 d.setTitle(rs.getString("title"));
                 d.setThumbnail(rs.getString("thumbnail"));
+                d.setAuthorsDisplay(rs.getString("authors"));
                 details.add(d);
             }
 
@@ -281,6 +286,23 @@ public class OrderDAO {
             e.printStackTrace();
         }
 
+        return false;
+    }
+
+    public boolean requestCodRefund(int orderID, int customerID, String refundReason) {
+        String sql = "UPDATE [Order] "
+                + "SET status = 'cancelled', payment_status = 'pending_refund', cancel_reason = ? "
+                + "WHERE orderID = ? AND customerID = ? "
+                + "AND status = 'completed' AND payment_method = 'cod' AND payment_status = 'paid'";
+
+        try (Connection conn = new DBContext().getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, refundReason);
+            ps.setInt(2, orderID);
+            ps.setInt(3, customerID);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return false;
     }
 
@@ -326,7 +348,7 @@ public class OrderDAO {
 
     public boolean confirmRefund(int orderID) {
         String sql = "UPDATE [Order] SET payment_status = 'refunded' "
-                + "WHERE orderID = ? AND payment_status = 'pending_refund'";
+                + "WHERE orderID = ? AND payment_method = 'cod' AND payment_status = 'pending_refund'";
         try (Connection conn = new DBContext().getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, orderID);
             return ps.executeUpdate() > 0;
@@ -348,9 +370,9 @@ public class OrderDAO {
                 int overdueOrderID = rsGet.getInt("orderID");
                 Order overdueOrder = getOrderByID(overdueOrderID);
                 if (overdueOrder != null) {
-                    boolean isVnpay = "vnpay".equalsIgnoreCase(overdueOrder.getPaymentMethod());
+                    boolean isCod = "cod".equalsIgnoreCase(overdueOrder.getPaymentMethod());
                     boolean isPaid = "paid".equalsIgnoreCase(overdueOrder.getPaymentStatus());
-                    if (isVnpay && isPaid) {
+                    if (isCod && isPaid) {
                         String autoCancelReason = "Order was not approved within two days";
                         String sqlAutoCancel = "UPDATE [Order] SET status = 'cancelled', cancel_reason = ? WHERE orderID = ?";
                         try (Connection connAC = new DBContext().getConnection(); PreparedStatement psAC = connAC.prepareStatement(sqlAutoCancel)) {

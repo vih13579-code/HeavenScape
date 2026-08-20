@@ -8,11 +8,7 @@
             <p class="max-w-sm text-sm leading-6 text-on-surface-variant">
                 Online bookstore for authentic titles, convenient ordering and a simple reading journey.
             </p>
-            <div class="text-xs text-on-surface-variant leading-6">
-                FPT University - SWP391.3w - Group 2<br>
-                Can Tho, Vietnam
-            </div>
-        </div>
+         </div>
 
         <div>
             <h2 class="hs-footer-title">Explore</h2>

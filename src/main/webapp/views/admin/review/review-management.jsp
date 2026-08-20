@@ -191,6 +191,7 @@
                                     <th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Book</th>
                                     <th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Review</th>
                                     <th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Content</th>
+                                    <th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Reply</th>
                                     <th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Date</th>
                                     <th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Status</th>
                                     <th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-right">Actions</th>
@@ -224,6 +225,27 @@
                                                 </td>
                                                 <td class="px-6 py-5">
                                                     <p class="font-body-sm text-body-sm text-on-surface-variant max-w-[200px] line-clamp-2">${review.comment}</p>
+                                                </td>
+                                                <td class="px-6 py-5">
+                                                    <c:choose>
+                                                        <c:when test="${not empty review.adminReply}">
+                                                            <div class="max-w-[260px] rounded-lg border border-primary/20 bg-primary-container/40 px-3 py-2">
+                                                                <div class="mb-1 flex items-center gap-1.5 text-primary">
+                                                                    <span class="material-symbols-outlined text-[16px]" data-icon="reply">reply</span>
+                                                                    <span class="font-label-sm text-label-sm">Staff/Admin reply</span>
+                                                                </div>
+                                                                <p class="whitespace-pre-line break-words font-body-sm text-body-sm text-on-surface"><c:out value="${review.adminReply}"/></p>
+                                                                <c:if test="${review.adminReplyDate != null}">
+                                                                    <span class="mt-1.5 block text-[11px] text-on-surface-variant">
+                                                                        <fmt:formatDate value="${review.adminReplyDate}" pattern="dd/MM/yyyy HH:mm"/>
+                                                                    </span>
+                                                                </c:if>
+                                                            </div>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span class="font-body-sm text-body-sm italic text-on-surface-variant">Not replied yet</span>
+                                                        </c:otherwise>
+                                                    </c:choose>
                                                 </td>
                                                 <td class="px-6 py-5">
                                                     <span class="font-body-sm text-body-sm text-on-surface-variant">
@@ -277,7 +299,7 @@
                                     </c:when>
                                     <c:otherwise>
                                         <tr>
-                                            <td colspan="7" class="px-6 py-8 text-center">
+                                            <td colspan="8" class="px-6 py-8 text-center">
                                                 <p class="font-body-md text-on-surface-variant">No reviews found</p>
                                             </td>
                                         </tr>

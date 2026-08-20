@@ -2,233 +2,567 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ include file="/views/layout/homepage/header.jsp" %>
-
 <%@ include file="/views/layout/common/toast.jsp" %>
 
 <style>
-    .hs-primary-button { background:#C92127; color:#fff; border-radius:9999px; transition: background .15s, transform .15s; text-align:center; }
-    .hs-primary-button:hover { background:#8E171B; }
-    .hs-cart-card { background:#fff; border:1px solid #E3E3E6; border-radius:12px; }
-    .hs-summary-card { background:#fff; border:1px solid #E3E3E6; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,.04); }
-    .hs-modal-card { border-radius:12px; box-shadow:0 20px 50px rgba(0,0,0,.2); }
+    .fhs-cart-page {
+        --fhs-red: #C92127;
+        --fhs-red-hover: #A8191F;
+        --fhs-bg: #F0F0F0;
+        --fhs-card: #FFFFFF;
+        --fhs-text: #333333;
+        --fhs-muted: #777777;
+        --fhs-border: #E6E6E6;
+        --fhs-green: #2F8F46;
+        font-family: Arial, Helvetica, sans-serif;
+        color: var(--fhs-text);
+        padding-top: 18px;
+        padding-bottom: 28px;
+    }
+
+    .fhs-cart-title {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        margin: 0 0 14px;
+        font-size: 20px;
+        line-height: 1.3;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #333;
+    }
+
+    .fhs-cart-title-count {
+        font-size: 14px;
+        font-weight: 400;
+        text-transform: none;
+        color: #555;
+    }
+
+    .fhs-cart-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 360px;
+        gap: 18px;
+        align-items: start;
+    }
+
+    .fhs-cart-card,
+    .fhs-cart-summary {
+        background: var(--fhs-card);
+        border-radius: 8px;
+        box-shadow: 0 1px 2px rgba(0,0,0,.04);
+    }
+
+    .fhs-cart-list-head {
+        display: grid;
+        grid-template-columns: minmax(260px, 1fr) 118px 140px 42px;
+        gap: 12px;
+        align-items: center;
+        padding: 13px 20px;
+        border-bottom: 1px solid var(--fhs-border);
+        font-size: 13px;
+        font-weight: 600;
+        color: #555;
+    }
+
+    .fhs-cart-list-head span:nth-child(2),
+    .fhs-cart-list-head span:nth-child(3) {
+        text-align: center;
+    }
+
+    .fhs-cart-item {
+        display: grid;
+        grid-template-columns: minmax(260px, 1fr) 118px 140px 42px;
+        gap: 12px;
+        align-items: center;
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--fhs-border);
+    }
+
+    .fhs-cart-item:last-child {
+        border-bottom: 0;
+    }
+
+    .fhs-cart-product {
+        display: flex;
+        gap: 16px;
+        align-items: flex-start;
+        min-width: 0;
+    }
+
+    .fhs-cart-cover {
+        width: 92px;
+        height: 122px;
+        flex: 0 0 92px;
+        border: 1px solid #EFEFEF;
+        border-radius: 4px;
+        overflow: hidden;
+        background: #FAFAFA;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .fhs-cart-cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    .fhs-cart-cover-placeholder {
+        color: #AAA;
+    }
+
+    .fhs-cart-info {
+        min-width: 0;
+        padding-top: 2px;
+    }
+
+    .fhs-cart-name {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        font-size: 14px;
+        line-height: 1.45;
+        font-weight: 500;
+        color: #333;
+        transition: color .15s ease;
+    }
+
+    .fhs-cart-name:hover {
+        color: var(--fhs-red);
+    }
+
+    .fhs-cart-author {
+        margin-top: 5px;
+        font-size: 12px;
+        color: var(--fhs-muted);
+    }
+
+    .fhs-cart-unit-price {
+        margin-top: 12px;
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--fhs-red);
+    }
+
+    .fhs-stock-badge {
+        display: inline-block;
+        margin-top: 8px;
+        padding: 3px 8px;
+        border-radius: 4px;
+        background: #F4F4F4;
+        color: #8A8A8A;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .fhs-qty-wrap {
+        display: flex;
+        justify-content: center;
+    }
+
+    .hs-stepper {
+        display: inline-flex;
+        align-items: center;
+        height: 32px;
+        border: 1px solid #CFCFCF;
+        border-radius: 4px;
+        overflow: hidden;
+        background: #fff;
+    }
+
+    .hs-stepper button {
+        width: 31px;
+        height: 30px;
+        border: 0;
+        background: #fff;
+        color: #555;
+        font-size: 18px;
+        line-height: 1;
+        cursor: pointer;
+    }
+
+    .hs-stepper button:hover:not(:disabled) {
+        color: var(--fhs-red);
+        background: #FAFAFA;
+    }
+
+    .hs-stepper button:disabled {
+        cursor: not-allowed;
+        color: #C5C5C5;
+    }
+
+    .hs-stepper span {
+        width: 38px;
+        text-align: center;
+        font-size: 14px;
+        font-weight: 600;
+        color: #333;
+        border-left: 1px solid #E5E5E5;
+        border-right: 1px solid #E5E5E5;
+    }
+
+    .fhs-cart-subtotal {
+        text-align: center;
+        white-space: nowrap;
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--fhs-red);
+    }
+
+    .hs-remove-btn {
+        width: 34px;
+        height: 34px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        color: #777;
+        transition: all .15s ease;
+        justify-self: center;
+    }
+
+    .hs-remove-btn:hover {
+        color: var(--fhs-red);
+        background: #FFF1F1;
+    }
+
+    .fhs-cart-summary {
+        position: sticky;
+        top: 18px;
+        overflow: hidden;
+    }
+
+    .fhs-summary-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 14px 18px;
+        font-size: 14px;
+        color: #555;
+        border-bottom: 1px solid var(--fhs-border);
+    }
+
+    .fhs-summary-row strong {
+        color: #333;
+        text-align: right;
+    }
+
+    .fhs-summary-total {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 12px;
+        padding: 16px 18px;
+    }
+
+    .fhs-summary-total-label {
+        font-size: 15px;
+        font-weight: 700;
+        color: #333;
+    }
+
+    .fhs-summary-total-value {
+        font-size: 21px;
+        line-height: 1.15;
+        font-weight: 700;
+        color: var(--fhs-red);
+        text-align: right;
+        white-space: nowrap;
+    }
+
+    .fhs-checkout-area {
+        padding: 0 18px 16px;
+    }
+
+    #checkout-btn {
+        width: 100%;
+        min-height: 46px;
+        border-radius: 6px;
+        background: var(--fhs-red);
+        color: #fff;
+        font-size: 14px;
+        font-weight: 700;
+        text-transform: uppercase;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: background .15s ease;
+    }
+
+    #checkout-btn:hover:not(:disabled) {
+        background: var(--fhs-red-hover);
+    }
+
+    .fhs-secure-note {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 0 18px 16px;
+        color: #777;
+        font-size: 11px;
+    }
+
+    .fhs-empty-cart {
+        background: #fff;
+        border-radius: 8px;
+        min-height: 360px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        text-align: center;
+        padding: 40px 20px;
+    }
+
+    .fhs-empty-cart p {
+        font-size: 16px;
+        font-weight: 600;
+        color: #555;
+    }
+
+    .fhs-continue-btn {
+        min-width: 190px;
+        padding: 12px 20px;
+        border-radius: 6px;
+        background: var(--fhs-red);
+        color: white;
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .hs-modal-card {
+        border-radius: 8px;
+        box-shadow: 0 20px 50px rgba(0,0,0,.2);
+    }
+
+    @media (max-width: 1024px) {
+        .fhs-cart-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .fhs-cart-summary {
+            position: static;
+        }
+    }
+
+    @media (max-width: 680px) {
+        .fhs-cart-page {
+            padding-top: 14px;
+        }
+
+        .fhs-cart-list-head {
+            display: none;
+        }
+
+        .fhs-cart-item {
+            grid-template-columns: minmax(0, 1fr) 34px;
+            gap: 12px;
+            align-items: start;
+        }
+
+        .fhs-cart-product {
+            grid-column: 1;
+        }
+
+        .fhs-qty-wrap {
+            grid-column: 1;
+            justify-content: flex-start;
+            padding-left: 108px;
+            margin-top: -43px;
+        }
+
+        .fhs-cart-subtotal {
+            grid-column: 1;
+            text-align: left;
+            padding-left: 108px;
+            margin-top: 12px;
+        }
+
+        .hs-remove-btn {
+            grid-column: 2;
+            grid-row: 1;
+        }
+
+        .fhs-cart-cover {
+            width: 92px;
+            height: 122px;
+            flex-basis: 92px;
+        }
+
+        .fhs-summary-total-value {
+            font-size: 19px;
+        }
+    }
 </style>
 
-    <main class="fhs-page-inner min-h-[716px] text-on-surface">
+<main class="fhs-page-inner fhs-cart-page">
+    <h1 class="fhs-cart-title">
+        Shopping Cart
+        <span class="fhs-cart-title-count">(<span id="cart-heading-count">${empty totalQuantity ? 0 : totalQuantity}</span> products)</span>
+    </h1>
 
-        <div class="mb-10 md:mb-12">
-            <h1 class="text-[28px] md:text-[32px] font-bold text-primary mb-2">Your Cart</h1>
-            <p class="text-lg text-on-surface-variant">
-                You have <span id="cart-heading-count">${empty totalQuantity ? 0 : totalQuantity}</span> items in your cart.
-            </p>
-        </div>
+    <c:choose>
+        <c:when test="${empty cartItems}">
+            <div class="fhs-empty-cart">
+                <i data-lucide="shopping-cart" class="w-16 h-16 text-gray-300"></i>
+                <p>Your shopping cart is empty.</p>
+                <a href="${pageContext.request.contextPath}/home" class="fhs-continue-btn">Continue Shopping</a>
+            </div>
+        </c:when>
 
-        <c:choose>
-            <c:when test="${empty cartItems}">
-                <div
-                    class="w-full flex flex-col items-center justify-center py-20 space-y-6 text-center">
-                    <i data-lucide="shopping-cart" class="w-16 h-16 text-outline-variant"></i>
-                    <p class="text-2xl text-[#5C5C5F]">Your cart is empty</p>
-                    <a href="${pageContext.request.contextPath}/home"
-                       class="hs-primary-button px-8 py-3 font-semibold">
-                        Continue Shopping
-                    </a>
-                </div>
-            </c:when>
+        <c:otherwise>
+            <c:set var="hasInStock" value="false" />
+            <c:forEach var="item" items="${cartItems}">
+                <c:if test="${item.stockQuantity > 0}">
+                    <c:set var="hasInStock" value="true" />
+                </c:if>
+            </c:forEach>
 
-            <c:otherwise>
-                <div class="grid grid-cols-12 gap-6">
-                    <div class="col-span-12 lg:col-span-8 space-y-6" id="cart-list">
+            <div class="fhs-cart-layout">
+                <section class="fhs-cart-card">
+                    <div class="fhs-cart-list-head">
+                        <span>Product</span>
+                        <span>Quantity</span>
+                        <span>Subtotal</span>
+                        <span></span>
+                    </div>
+
+                    <div id="cart-list">
                         <c:forEach var="item" items="${cartItems}">
-
-                            <div class="hs-cart-card p-6 flex flex-col sm:flex-row items-center sm:items-stretch gap-6
-                                 transition-transform duration-200 ease-out hover:-translate-y-0.5"
-                                 id="cart-item-${item.cartItemID}" data-stock="${item.stockQuantity}">
-
-                                <div
-                                    class="w-32 h-48 flex-shrink-0 overflow-hidden rounded bg-surface-container-low border border-outline-variant">
-                                    <c:choose>
-                                        <c:when test="${not empty item.thumbnail}">
-                                            <img class="w-full h-full object-cover"
-                                                 src="${item.thumbnailFirst}" alt="${item.title}" />
-                                        </c:when>
-                                        <c:otherwise>
-                                            <div
-                                                class="w-full h-full flex items-center justify-center text-outline-variant">
-                                                <i data-lucide="book-open" class="w-10 h-10"></i>
-                                            </div>
-                                        </c:otherwise>
-                                    </c:choose>
-                                </div>
-
-                                <div class="flex-grow space-y-1">
-                                    <a
-                                        href="${pageContext.request.contextPath}/products?id=${item.bookID}">
-                                        <h3
-                                            class="font-headline-sm text-2xl font-semibold text-primary hover:underline">
-                                            ${item.title}</h3>
+                            <div class="fhs-cart-item" id="cart-item-${item.cartItemID}" data-stock="${item.stockQuantity}">
+                                <div class="fhs-cart-product">
+                                    <a class="fhs-cart-cover" href="${pageContext.request.contextPath}/products?id=${item.bookID}">
+                                        <c:choose>
+                                            <c:when test="${not empty item.thumbnail}">
+                                                <img src="${item.thumbnailFirst}" alt="${item.title}" />
+                                            </c:when>
+                                            <c:otherwise>
+                                                <span class="fhs-cart-cover-placeholder">
+                                                    <i data-lucide="book-open" class="w-8 h-8"></i>
+                                                </span>
+                                            </c:otherwise>
+                                        </c:choose>
                                     </a>
-                                    <p class="text-sm text-on-surface-variant">Author:
-                                        ${item.authorsDisplay}</p>
-                                    <p class="text-base text-primary font-semibold mt-2">
-                                        <fmt:formatNumber value="${item.price}" type="number"
-                                                          groupingUsed="true" /> VND
-                                    </p>
+
+                                    <div class="fhs-cart-info">
+                                        <a href="${pageContext.request.contextPath}/products?id=${item.bookID}" class="fhs-cart-name">
+                                            ${item.title}
+                                        </a>
+                                        <p class="fhs-cart-author">${item.authorsDisplay}</p>
+                                        <p class="fhs-cart-unit-price">
+                                            <fmt:formatNumber value="${item.price}" type="number" groupingUsed="true" /> VND
+                                        </p>
+                                        <c:if test="${item.stockQuantity == 0}">
+                                            <span class="fhs-stock-badge">Out of Stock</span>
+                                        </c:if>
+                                    </div>
                                 </div>
 
-                                <div class="flex flex-col items-center md:items-end gap-4">
+                                <div class="fhs-qty-wrap">
                                     <c:choose>
                                         <c:when test="${item.stockQuantity == 0}">
-                                            <span
-                                                class="text-xs font-bold text-white bg-red-500 px-3 py-1 rounded-full">Out of Stock</span>
-                                            <div
-                                                class="flex items-center border border-outline-variant rounded overflow-hidden bg-surface-container-low opacity-50">
-                                                <button
-                                                    class="px-3 py-1 font-bold cursor-not-allowed"
-                                                    disabled>−</button>
-                                                <span
-                                                    class="px-4 py-1 text-base border-x border-outline-variant"
-                                                    id="qty-${item.cartItemID}">${item.quantity}</span>
-                                                <button
-                                                    class="px-3 py-1 font-bold cursor-not-allowed"
-                                                    disabled>+</button>
+                                            <div class="hs-stepper opacity-50">
+                                                <button type="button" disabled>−</button>
+                                                <span id="qty-${item.cartItemID}">${item.quantity}</span>
+                                                <button type="button" disabled>+</button>
                                             </div>
                                         </c:when>
                                         <c:otherwise>
-                                            <div
-                                                class="flex items-center border border-outline-variant rounded overflow-hidden bg-surface-container-lowest">
-                                                <button
-                                                    class="px-3 py-1 hover:bg-surface-container-low transition-colors font-bold"
-                                                    onclick="updateQty(${item.cartItemID}, ${item.quantity - 1})">−</button>
-                                                <span
-                                                    class="px-4 py-1 text-base border-x border-outline-variant"
-                                                    id="qty-${item.cartItemID}">${item.quantity}</span>
-                                                <button
-                                                    class="px-3 py-1 hover:bg-surface-container-low transition-colors font-bold"
-                                                    onclick="updateQty(${item.cartItemID}, ${item.quantity + 1})">+</button>
+                                            <div class="hs-stepper">
+                                                <button type="button" onclick="updateQty(${item.cartItemID}, ${item.quantity - 1})">−</button>
+                                                <span id="qty-${item.cartItemID}">${item.quantity}</span>
+                                                <button type="button" onclick="updateQty(${item.cartItemID}, ${item.quantity + 1})">+</button>
                                             </div>
                                         </c:otherwise>
                                     </c:choose>
-
-                                    <div class="text-right">
-                                        <p class="text-xs text-on-surface-variant">Subtotal</p>
-                                        <p class="font-headline-sm text-xl font-semibold text-primary"
-                                           id="subtotal-item-${item.cartItemID}">
-                                            <fmt:formatNumber value="${item.subtotal}" type="number"
-                                                              groupingUsed="true" /> VND
-                                        </p>
-                                    </div>
-
-                                    <button
-                                        class="text-[#D32F2F] hover:bg-[#ffdad6]/20 p-2 rounded-full transition-all duration-200"
-                                        onclick="removeItem(${item.cartItemID})"
-                                        title="Remove from Cart">
-                                        <i data-lucide="trash-2" class="w-5 h-5"></i>
-                                    </button>
-
                                 </div>
+
+                                <div class="fhs-cart-subtotal" id="subtotal-item-${item.cartItemID}">
+                                    <fmt:formatNumber value="${item.subtotal}" type="number" groupingUsed="true" /> VND
+                                </div>
+
+                                <button type="button" class="hs-remove-btn" onclick="removeItem(${item.cartItemID})" title="Remove from cart">
+                                    <i data-lucide="trash-2" class="w-5 h-5"></i>
+                                </button>
                             </div>
                         </c:forEach>
                     </div>
 
-                    <div class="col-span-12 lg:col-span-4">
-                        <div class="hs-summary-card p-6 md:p-8 sticky top-28 space-y-6">
+                </section>
 
-                            <h2
-                                class="font-headline-md text-3xl font-semibold text-primary border-b border-outline-variant pb-4">
-                                Order Summary</h2>
-
-                            <div class="space-y-4">
-                                <div class="flex justify-between items-center text-base">
-                                    <span class="text-on-surface-variant">
-                                        Subtotal (<span id="item-count">${totalQuantity}</span> items)
-                                    </span>
-                                    <span class="font-semibold" id="summary-subtotal">
-                                        <fmt:formatNumber value="${subtotal}" type="number"
-                                                          groupingUsed="true" /> VND
-                                    </span>
-                                </div>
-                            </div>
-
-                            <p class="text-[12px] text-on-surface-variant -mt-2">
-                                You can enter a voucher code during checkout.
-                            </p>
-
-                            <div class="border-t border-outline-variant pt-6">
-                                <div class="flex justify-between items-end mb-8">
-                                    <span class="font-headline-sm text-xl font-semibold text-primary">Total</span>
-                                    <p class="font-headline-md text-primary font-semibold text-3xl"
-                                       id="summary-total">
-                                        <fmt:formatNumber value="${total}" type="number"
-                                                          groupingUsed="true" /> VND
-                                    </p>
-                                </div>
-
-                                <c:set var="hasInStock" value="false" />
-                                <c:forEach var="item" items="${cartItems}">
-                                    <c:if test="${item.stockQuantity > 0}">
-                                        <c:set var="hasInStock" value="true" />
-                                    </c:if>
-                                </c:forEach>
-
-                                <div id="checkout-btn-wrap">
-                                    <c:choose>
-                                        <c:when test="${hasInStock}">
-                                            <a id="checkout-link"
-                                               href="${pageContext.request.contextPath}/checkout">
-                                                <button id="checkout-btn" class="hs-primary-button w-full py-4
-                                                        font-semibold text-base transition-all duration-200
-                                                        flex items-center justify-center gap-3 active:scale-95">
-                                                    Proceed to Checkout
-                                                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                                                </button>
-                                            </a>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <button id="checkout-btn"
-                                                    class="w-full bg-gray-300 text-gray-500 py-4 rounded-xl
-                                                    font-bold text-xl cursor-not-allowed flex items-center justify-center gap-3" disabled>
-                                                CHECKOUT (OUT OF STOCK)
-                                            </button>
-                                        </c:otherwise>
-                                    </c:choose>
-                                </div>
-                            </div>
-
-                            <div
-                                class="pt-4 flex items-center gap-2 justify-center text-on-surface-variant text-xs">
-                                <i data-lucide="shield-check" class="w-4 h-4"></i>
-                                100% safe and secure checkout
-                            </div>
-
-                        </div>
+                <aside class="fhs-cart-summary">
+                    <div class="fhs-summary-row">
+                        <span>Subtotal (<span id="item-count">${totalQuantity}</span> items)</span>
+                        <strong id="summary-subtotal">
+                            <fmt:formatNumber value="${subtotal}" type="number" groupingUsed="true" /> VND
+                        </strong>
                     </div>
-                </div>
-            </c:otherwise>
-        </c:choose>
-    </main>
 
-    <!-- Confirmation Modal -->
-    <div id="confirmModal"
-         class="fixed inset-0 bg-black/50 hidden items-center justify-center z-[9999]">
-        <div class="hs-modal-card bg-white w-full max-w-[450px] mx-5 p-6 relative">
-            <button type="button"
-                    class="absolute top-3 right-4 text-2xl hover:text-gray-500 close-confirm">×</button>
+                    <div class="fhs-summary-total">
+                        <span class="fhs-summary-total-label">Total</span>
+                        <span class="fhs-summary-total-value" id="summary-total">
+                            <fmt:formatNumber value="${total}" type="number" groupingUsed="true" /> VND
+                        </span>
+                    </div>
 
-            <h3 class="text-xl font-bold mb-4" id="confirmTitle">Confirm Action</h3>
-            <p class="text-gray-600 mb-6" id="confirmMessage">Are you sure you want to continue?</p>
+                    <div class="fhs-checkout-area" id="checkout-btn-wrap">
+                        <c:choose>
+                            <c:when test="${hasInStock}">
+                                <a id="checkout-link" href="${pageContext.request.contextPath}/checkout" class="block">
+                                    <button type="button" id="checkout-btn">
+                                        Proceed to Checkout
+                                    </button>
+                                </a>
+                            </c:when>
+                            <c:otherwise>
+                                <button type="button" id="checkout-btn" disabled
+                                        style="background:#D5D5D5;color:#8A8A8A;cursor:not-allowed;">
+                                    Out of Stock
+                                </button>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
 
-            <div class="flex justify-end gap-3">
-                <button type="button"
-                        class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 close-confirm">
-                    Cancel
-                </button>
-                <button type="button" id="confirmAction"
-                        class="hs-primary-button px-4 py-2 hover:opacity-90">
-                    Confirm
-                </button>
+                    <div class="fhs-secure-note">
+                        <i data-lucide="shield-check" class="w-4 h-4"></i>
+                        Secure checkout
+                    </div>
+                </aside>
             </div>
+        </c:otherwise>
+    </c:choose>
+</main>
+
+<!-- Confirmation Modal -->
+<div id="confirmModal"
+     class="fixed inset-0 bg-black/50 hidden items-center justify-center z-[9999]">
+    <div class="hs-modal-card bg-white w-full max-w-[450px] mx-5 p-6 relative">
+        <button type="button"
+                class="absolute top-3 right-4 text-2xl hover:text-gray-500 close-confirm">×</button>
+
+        <h3 class="text-xl font-bold mb-4" id="confirmTitle">Confirm Action</h3>
+        <p class="text-gray-600 mb-6" id="confirmMessage">Are you sure you want to continue?</p>
+
+        <div class="flex justify-end gap-3">
+            <button type="button"
+                    class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 close-confirm">
+                Cancel
+            </button>
+            <button type="button" id="confirmAction"
+                    class="px-4 py-2 bg-[#C92127] text-white rounded-md hover:bg-[#A8191F]">
+                Confirm
+            </button>
         </div>
     </div>
+</div>
 
     <script>
         const CART_URL = '${pageContext.request.contextPath}/cart';
@@ -281,7 +615,8 @@
                         document.getElementById('qty-' + cartItemID).textContent = newQty;
                         document.getElementById('subtotal-item-' + cartItemID).textContent = formatPrice(data.itemSubtotal);
 
-                        const buttons = card.querySelectorAll('button');
+                        const stepper = card.querySelector('.hs-stepper');
+                        const buttons = stepper ? stepper.querySelectorAll('button') : [];
                         buttons[0].setAttribute('onclick', 'updateQty(' + cartItemID + ',' + (newQty - 1) + ')');
                         buttons[1].setAttribute('onclick', 'updateQty(' + cartItemID + ',' + (newQty + 1) + ')');
 
@@ -334,7 +669,8 @@
                 const id = card.id.replace('cart-item-', '');
                 const stock = parseInt(card.getAttribute('data-stock'), 10);
                 const qty = parseInt(document.getElementById('qty-' + id).textContent, 10);
-                const buttons = card.querySelectorAll('button');
+                const stepper = card.querySelector('.hs-stepper');
+                        const buttons = stepper ? stepper.querySelectorAll('button') : [];
                 if (buttons.length >= 2) {
                     buttons[1].disabled = (qty >= stock);
                     buttons[1].classList.toggle('opacity-40', qty >= stock);

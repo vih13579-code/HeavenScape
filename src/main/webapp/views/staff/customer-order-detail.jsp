@@ -91,7 +91,7 @@
                                 </c:choose>
                             </span>
 
-                            <c:if test="${order.status == 'cancelled' && order.paymentMethod == 'vnpay'}">
+                            <c:if test="${order.status == 'cancelled' && order.paymentMethod == 'cod'}">
                                 <c:choose>
                                     <c:when test="${order.paymentStatus == 'pending_refund'}">
                                         <span class="px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-1 bg-amber-50 text-amber-600 border border-amber-200">
@@ -336,14 +336,14 @@
                                 <c:choose>
                                     <c:when test="${order.status == 'cancelled'}">
                                         <c:choose>
-                                            <c:when test="${order.paymentMethod == 'vnpay' && order.paymentStatus == 'pending_refund'}">
+                                            <c:when test="${order.paymentMethod == 'cod' && order.paymentStatus == 'pending_refund'}">
                                                 <div class="space-y-3">
                                                     <div class="flex flex-col gap-2 p-4 bg-amber-50 rounded-lg border border-amber-200">
                                                         <div class="flex items-center gap-3">
                                                             <span class="material-symbols-outlined text-amber-500 text-[22px]" style="font-variation-settings: 'FILL' 1;">schedule</span>
                                                             <div class="flex-1">
                                                                 <p class="text-sm font-semibold text-amber-700">Order Cancelled &mdash; Refund Processing</p>
-                                                                <p class="text-xs text-amber-600 mt-0.5">VNPAY — Transfer Not Yet Confirmed</p>
+                                                                <p class="text-xs text-amber-600 mt-0.5">COD — Transfer Not Yet Confirmed</p>
                                                             </div>
                                                         </div>
                                                         <c:if test="${not empty order.cancelReason}">
@@ -365,13 +365,13 @@
                                                 </div>
                                             </c:when>
 
-                                            <c:when test="${order.paymentMethod == 'vnpay' && order.paymentStatus == 'refunded'}">
+                                            <c:when test="${order.paymentMethod == 'cod' && order.paymentStatus == 'refunded'}">
                                                 <div class="flex flex-col gap-2 p-4 bg-green-50 rounded-lg border border-green-200">
                                                     <div class="flex items-center gap-3">
                                                         <span class="material-symbols-outlined text-green-600 text-[22px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
                                                         <div>
                                                             <p class="text-sm font-semibold text-green-700">Order Cancelled &mdash; Refunded</p>
-                                                            <p class="text-xs text-green-600 mt-0.5">VNPAY — Transfer Confirmed</p>
+                                                            <p class="text-xs text-green-600 mt-0.5">COD — Transfer Confirmed</p>
                                                         </div>
                                                     </div>
                                                     <c:if test="${not empty order.cancelReason}">
