@@ -99,16 +99,29 @@
                     </div>
                 </div>
 
-                <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                <div class="w-full grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <a href="${pageContext.request.contextPath}/profile/order-history"
-                       class="px-6 py-3 rounded-full font-bold text-sm bg-[#fdd835] text-[#705e00] hover:shadow-md transition-all flex items-center justify-center gap-2">
-                        <span class="material-symbols-outlined text-[20px]">history</span>
-                        View Order History
+                       class="group flex items-center gap-4 bg-white border border-gray-200 rounded-2xl p-5 text-left hover:border-[#fdd835] hover:shadow-md transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#C92127]">
+                        <span class="flex items-center justify-center w-12 h-12 rounded-full bg-yellow-50 text-[#705e00] shrink-0">
+                            <span class="material-symbols-outlined text-[24px]">history</span>
+                        </span>
+                        <span class="flex-grow">
+                            <span class="block font-bold text-sm text-[#1B1B1B]">View Order History</span>
+                            <span class="block text-xs text-gray-500 mt-0.5">Track this and past orders</span>
+                        </span>
+                        <span class="material-symbols-outlined text-gray-300 group-hover:text-[#705e00] group-hover:translate-x-1 transition-all">chevron_right</span>
                     </a>
+
                     <a href="${pageContext.request.contextPath}/home"
-                       class="px-6 py-3 rounded-full font-bold text-sm border-2 border-[#C92127] text-[#C92127] bg-transparent hover:bg-[#FDE8E9] transition-all flex items-center justify-center gap-2">
-                        <span class="material-symbols-outlined text-[20px]">shopping_bag</span>
-                        Continue Shopping
+                       class="group flex items-center gap-4 bg-[#C92127] rounded-2xl p-5 text-left hover:shadow-lg hover:shadow-red-100 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#C92127]">
+                        <span class="flex items-center justify-center w-12 h-12 rounded-full bg-white/15 text-white shrink-0">
+                            <span class="material-symbols-outlined text-[24px]">shopping_bag</span>
+                        </span>
+                        <span class="flex-grow">
+                            <span class="block font-bold text-sm text-white">Continue Shopping</span>
+                            <span class="block text-xs text-white/80 mt-0.5">Back to the homepage</span>
+                        </span>
+                        <span class="material-symbols-outlined text-white/60 group-hover:text-white group-hover:translate-x-1 transition-all">chevron_right</span>
                     </a>
                 </div>
 

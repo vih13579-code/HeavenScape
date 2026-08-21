@@ -687,7 +687,6 @@ SET IDENTITY_INSERT [dbo].[BookSeries] OFF
 GO
 SET IDENTITY_INSERT [dbo].[Cart] ON 
 
-INSERT [dbo].[Cart] ([cartID], [customerID], [status], [created_at], [updated_at]) VALUES (4, 10, N'active', CAST(N'2026-07-24T15:26:59.877' AS DateTime), NULL)
 INSERT [dbo].[Cart] ([cartID], [customerID], [status], [created_at], [updated_at]) VALUES (5, 11, N'active', CAST(N'2026-08-10T12:38:43.023' AS DateTime), NULL)
 INSERT [dbo].[Cart] ([cartID], [customerID], [status], [created_at], [updated_at]) VALUES (6, 12, N'active', CAST(N'2026-08-12T15:29:25.300' AS DateTime), NULL)
 SET IDENTITY_INSERT [dbo].[Cart] OFF
@@ -709,7 +708,6 @@ SET IDENTITY_INSERT [dbo].[Content] OFF
 GO
 SET IDENTITY_INSERT [dbo].[Customer] ON 
 
-INSERT [dbo].[Customer] ([customerID], [fullname], [email], [password], [phone], [role], [status], [created_at], [gender], [dob]) VALUES (10, N'Nguyen Thi A', N'truongngoctran2209@gmail.com', N'e10adc3949ba59abbe56e057f20f883e', N'0987654321', N'customer', N'active', CAST(N'2026-07-24T15:26:08.027' AS DateTime), N'Male', CAST(N'2003-07-24' AS Date))
 INSERT [dbo].[Customer] ([customerID], [fullname], [email], [password], [phone], [role], [status], [created_at], [gender], [dob]) VALUES (11, N'Nguyễn Lê Duy Minh', N'duyminhnguyen247@gmail.com', N'acc90d86e202e53c381541ed2521ee18', N'0915783916', N'customer', N'active', CAST(N'2026-08-10T12:38:22.980' AS DateTime), N'Male', CAST(N'2004-10-01' AS Date))
 INSERT [dbo].[Customer] ([customerID], [fullname], [email], [password], [phone], [role], [status], [created_at], [gender], [dob]) VALUES (12, N'Minh Duy', N'duyminhnguyenle3619@gmail.com', N'b14e7c766ce93527677960a14365be83', N'0915783916', N'customer', N'active', CAST(N'2026-08-12T15:29:01.870' AS DateTime), NULL, NULL)
 SET IDENTITY_INSERT [dbo].[Customer] OFF
@@ -751,7 +749,6 @@ SET IDENTITY_INSERT [dbo].[Voucher] OFF
 GO
 SET IDENTITY_INSERT [dbo].[WishList] ON 
 
-INSERT [dbo].[WishList] ([wishlistID], [customerID], [created_at]) VALUES (4, 10, CAST(N'2026-07-24T20:43:05.367' AS DateTime))
 INSERT [dbo].[WishList] ([wishlistID], [customerID], [created_at]) VALUES (5, 11, CAST(N'2026-08-11T03:52:40.020' AS DateTime))
 SET IDENTITY_INSERT [dbo].[WishList] OFF
 GO
