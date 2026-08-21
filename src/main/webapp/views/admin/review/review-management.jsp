@@ -230,9 +230,30 @@
                                                     <c:choose>
                                                         <c:when test="${not empty review.adminReply}">
                                                             <div class="max-w-[260px] rounded-lg border border-primary/20 bg-primary-container/40 px-3 py-2">
-                                                                <div class="mb-1 flex items-center gap-1.5 text-primary">
-                                                                    <span class="material-symbols-outlined text-[16px]" data-icon="reply">reply</span>
-                                                                    <span class="font-label-sm text-label-sm">Staff/Admin reply</span>
+                                                                <div class="mb-1 flex items-center justify-between gap-2 text-primary">
+                                                                    <div class="flex items-center gap-1.5">
+                                                                        <span class="material-symbols-outlined text-[16px]" data-icon="reply">reply</span>
+                                                                        <span class="font-label-sm text-label-sm">Staff/Admin reply</span>
+                                                                    </div>
+                                                                    <div class="flex items-center gap-1">
+                                                                        <button type="button" data-edit-reply-btn
+                                                                                data-review-id="${review.reviewID}"
+                                                                                data-customer-name="${fn:escapeXml(review.customerName)}"
+                                                                                data-book-title="${fn:escapeXml(review.bookTitle)}"
+                                                                                data-rating="${review.rating}"
+                                                                                data-comment="${fn:escapeXml(review.comment)}"
+                                                                                data-reply="${fn:escapeXml(review.adminReply)}"
+                                                                                class="rounded p-1 hover:bg-primary/10"
+                                                                                title="Update Staff/Admin Reply">
+                                                                            <span class="material-symbols-outlined text-[16px]">edit</span>
+                                                                        </button>
+                                                                        <button type="button" data-delete-reply-btn
+                                                                                data-review-id="${review.reviewID}"
+                                                                                class="rounded p-1 text-error hover:bg-error/10"
+                                                                                title="Delete Staff/Admin Reply">
+                                                                            <span class="material-symbols-outlined text-[16px]">delete</span>
+                                                                        </button>
+                                                                    </div>
                                                                 </div>
                                                                 <p class="whitespace-pre-line break-words font-body-sm text-body-sm text-on-surface"><c:out value="${review.adminReply}"/></p>
                                                                 <c:if test="${review.adminReplyDate != null}">
@@ -396,7 +417,7 @@
                         <div class="bg-white w-[600px] rounded-xl p-6 relative max-h-[90vh] overflow-y-auto">
                             <button id="closeReplyModal" class="absolute top-3 right-4 text-2xl hover:text-gray-500">×</button>
                             
-                            <h3 class="text-xl font-bold mb-4">Reply to Review</h3>
+                            <h3 id="replyModalTitle" class="text-xl font-bold mb-4">Reply to Review</h3>
                             
                             <div id="reviewPreview" class="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
                                 <p class="text-sm text-gray-600 mb-2">
@@ -416,7 +437,7 @@
                             
                             <form id="replyForm">
                                 <input type="hidden" id="replyReviewID" name="reviewID" value="">
-                                <input type="hidden" name="action" value="reply">
+                                <input type="hidden" id="replyAction" name="action" value="reply">
                                 
                                 <div class="mb-4">
                                     <label class="block font-semibold mb-2">Your Reply</label>
@@ -424,6 +445,7 @@
                                         name="reply" 
                                         id="replyContent"
                                         rows="6"
+                                        maxlength="2000"
                                         required
                                         placeholder="Enter your reply..."
                                         class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-primary focus:outline-none">
@@ -434,7 +456,7 @@
                                     <button type="button" onclick="closeModal()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100">
                                         Cancel
                                     </button>
-                                    <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg hover:opacity-90">
+                                    <button type="submit" id="replySubmitButton" class="px-4 py-2 bg-primary text-white rounded-lg hover:opacity-90">
                                         Send Reply
                                     </button>
                                 </div>
@@ -446,15 +468,23 @@
                 document.body.insertAdjacentHTML('beforeend', modalHTML);
             }
 
-            function openReplyModal(reviewID, customerName, bookTitle, rating, comment) {
+            function openReplyModal(reviewID, customerName, bookTitle, rating, comment, existingReply, editMode) {
                 currentReviewID = reviewID;
+                const editing = editMode === true;
 
                 document.getElementById('previewCustomerName').textContent = customerName;
                 document.getElementById('previewBookTitle').textContent = bookTitle;
                 document.getElementById('previewRating').textContent = '⭐'.repeat(rating);
                 document.getElementById('previewComment').textContent = comment;
                 document.getElementById('replyReviewID').value = reviewID;
-                document.getElementById('replyContent').value = '';
+                document.getElementById('replyAction').value = editing ? 'editReply' : 'reply';
+                document.getElementById('replyContent').value = editing ? (existingReply || '') : '';
+                document.getElementById('replyModalTitle').textContent = editing
+                        ? 'Update Staff/Admin Reply'
+                        : 'Reply to Review';
+                document.getElementById('replySubmitButton').textContent = editing
+                        ? 'Save Changes'
+                        : 'Send Reply';
 
                 replyModal.classList.remove('hidden');
                 replyModal.classList.add('flex');
@@ -522,6 +552,31 @@
                         .catch(err => {
                             console.error('Error:', err);
                             showToast('An error occurred', true);
+                        });
+            }
+
+            function deleteReply(reviewID) {
+                const formData = new URLSearchParams();
+                formData.append('action', 'deleteReply');
+                formData.append('reviewID', reviewID);
+
+                fetch(REVIEW_API_URL, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                    body: formData.toString()
+                })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (!data.success) {
+                                showToast(data.message || 'Could not delete the reply', true);
+                                return;
+                            }
+                            showToast(data.message || 'Reply deleted successfully');
+                            setTimeout(() => location.reload(), 700);
+                        })
+                        .catch(err => {
+                            console.error('Error:', err);
+                            showToast('Could not connect to the server', true);
                         });
             }
 
@@ -610,6 +665,8 @@
                 initReplyModal();
                 initConfirmModal();
                 initReplyButtons();
+                initEditReplyButtons();
+                initDeleteReplyButtons();
                 initHideButtons();
                 initLockButtons();
             });
@@ -626,6 +683,37 @@
                         const comment = this.dataset.comment;
 
                         openReplyModal(reviewID, customerName, bookTitle, rating, comment);
+                    });
+                });
+            }
+
+            function initEditReplyButtons() {
+                document.querySelectorAll('[data-edit-reply-btn]').forEach(btn => {
+                    btn.addEventListener('click', function (event) {
+                        event.preventDefault();
+                        openReplyModal(
+                                this.dataset.reviewId,
+                                this.dataset.customerName,
+                                this.dataset.bookTitle,
+                                this.dataset.rating,
+                                this.dataset.comment,
+                                this.dataset.reply,
+                                true
+                                );
+                    });
+                });
+            }
+
+            function initDeleteReplyButtons() {
+                document.querySelectorAll('[data-delete-reply-btn]').forEach(btn => {
+                    btn.addEventListener('click', function (event) {
+                        event.preventDefault();
+                        const reviewID = this.dataset.reviewId;
+                        openConfirmModal(
+                                'Delete Staff/Admin Reply',
+                                'Are you sure you want to delete this staff/admin reply? The customer review will remain unchanged.',
+                                () => deleteReply(reviewID)
+                        );
                     });
                 });
             }

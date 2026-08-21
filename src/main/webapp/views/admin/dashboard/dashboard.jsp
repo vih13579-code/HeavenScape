@@ -78,11 +78,11 @@
                             <input type="date" name="toDate" value="${toDate}" max="${currentDate}" class="w-full rounded-xl border-outline-variant bg-surface-container-low focus:ring-primary focus:border-primary">
                         </div>
                         <div>
-                            <label class="block text-sm font-semibold text-on-surface-variant mb-2">Genre</label>
-                            <select name="genreID" class="w-full rounded-xl border-outline-variant bg-surface-container-low focus:ring-primary focus:border-primary">
-                                <option value="0">All Genres</option>
-                                <c:forEach var="g" items="${genres}">
-                                    <option value="${g.genreID}" <c:if test="${selectedGenreID == g.genreID}">selected</c:if>>${g.genreName}</option>
+                            <label class="block text-sm font-semibold text-on-surface-variant mb-2">Category</label>
+                            <select name="categoryID" class="w-full rounded-xl border-outline-variant bg-surface-container-low focus:ring-primary focus:border-primary">
+                                <option value="0">All Categories</option>
+                                <c:forEach var="g" items="${categories}">
+                                    <option value="${g.categoryID}" <c:if test="${selectedCategoryID == g.categoryID}">selected</c:if>>${g.categoryName}</option>
                                 </c:forEach>
                             </select>
                         </div>
@@ -162,7 +162,7 @@
                     <div class="bg-surface rounded-2xl shadow-[0_4px_20px_rgba(21,101,192,0.08)] border border-outline-variant/30 p-6">
                         <div class="flex items-center justify-between mb-6">
                             <div>
-                                <h3 class="text-xl font-bold">Revenue by Genre</h3>
+                                <h3 class="text-xl font-bold">Revenue by Category</h3>
                                 <p class="text-sm text-on-surface-variant">
                             </div>
                             <span class="material-symbols-outlined text-primary">bar_chart</span>
@@ -176,7 +176,7 @@
                                     <c:forEach var="row" items="${revenueByCategory}">
                                         <div>
                                             <div class="flex justify-between text-sm mb-1">
-                                                <span class="font-semibold">${row.genreName}</span>
+                                                <span class="font-semibold">${row.categoryName}</span>
                                                 <span class="text-primary font-bold"><fmt:formatNumber value="${row.revenue}" type="number" groupingUsed="true"/> VND</span>
                                             </div>
                                             <div class="h-3 bg-surface-container-low rounded-full overflow-hidden">
@@ -193,7 +193,7 @@
                         <div class="flex items-center justify-between mb-6">
                             <div>
                                 <h3 class="text-xl font-bold">Best-Selling Books</h3>
-                                <p class="text-sm text-on-surface-variant">Top books for the selected date range and genre</p>
+                                <p class="text-sm text-on-surface-variant">Top books for the selected date range and category</p>
                             </div>
                             <span class="material-symbols-outlined text-primary">workspace_premium</span>
                         </div>
@@ -202,7 +202,7 @@
                                 <thead>
                                     <tr class="border-b border-outline-variant/20">
                                         <th class="py-3 text-xs uppercase text-on-surface-variant">Book</th>
-                                        <th class="py-3 text-xs uppercase text-on-surface-variant">Genre</th>
+                                        <th class="py-3 text-xs uppercase text-on-surface-variant">Category</th>
                                         <th class="py-3 text-xs uppercase text-on-surface-variant text-right">Sold</th>
                                     </tr>
                                 </thead>
@@ -210,7 +210,7 @@
                                     <c:forEach var="book" items="${topSellingBooks}">
                                         <tr>
                                             <td class="py-3 font-semibold text-sm">${book.title}</td>
-                                            <td class="py-3 text-sm text-on-surface-variant">${book.genreName}</td>
+                                            <td class="py-3 text-sm text-on-surface-variant">${book.categoryName}</td>
                                             <td class="py-3 text-sm font-bold text-primary text-right">${book.soldQuantity}</td>
                                         </tr>
                                     </c:forEach>

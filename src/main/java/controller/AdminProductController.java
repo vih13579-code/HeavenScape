@@ -91,16 +91,16 @@ public class AdminProductController extends HttpServlet {
         int page = parsePage(req.getParameter("page"));
         String keyword = req.getParameter("keyword");
         String status = req.getParameter("status");
-        Integer genreID = parseIntParam(req.getParameter("genre"));
+        Integer categoryID = parseIntParam(req.getParameter("category"));
 
-        int total = bookDAO.countBooksAdmin(keyword, status, genreID);
+        int total = bookDAO.countBooksAdmin(keyword, status, categoryID);
         int totalPages = Math.max(1, (int) Math.ceil((double) total / PAGE_SIZE));
         if (page > totalPages) {
             page = totalPages;
         }
 
-        List<Book> books = bookDAO.getBooksAdmin((page - 1) * PAGE_SIZE, PAGE_SIZE, keyword, status, genreID);
-        Map<Integer, String> genreMap = bookDAO.getGenreMap();
+        List<Book> books = bookDAO.getBooksAdmin((page - 1) * PAGE_SIZE, PAGE_SIZE, keyword, status, categoryID);
+        Map<Integer, String> categoryMap = bookDAO.getCategoryMap();
 
         req.setAttribute("books", books);
         req.setAttribute("total", total);
@@ -108,8 +108,8 @@ public class AdminProductController extends HttpServlet {
         req.setAttribute("totalPages", totalPages);
         req.setAttribute("keyword", keyword);
         req.setAttribute("status", status);
-        req.setAttribute("genreID", genreID);
-        req.setAttribute("genreMap", genreMap);
+        req.setAttribute("categoryID", categoryID);
+        req.setAttribute("categoryMap", categoryMap);
 
         req.getRequestDispatcher("/views/admin/product/product-management.jsp").forward(req, resp);
     }
@@ -120,7 +120,7 @@ public class AdminProductController extends HttpServlet {
         req.setAttribute("activeMenu", "product-management");
         lookupDAO.ensureDefaultLookups();
         req.setAttribute("book", book);
-        req.setAttribute("genreMap", bookDAO.getGenreMap());
+        req.setAttribute("categoryMap", bookDAO.getCategoryMap());
         req.setAttribute("originMap", bookDAO.getOriginMap());
         req.setAttribute("contentMap", bookDAO.getContentMap());
         req.setAttribute("seriesMap", bookDAO.getSeriesMap());
@@ -158,7 +158,7 @@ public class AdminProductController extends HttpServlet {
 
         lookupDAO.ensureDefaultLookups();
         req.setAttribute("book", book);
-        req.setAttribute("genreMap", bookDAO.getGenreMap());
+        req.setAttribute("categoryMap", bookDAO.getCategoryMap());
         req.setAttribute("originMap", bookDAO.getOriginMap());
         req.setAttribute("contentMap", bookDAO.getContentMap());
         req.setAttribute("seriesMap", bookDAO.getSeriesMap());
@@ -360,9 +360,9 @@ public class AdminProductController extends HttpServlet {
             status = !requestedStatus.isEmpty() ? requestedStatus : "available";
         }
         b.setStatus(status);
-        Integer gid = parseIntParam(req.getParameter("genreID"));
+        Integer gid = parseIntParam(req.getParameter("categoryID"));
         if (gid != null) {
-            b.setGenreID(gid);
+            b.setCategoryID(gid);
         }
         Integer cid = parseIntParam(req.getParameter("contentID"));
         if (cid != null) {

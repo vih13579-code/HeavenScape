@@ -390,15 +390,15 @@
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label class="field-label" for="genreID">Genre</label>
+                                <label class="field-label" for="categoryID">Category</label>
                                 <div class="lookup-row">
-                                    <select id="genreID" name="genreID" class="field-input">
-                                        <option value="">-- Select Genre --</option>
-                                        <c:forEach var="entry" items="${genreMap}">
-                                            <option value="${entry.key}" <c:if test="${book.genreID == entry.key}">selected</c:if>>${entry.value}</option>
+                                    <select id="categoryID" name="categoryID" class="field-input">
+                                        <option value="">-- Select Category --</option>
+                                        <c:forEach var="entry" items="${categoryMap}">
+                                            <option value="${entry.key}" <c:if test="${book.categoryID == entry.key}">selected</c:if>>${entry.value}</option>
                                         </c:forEach>
                                     </select>
-                                    <button type="button" class="lookup-add-btn" data-lookup-type="genre" data-target-select="genreID" title="Add Genre">+</button>
+                                    <button type="button" class="lookup-add-btn" data-lookup-type="category" data-target-select="categoryID" title="Add Category">+</button>
                                 </div>
                             </div>
                             <div>
@@ -718,7 +718,7 @@
             });
 
 
-            const lookupLabels = {genre: 'genre', content: 'format', origin: 'origin', series: 'series', publisher: 'publisher'};
+            const lookupLabels = {category: 'category', content: 'format', origin: 'origin', series: 'series', publisher: 'publisher'};
             let activeLookupType = '';
             let activeLookupSelectId = '';
 

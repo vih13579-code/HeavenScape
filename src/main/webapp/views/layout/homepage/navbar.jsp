@@ -1,10 +1,10 @@
-<%@ page import="dao.GenreDAO" %>
-<%@ page import="model.Genre" %>
+<%@ page import="dao.CategoryDAO" %>
+<%@ page import="model.Category" %>
 <%@ page import="java.util.List" %>
 
 <%
-    GenreDAO genreDAO = new GenreDAO();
-    List<Genre> genres = genreDAO.getAllGenres();
+    CategoryDAO categoryDAO = new CategoryDAO();
+    List<Category> categories = categoryDAO.getAllCategories();
 %>
 
 <div class="category-navbar-shell">
@@ -14,12 +14,12 @@
             All Books
         </a>
         <%
-            if (genres != null && !genres.isEmpty()) {
-                for (Genre genre : genres) {
+            if (categories != null && !categories.isEmpty()) {
+                for (Category category : categories) {
         %>
                     <a class="cat-nav-item"
-                       href="<%= request.getContextPath() %>/products?genre=<%= genre.getGenreID() %>">
-                        <%= genre.getGenreName() %>
+                       href="<%= request.getContextPath() %>/products?category=<%= category.getCategoryID() %>">
+                        <%= category.getCategoryName() %>
                     </a>
         <%
                 }

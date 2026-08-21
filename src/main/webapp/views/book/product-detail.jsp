@@ -245,8 +245,8 @@
     <nav class="flex flex-wrap items-center gap-2 text-sm text-on-surface-variant" aria-label="Breadcrumb">
         <a href="${pageContext.request.contextPath}/home" class="hover:text-primary">Home</a>
         <i data-lucide="chevron-right" class="w-4 h-4"></i>
-        <c:if test="${not empty book.genreName}">
-            <a href="${pageContext.request.contextPath}/products?genre=${book.genreID}" class="hover:text-primary">${book.genreName}</a>
+        <c:if test="${not empty book.categoryName}">
+            <a href="${pageContext.request.contextPath}/products?category=${book.categoryID}" class="hover:text-primary">${book.categoryName}</a>
             <i data-lucide="chevron-right" class="w-4 h-4"></i>
         </c:if>
         <span class="text-on-surface line-clamp-1">${book.title}</span>
@@ -372,9 +372,9 @@
 
             <!-- Tags -->
             <div class="flex flex-wrap gap-2">
-                <c:if test="${not empty book.genreName}">
+                <c:if test="${not empty book.categoryName}">
                     <span
-                        class="bg-primary/10 text-primary text-[12px] font-bold px-3 py-1 rounded-full uppercase tracking-wide">${book.genreName}</span>
+                        class="bg-primary/10 text-primary text-[12px] font-bold px-3 py-1 rounded-full uppercase tracking-wide">${book.categoryName}</span>
                 </c:if>
                 <c:if test="${book.featured}">
                     <span

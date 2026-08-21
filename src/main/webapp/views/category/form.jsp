@@ -41,17 +41,17 @@
                 <section class="bg-surface rounded-2xl border border-outline-variant shadow-card overflow-hidden">
                     <div class="px-6 py-5 border-b border-outline-variant">
                         <h1 class="text-2xl font-bold">${pageTitle}</h1>
-                        <p class="text-sm text-on-surface-variant mt-1">Enter a genre name to save it in HeavenScape.</p>
+                        <p class="text-sm text-on-surface-variant mt-1">Enter a category name to save it in HeavenScape.</p>
                     </div>
 
                     <form action="${pageContext.request.contextPath}/dashboard/category-management" method="post" class="p-6 space-y-5">
                         <input type="hidden" name="action" value="${formAction}">
-                        <input type="hidden" name="id" value="${genre.genreID}">
+                        <input type="hidden" name="id" value="${category.categoryID}">
 
                         <div>
-                            <label class="block text-sm font-bold mb-2">Genre Name</label>
-                            <input type="text" name="genre_name" id="genreName" required maxlength="100"
-                                   value="${genre.genreName}"
+                            <label class="block text-sm font-bold mb-2">Category Name</label>
+                            <input type="text" name="category_name" id="categoryName" required maxlength="100"
+                                   value="${category.categoryName}"
                                    placeholder="Example: Fiction, Personal Development..."
                                    class="w-full rounded-xl border-outline-variant bg-surface-container-low px-4 py-3 text-sm focus:border-primary focus:ring-primary">
 <p class="text-xs text-on-surface-variant mt-2">Use letters and spaces only; do not enter numbers or special characters.</p>
@@ -64,7 +64,7 @@
                             </a>
                             <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-bold text-white hover:bg-[#8E171B] transition">
                                 <span class="material-symbols-outlined text-[19px]">save</span>
-                                Save Genre
+                                Save Category
                             </button>
                         </div>
                     </form>
@@ -72,22 +72,22 @@
             </div>
         </main>
             <script>
-            const allowedGenres = null;
+            const allowedCategories = null;
 
             document.querySelector('form').addEventListener('submit', function (event) {
-                const input = document.getElementById('genreName');
+                const input = document.getElementById('categoryName');
                 const value = input.value.trim().replace(/\s+/g, ' ');
                 input.value = value;
 
                 if (!/^[\p{L}\s]+$/u.test(value)) {
                     event.preventDefault();
-                    input.setCustomValidity('A genre name may contain only letters and spaces, not numbers or special characters.');
+                    input.setCustomValidity('A category name may contain only letters and spaces, not numbers or special characters.');
                     input.reportValidity();
                     return;
                 }        input.setCustomValidity('');
             });
 
-            document.getElementById('genreName').addEventListener('input', function () {
+            document.getElementById('categoryName').addEventListener('input', function () {
                 this.setCustomValidity('');
             });
         </script>

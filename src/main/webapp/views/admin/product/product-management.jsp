@@ -75,8 +75,8 @@
                         <span class="text-2xl font-bold">${page}/${totalPages}</span>
                     </div>
                     <div class="bg-surface p-4 rounded-2xl border border-outline-variant/30 flex flex-col gap-1">
-                        <span class="text-xs font-semibold text-on-surface-variant uppercase">Genre</span>
-                        <span class="text-2xl font-bold">${genreMap.size()}</span>
+                        <span class="text-xs font-semibold text-on-surface-variant uppercase">Category</span>
+                        <span class="text-2xl font-bold">${categoryMap.size()}</span>
                     </div>
                 </div>
 
@@ -94,11 +94,11 @@
 
 
                         <div class="relative min-w-[150px]">
-                            <select name="genre" onchange="this.form.submit()"
+                            <select name="category" onchange="this.form.submit()"
                                     class="appearance-none w-full pl-3 pr-9 py-2.5 border border-outline-variant rounded-xl focus:ring-2 focus:ring-primary text-sm outline-none cursor-pointer bg-white">
-                                <option value="">Genre</option>
-                                <c:forEach var="entry" items="${genreMap}">
-                                    <option value="${entry.key}" <c:if test="${genreID == entry.key}">selected</c:if>>${entry.value}</option>
+                                <option value="">Category</option>
+                                <c:forEach var="entry" items="${categoryMap}">
+                                    <option value="${entry.key}" <c:if test="${categoryID == entry.key}">selected</c:if>>${entry.value}</option>
                                 </c:forEach>
                             </select>
                             <span class="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px] pointer-events-none">expand_more</span>
@@ -117,7 +117,7 @@
                             </div>
 
 
-                        <c:if test="${not empty keyword or not empty status or not empty genreID}">
+                        <c:if test="${not empty keyword or not empty status or not empty categoryID}">
                             <a href="${pageContext.request.contextPath}/dashboard/product-management"
                                class="text-sm text-gray-400 hover:text-error transition-colors px-2 py-2.5 whitespace-nowrap">✕ Clear Filters</a>
                         </c:if>
@@ -131,7 +131,7 @@
                             <thead>
                                 <tr class="bg-background-alt border-b border-outline-variant/30">
                                     <th class="px-4 py-3 font-semibold text-on-surface-variant">Book</th>
-                                    <th class="px-4 py-3 font-semibold text-on-surface-variant">Genre</th>
+                                    <th class="px-4 py-3 font-semibold text-on-surface-variant">Category</th>
                                     <th class="px-4 py-3 font-semibold text-on-surface-variant">Publisher</th>
                                     <th class="px-4 py-3 font-semibold text-on-surface-variant text-right">Price</th>
                                     <th class="px-4 py-3 font-semibold text-on-surface-variant text-center">Stock</th>
@@ -166,8 +166,8 @@
                                             </div>
                                         </td>
                                         <td class="px-4 py-3">
-                                            <c:if test="${not empty book.genreName}">
-                                                <span class="bg-primary-fixed text-primary text-xs font-semibold px-2.5 py-0.5 rounded-full">${book.genreName}</span>
+                                            <c:if test="${not empty book.categoryName}">
+                                                <span class="bg-primary-fixed text-primary text-xs font-semibold px-2.5 py-0.5 rounded-full">${book.categoryName}</span>
                                             </c:if>
                                         </td>
                                         <td class="px-4 py-3 text-on-surface-variant whitespace-nowrap">
@@ -258,7 +258,7 @@
                     <c:if test="${totalPages > 1}">
                         <div class="px-4 py-3 border-t border-outline-variant/30 flex justify-center gap-1.5 flex-wrap">
                             <c:if test="${page > 1}">
-                                <a href="?page=${page-1}<c:if test="${not empty keyword}">&keyword=${keyword}</c:if><c:if test="${not empty status}">&status=${status}</c:if><c:if test="${not empty genreID}">&genre=${genreID}</c:if>"
+                                <a href="?page=${page-1}<c:if test="${not empty keyword}">&keyword=${keyword}</c:if><c:if test="${not empty status}">&status=${status}</c:if><c:if test="${not empty categoryID}">&category=${categoryID}</c:if>"
                                    class="w-9 h-9 flex items-center justify-center rounded-lg border border-outline-variant text-on-surface-variant hover:border-primary hover:text-primary transition-colors text-sm">‹</a>
                             </c:if>
                             <c:forEach begin="1" end="${totalPages}" var="i">
@@ -267,13 +267,13 @@
                                         <span class="w-9 h-9 flex items-center justify-center rounded-lg bg-primary text-white font-bold text-sm">${i}</span>
                                     </c:when>
                                     <c:otherwise>
-                                        <a href="?page=${i}<c:if test="${not empty keyword}">&keyword=${keyword}</c:if><c:if test="${not empty status}">&status=${status}</c:if><c:if test="${not empty genreID}">&genre=${genreID}</c:if>"
+                                        <a href="?page=${i}<c:if test="${not empty keyword}">&keyword=${keyword}</c:if><c:if test="${not empty status}">&status=${status}</c:if><c:if test="${not empty categoryID}">&category=${categoryID}</c:if>"
                                            class="w-9 h-9 flex items-center justify-center rounded-lg border border-outline-variant text-on-surface-variant hover:border-primary hover:text-primary transition-colors text-sm">${i}</a>
                                     </c:otherwise>
                                 </c:choose>
                             </c:forEach>
                             <c:if test="${page < totalPages}">
-                                <a href="?page=${page+1}<c:if test="${not empty keyword}">&keyword=${keyword}</c:if><c:if test="${not empty status}">&status=${status}</c:if><c:if test="${not empty genreID}">&genre=${genreID}</c:if>"
+                                <a href="?page=${page+1}<c:if test="${not empty keyword}">&keyword=${keyword}</c:if><c:if test="${not empty status}">&status=${status}</c:if><c:if test="${not empty categoryID}">&category=${categoryID}</c:if>"
                                    class="w-9 h-9 flex items-center justify-center rounded-lg border border-outline-variant text-on-surface-variant hover:border-primary hover:text-primary transition-colors text-sm">›</a>
                             </c:if>
                         </div>

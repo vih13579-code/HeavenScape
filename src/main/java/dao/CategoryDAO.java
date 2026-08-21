@@ -5,29 +5,29 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
-import model.Genre;
+import model.Category;
 import utils.DBContext;
 
-public class GenreDAO {
+public class CategoryDAO {
 
     private final DBContext db = new DBContext();
 
-    public List<Genre> getAllGenres() {
-        List<Genre> list = new ArrayList<>();
-        String sql = "SELECT g.genreID, g.genre_name, COUNT(b.bookID) AS book_count "
-                + "FROM Genre g "
-                + "LEFT JOIN Book b ON b.genreID = g.genreID "
-                + "GROUP BY g.genreID, g.genre_name "
-                + "ORDER BY g.genreID DESC";
+    public List<Category> getAllCategories() {
+        List<Category> list = new ArrayList<>();
+        String sql = "SELECT g.categoryID, g.category_name, COUNT(b.bookID) AS book_count "
+                + "FROM Category g "
+                + "LEFT JOIN Book b ON b.categoryID = g.categoryID "
+                + "GROUP BY g.categoryID, g.category_name "
+                + "ORDER BY g.categoryID DESC";
 
         try (Connection conn = db.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                list.add(new Genre(
-                        rs.getInt("genreID"),
-                        rs.getString("genre_name"),
+                list.add(new Category(
+                        rs.getInt("categoryID"),
+                        rs.getString("category_name"),
                         rs.getInt("book_count")
                 ));
             }
@@ -38,14 +38,14 @@ public class GenreDAO {
         return list;
     }
 
-    public List<Genre> searchGenres(String keyword) {
-        List<Genre> list = new ArrayList<>();
-        String sql = "SELECT g.genreID, g.genre_name, COUNT(b.bookID) AS book_count "
-                + "FROM Genre g "
-                + "LEFT JOIN Book b ON b.genreID = g.genreID "
-                + "WHERE g.genre_name LIKE ? "
-                + "GROUP BY g.genreID, g.genre_name "
-                + "ORDER BY g.genreID DESC";
+    public List<Category> searchCategories(String keyword) {
+        List<Category> list = new ArrayList<>();
+        String sql = "SELECT g.categoryID, g.category_name, COUNT(b.bookID) AS book_count "
+                + "FROM Category g "
+                + "LEFT JOIN Book b ON b.categoryID = g.categoryID "
+                + "WHERE g.category_name LIKE ? "
+                + "GROUP BY g.categoryID, g.category_name "
+                + "ORDER BY g.categoryID DESC";
 
         try (Connection conn = db.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -54,9 +54,9 @@ public class GenreDAO {
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    list.add(new Genre(
-                            rs.getInt("genreID"),
-                            rs.getString("genre_name"),
+                    list.add(new Category(
+                            rs.getInt("categoryID"),
+                            rs.getString("category_name"),
                             rs.getInt("book_count")
                     ));
                 }
@@ -68,12 +68,12 @@ public class GenreDAO {
         return list;
     }
 
-    public Genre getGenreById(int id) {
-        String sql = "SELECT g.genreID, g.genre_name, COUNT(b.bookID) AS book_count "
-                + "FROM Genre g "
-                + "LEFT JOIN Book b ON b.genreID = g.genreID "
-                + "WHERE g.genreID = ? "
-                + "GROUP BY g.genreID, g.genre_name";
+    public Category getCategoryById(int id) {
+        String sql = "SELECT g.categoryID, g.category_name, COUNT(b.bookID) AS book_count "
+                + "FROM Category g "
+                + "LEFT JOIN Book b ON b.categoryID = g.categoryID "
+                + "WHERE g.categoryID = ? "
+                + "GROUP BY g.categoryID, g.category_name";
 
         try (Connection conn = db.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -82,9 +82,9 @@ public class GenreDAO {
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return new Genre(
-                            rs.getInt("genreID"),
-                            rs.getString("genre_name"),
+                    return new Category(
+                            rs.getInt("categoryID"),
+                            rs.getString("category_name"),
                             rs.getInt("book_count")
                     );
                 }
@@ -96,14 +96,14 @@ public class GenreDAO {
         return null;
     }
 
-    public boolean isGenreNameExists(String name) {
-        return isGenreNameExists(name, 0);
+    public boolean isCategoryNameExists(String name) {
+        return isCategoryNameExists(name, 0);
     }
 
-    public boolean isGenreNameExists(String name, int exceptId) {
-        String sql = "SELECT COUNT(*) FROM Genre WHERE LOWER(LTRIM(RTRIM(genre_name))) = LOWER(LTRIM(RTRIM(?)))";
+    public boolean isCategoryNameExists(String name, int exceptId) {
+        String sql = "SELECT COUNT(*) FROM Category WHERE LOWER(LTRIM(RTRIM(category_name))) = LOWER(LTRIM(RTRIM(?)))";
         if (exceptId > 0) {
-            sql += " AND genreID <> ?";
+            sql += " AND categoryID <> ?";
         }
 
         try (Connection conn = db.getConnection();
@@ -126,8 +126,8 @@ public class GenreDAO {
         return false;
     }
 
-    public boolean insertGenre(String name) {
-        String sql = "INSERT INTO Genre(genre_name) VALUES (?)";
+    public boolean insertCategory(String name) {
+        String sql = "INSERT INTO Category(category_name) VALUES (?)";
 
         try (Connection conn = db.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -141,8 +141,8 @@ public class GenreDAO {
         return false;
     }
 
-    public boolean updateGenre(int id, String name) {
-        String sql = "UPDATE Genre SET genre_name = ? WHERE genreID = ?";
+    public boolean updateCategory(int id, String name) {
+        String sql = "UPDATE Category SET category_name = ? WHERE categoryID = ?";
 
         try (Connection conn = db.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -157,8 +157,8 @@ public class GenreDAO {
         return false;
     }
 
-    public boolean deleteGenre(int id) {
-        String sql = "DELETE FROM Genre WHERE genreID = ?";
+    public boolean deleteCategory(int id) {
+        String sql = "DELETE FROM Category WHERE categoryID = ?";
 
         try (Connection conn = db.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -172,8 +172,8 @@ public class GenreDAO {
         return false;
     }
 
-    public int countBooksByGenre(int id) {
-        String sql = "SELECT COUNT(*) FROM Book WHERE genreID = ?";
+    public int countBooksByCategory(int id) {
+        String sql = "SELECT COUNT(*) FROM Book WHERE categoryID = ?";
 
         try (Connection conn = db.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {

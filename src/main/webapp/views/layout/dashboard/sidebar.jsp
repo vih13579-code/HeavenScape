@@ -152,7 +152,7 @@
         <a href="${pageContext.request.contextPath}/dashboard/category-management"
            class="sidebar-link <%= sidebarCurrentPath.startsWith("/dashboard/category-management") ? "active" : ""%>">
             <span class="material-symbols-outlined">category</span>
-            Genre
+            Category
         </a>
         <% } %>
 

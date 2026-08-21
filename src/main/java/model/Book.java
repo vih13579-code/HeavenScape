@@ -22,8 +22,8 @@ public class Book {
     private String status;
 
     // FK info
-    private int genreID;
-    private String genreName;
+    private int categoryID;
+    private String categoryName;
     private int contentID;
     private String contentName;
     private int seriesID;
@@ -124,20 +124,20 @@ public class Book {
         this.status = v;
     }
 
-    public int getGenreID() {
-        return genreID;
+    public int getCategoryID() {
+        return categoryID;
     }
 
-    public void setGenreID(int v) {
-        this.genreID = v;
+    public void setCategoryID(int v) {
+        this.categoryID = v;
     }
 
-    public String getGenreName() {
-        return genreName;
+    public String getCategoryName() {
+        return categoryName;
     }
 
-    public void setGenreName(String v) {
-        this.genreName = v;
+    public void setCategoryName(String v) {
+        this.categoryName = v;
     }
 
     public int getContentID() {
