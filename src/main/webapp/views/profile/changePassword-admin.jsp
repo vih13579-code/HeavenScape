@@ -8,6 +8,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Change Password</title>
+        <link rel="icon" type="image/png" href="https://res.cloudinary.com/llfxqkny/image/upload/v1787226687/heavenscape/favicon/heavenscape_favicon.png">
         <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
@@ -37,7 +38,7 @@
             }
             .input-premium:focus {
                 outline: none;
-                border-color: #004d99;
+                border-color: #C92127;
                 box-shadow: 0 0 0 4px rgba(0,77,153,.15);
             }
             .form-label-modern {
@@ -55,7 +56,7 @@
                 display: inline-flex;
                 align-items: center;
                 gap: 10px;
-                background: linear-gradient(135deg,#004d99,#003366);
+                background: linear-gradient(135deg,#C92127,#8E171B);
                 color: white;
                 padding: 14px 28px;
                 border-radius: 9999px;
@@ -191,7 +192,7 @@
                                     </button>
                                 </div>
                             </div>
-                            <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                            <div class="bg-[#FDE8E9] border border-[#FFB3B0] rounded-xl p-4">
                                 <p class="text-sm text-blue-700">
                                     Password must be 8–15 characters long,
                                     including uppercase and lowercase letters, numbers,

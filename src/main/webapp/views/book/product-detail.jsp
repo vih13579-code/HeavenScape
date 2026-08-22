@@ -7,6 +7,20 @@
 <%@ include file="/views/layout/common/toast.jsp" %>
 <%@ include file="/views/layout/common/wishlist-heart.js.jsp" %>
 <style>
+    :root {
+        --hs-primary: #C92127;
+        --hs-surface-low: #F7F7F8;
+        --hs-outline-variant: #D9D9DC;
+        --hs-tertiary: #F5A623;
+        --hs-tertiary-container: #FFF3D6;
+    }
+    .hs-detail-title { font-size: 24px; font-weight: 700; color: #1B1B1B; line-height: 1.3; }
+    .hs-primary-button { background:#C92127; color:#fff; border-radius:6px; transition: background .15s, transform .15s; }
+    .hs-primary-button:hover { background:#8E171B; }
+    .hs-secondary-button { background:#fff; color:#C92127; border:2px solid #C92127; border-radius:6px; transition: background .15s; }
+    .hs-secondary-button:hover { background:#FDE8E9; }
+    .hs-purchase-panel { background:#fff; border:1px solid #E3E3E6; border-radius:12px; }
+
     .no-spinner::-webkit-outer-spin-button,
     .no-spinner::-webkit-inner-spin-button {
         -webkit-appearance: none;
@@ -211,7 +225,7 @@
         width: 40px;
         height: 40px;
         border-radius: 50%;
-        background: #4f46e5;
+        background: #C92127;
         color: white;
         display: flex;
         align-items: center;
@@ -226,20 +240,20 @@
     }
 </style>
 
-<main class="flex-grow max-w-[1280px] w-full mx-auto px-5 md:px-16 py-10 md:py-16 flex flex-col gap-10">
+<main class="fhs-page-inner flex flex-col gap-4">
 
     <nav class="flex flex-wrap items-center gap-2 text-sm text-on-surface-variant" aria-label="Breadcrumb">
         <a href="${pageContext.request.contextPath}/home" class="hover:text-primary">Home</a>
         <i data-lucide="chevron-right" class="w-4 h-4"></i>
-        <c:if test="${not empty book.genreName}">
-            <a href="${pageContext.request.contextPath}/products?genre=${book.genreID}" class="hover:text-primary">${book.genreName}</a>
+        <c:if test="${not empty book.categoryName}">
+            <a href="${pageContext.request.contextPath}/products?category=${book.categoryID}" class="hover:text-primary">${book.categoryName}</a>
             <i data-lucide="chevron-right" class="w-4 h-4"></i>
         </c:if>
         <span class="text-on-surface line-clamp-1">${book.title}</span>
     </nav>
 
 
-    <section class="flex flex-col lg:flex-row gap-8 lg:gap-14">
+    <section class="fhs-block p-5 md:p-7 flex flex-col lg:flex-row gap-7 lg:gap-10">
 
 
         <div class="flex-shrink-0 w-full lg:w-[42%] flex flex-col gap-4">
@@ -358,9 +372,9 @@
 
             <!-- Tags -->
             <div class="flex flex-wrap gap-2">
-                <c:if test="${not empty book.genreName}">
+                <c:if test="${not empty book.categoryName}">
                     <span
-                        class="bg-primary/10 text-primary text-[12px] font-bold px-3 py-1 rounded-full uppercase tracking-wide">${book.genreName}</span>
+                        class="bg-primary/10 text-primary text-[12px] font-bold px-3 py-1 rounded-full uppercase tracking-wide">${book.categoryName}</span>
                 </c:if>
                 <c:if test="${book.featured}">
                     <span
@@ -541,7 +555,7 @@
 
             <!-- Specs grid -->
             <div
-                class="border-y border-outline-variant grid grid-cols-2 md:grid-cols-4 divide-x divide-outline-variant py-6">
+                class="border-y border-outline-variant grid grid-cols-2 md:grid-cols-5 divide-x divide-outline-variant py-6">
                 <div class="flex flex-col gap-1 px-4 first:pl-0">
                     <span
                         class="text-[12px] font-bold text-gray-500 uppercase tracking-wide">Format</span>
@@ -577,6 +591,17 @@
                 </div>
                 <div class="flex flex-col gap-1 px-4">
                     <span
+                        class="text-[12px] font-bold text-gray-500 uppercase tracking-wide">Publisher</span>
+                    <span class="text-[16px] font-medium text-[#222222]">
+                        <c:choose>
+                            <c:when test="${not empty book.publisherName}">${book.publisherName}
+                            </c:when>
+                            <c:otherwise>&mdash;</c:otherwise>
+                        </c:choose>
+                    </span>
+                </div>
+                <div class="flex flex-col gap-1 px-4">
+                    <span
                         class="text-[12px] font-bold text-gray-500 uppercase tracking-wide">Page Count</span>
                     <span class="text-[16px] font-medium text-[#222222]">
                         <c:choose>
@@ -592,7 +617,7 @@
 
 
     <!-- ══ TABS: Description / Thông tin / Review  -->
-    <section class="pt-2">
+    <section class="fhs-block p-5 md:p-7">
         <!-- Tab Navigation -->
         <div class="tab-nav">
             <button class="tab-btn" onclick="switchTab('tab-desc', this)">Description</button>
@@ -660,6 +685,17 @@
                                     ${book.seriesName}
                                 </c:when>
                                 <c:otherwise>—</c:otherwise>
+                            </c:choose>
+                        </td>
+                    </tr>
+                    <tr class="border-b border-gray-100">
+                        <td class="py-3 font-semibold text-gray-500">Publisher</td>
+                        <td class="py-3 text-gray-800">
+                            <c:choose>
+                                <c:when test="${not empty book.publisherName}">
+                                    ${book.publisherName}
+                                </c:when>
+                                <c:otherwise>&mdash;</c:otherwise>
                             </c:choose>
                         </td>
                     </tr>
@@ -768,7 +804,7 @@
                                 </p>
                                 <c:if test="${not empty review.adminReply}">
                                     <div
-                                        class="mt-5 ml-6 p-4 bg-blue-50 rounded-lg border-l-4 border-primary">
+                                        class="mt-5 ml-6 p-4 bg-[#FDE8E9] rounded-lg border-l-4 border-primary">
                                         <div class="flex items-center gap-2 mb-2">
                                             <span
                                                 class="font-bold text-primary">HeavenScape</span>
@@ -837,7 +873,7 @@
 
 
     <c:if test="${not empty relatedBooks}">
-        <section class="pt-2">
+        <section class="fhs-block p-5 md:p-7">
             <div class="flex items-center justify-between mb-5">
                 <h2 class="section-title-left text-[20px] font-bold text-primary">📚 You May Also Like</h2>
                 <div class="flex gap-2">
@@ -857,7 +893,7 @@
                     <div
                         class="slider-item prod-card-hover bg-white rounded-xl overflow-hidden flex flex-col">
                         <div
-                            class="relative block bg-[#f0f4ff] aspect-[3/4] overflow-hidden">
+                            class="relative block bg-[#F7F7F8] aspect-[3/4] overflow-hidden">
                             <a
                                 href="${pageContext.request.contextPath}/products?id=${rb.bookID}">
                                 <%-- [FIX] check đúng field đang được hiển thị
@@ -880,7 +916,7 @@
                             </a>
                             <c:if test="${rb.featured}">
                                 <span
-                                    class="absolute top-2.5 right-2.5 bg-[#8E24AA] text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full">🔥
+                                    class="absolute top-2.5 left-2.5 z-10 bg-[#8E24AA] text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full">🔥
                                     Hot</span>
                                 </c:if>
                                 <jsp:include page="/views/layout/common/wishlist-heart.jsp">

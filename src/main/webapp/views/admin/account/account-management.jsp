@@ -8,6 +8,7 @@
         <meta charset="UTF-8">
         <meta content="width=device-width, initial-scale=1.0" name="viewport">
         <title>Account Management - HeavenScape</title>
+        <link rel="icon" type="image/png" href="https://res.cloudinary.com/llfxqkny/image/upload/v1787226687/heavenscape/favicon/heavenscape_favicon.png">
         <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
@@ -18,24 +19,24 @@
                 theme: {
                     extend: {
                         "colors": {
-                            "primary": "#004d99",
-                            "secondary": "#705d00",
+                            "primary": "#C92127",
+                            "secondary": "#F97316",
                             "success": "#2E7D32",
                             "error": "#D32F2F",
-                            "warning": "#FFA000",
-                            "background": "#f3faff",
-                            "background-alt": "#F5F7F9",
+                            "warning": "#F9A825",
+                            "background": "#F7F7F8",
+                            "background-alt": "#FFFFFF",
                             "surface": "#FFFFFF",
-                            "on-surface": "#071e27",
-                            "on-surface-variant": "#424752",
-                            "outline": "#727783",
-                            "outline-variant": "#c2c6d4",
-                            "surface-container-low": "#e6f6ff",
-                            "surface-container": "#dbf1fe",
-                            "surface-container-high": "#d5ecf8",
-                            "primary-fixed": "#d6e3ff",
-                            "secondary-container": "#fdd835",
-                            "error-container": "#ffdad6"
+                            "on-surface": "#1B1B1B",
+                            "on-surface-variant": "#5C5C5F",
+                            "outline": "#8F8F92",
+                            "outline-variant": "#D9D9DC",
+                            "surface-container-low": "#F7F7F8",
+                            "surface-container": "#F1F1F3",
+                            "surface-container-high": "#EBEBED",
+                            "primary-fixed": "#FFDAD9",
+                            "secondary-container": "#FFE3C2",
+                            "error-container": "#FFDAD6"
                         }
                     }
                 }
@@ -73,8 +74,8 @@
                 color: #D32F2F;
             }
             .role-badge-staff    {
-                background: #E3F2FD;
-                color: #004d99;
+                background: #FDE8E9;
+                color: #C92127;
             }
             .role-badge-customer {
                 background: #FFF3E0;
@@ -96,14 +97,12 @@
         <%@ include file="/views/layout/dashboard/sidebar.jsp" %>
 
         <main class="flex-1 md:ml-64 min-h-screen flex flex-col">
-            <header class="bg-white border-b h-14 sticky top-0 z-30 flex items-center px-6"
-                    style="border-color:#c2c6d4;">
-                <h2 class="font-semibold text-base">
-                    Account Management
-                </h2>
-            </header>
             <div class="p-6 md:p-8 ">
-                <div class="flex flex-col md:flex-row justify-end items-end gap-4 mb-6">
+                <div class="hs-admin-page-heading mb-6">
+                    <div>
+                        <h1 class="hs-admin-page-title">Account Management</h1>
+                        <p class="hs-admin-page-subtitle">Manage customer, staff, and administrator accounts.</p>
+                    </div>
                     <c:if test="${sessionScope.account.role == 'admin'}">
                         <a href="${pageContext.request.contextPath}/dashboard/add-staff"
                            class="bg-primary text-white px-6 py-3 rounded-xl inline-flex items-center gap-2 hover:opacity-90 transition">

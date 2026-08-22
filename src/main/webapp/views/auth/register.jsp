@@ -7,6 +7,7 @@
         <meta charset="utf-8">
         <meta content="width=device-width, initial-scale=1.0" name="viewport">
         <title>Create an Account | HeavenScape</title>
+        <link rel="icon" type="image/png" href="https://res.cloudinary.com/llfxqkny/image/upload/v1787226687/heavenscape/favicon/heavenscape_favicon.png">
         <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
@@ -16,35 +17,35 @@
                 theme: {
                     extend: {
                         "colors": {
-                            "surface-dim": "#c7dde9",
-                            "tertiary": "#134aa4",
+                            "surface-dim": "#E9E9EB",
+                            "tertiary": "#F5A623",
                             "error": "#D32F2F",
-                            "primary-fixed": "#d6e3ff",
-                            "secondary": "#705d00",
-                            "surface-container-high": "#d5ecf8",
-                            "on-primary": "#ffffff",
-                            "outline": "#727783",
-                            "on-surface-variant": "#424752",
-                            "on-error-container": "#93000a",
-                            "on-tertiary": "#ffffff",
-                            "on-secondary": "#ffffff",
-                            "on-primary-container": "#dae5ff",
+                            "primary-fixed": "#FFDAD9",
+                            "secondary": "#F97316",
+                            "surface-container-high": "#EBEBED",
+                            "on-primary": "#FFFFFF",
+                            "outline": "#8F8F92",
+                            "on-surface-variant": "#5C5C5F",
+                            "on-error-container": "#93000A",
+                            "on-tertiary": "#402D00",
+                            "on-secondary": "#FFFFFF",
+                            "on-primary-container": "#7A0F13",
                             "surface": "#FFFFFF",
-                            "surface-container": "#dbf1fe",
-                            "on-background": "#071e27",
-                            "warning": "#FFA000",
-                            "surface-container-low": "#e6f6ff",
-                            "surface-bright": "#f3faff",
-                            "primary-container": "#1565c0",
-                            "primary": "#004d99",
-                            "on-surface": "#071e27",
-                            "background": "#f3faff",
-                            "surface-variant": "#cfe6f2",
-                            "secondary-container": "#fdd835",
-                            "surface-container-lowest": "#ffffff",
+                            "surface-container": "#F1F1F3",
+                            "on-background": "#1B1B1B",
+                            "warning": "#F9A825",
+                            "surface-container-low": "#F7F7F8",
+                            "surface-bright": "#FFFFFF",
+                            "primary-container": "#FDE8E9",
+                            "primary": "#C92127",
+                            "on-surface": "#1B1B1B",
+                            "background": "#F7F7F8",
+                            "surface-variant": "#EFE0DF",
+                            "secondary-container": "#FFE3C2",
+                            "surface-container-lowest": "#FFFFFF",
                             "success": "#2E7D32",
-                            "outline-variant": "#c2c6d4",
-                            "error-container": "#ffdad6"
+                            "outline-variant": "#D9D9DC",
+                            "error-container": "#FFDAD6"
                         },
                         "borderRadius": {
                             "DEFAULT": "0.25rem",
@@ -92,7 +93,7 @@
         <style>
             body {
                 font-family: 'Inter', sans-serif;
-                background-color: #f3faff;
+                background-color: #F7F7F8;
             }
             .material-symbols-outlined {
                 font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;

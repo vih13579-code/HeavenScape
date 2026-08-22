@@ -238,7 +238,7 @@ public class CustomerOrderController extends HttpServlet {
                     orderDAO.updatePaymentStatus(orderID, "paid");
                 }
             } else if ("cancelled".equalsIgnoreCase(status)) {
-                if ("vnpay".equalsIgnoreCase(order.getPaymentMethod()) && "paid".equalsIgnoreCase(order.getPaymentStatus())) {
+                if ("cod".equalsIgnoreCase(order.getPaymentMethod()) && "paid".equalsIgnoreCase(order.getPaymentStatus())) {
 
                     orderDAO.updatePaymentStatus(orderID, "pending_refund");
 

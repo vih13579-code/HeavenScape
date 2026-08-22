@@ -7,6 +7,7 @@
         <meta charset="utf-8">
         <meta content="width=device-width, initial-scale=1.0" name="viewport">
         <title>Dashboard - HeavenScape</title>
+        <link rel="icon" type="image/png" href="https://res.cloudinary.com/llfxqkny/image/upload/v1787226687/heavenscape/favicon/heavenscape_favicon.png">
         <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
@@ -16,24 +17,24 @@
                 theme: {
                     extend: {
                         "colors": {
-                            "tertiary": "#134aa4",
-                            "primary": "#004d99",
-                            "warning": "#FFA000",
-                            "surface-container-highest": "#cfe6f2",
-                            "surface-container-lowest": "#ffffff",
-                            "on-primary": "#ffffff",
+                            "tertiary": "#F5A623",
+                            "primary": "#C92127",
+                            "warning": "#F9A825",
+                            "surface-container-highest": "#E3E3E6",
+                            "surface-container-lowest": "#FFFFFF",
+                            "on-primary": "#FFFFFF",
                             "surface": "#FFFFFF",
-                            "primary-container": "#1565c0",
-                            "on-background": "#071e27",
-                            "background": "#f3faff",
-                            "surface-container-low": "#e6f6ff",
-                            "background-alt": "#F5F7F9",
+                            "primary-container": "#FDE8E9",
+                            "on-background": "#1B1B1B",
+                            "background": "#F7F7F8",
+                            "surface-container-low": "#F7F7F8",
+                            "background-alt": "#FFFFFF",
                             "success": "#2E7D32",
                             "error": "#D32F2F",
-                            "on-surface-variant": "#424752",
-                            "on-surface": "#071e27",
-                            "outline": "#727783",
-                            "outline-variant": "#c2c6d4"
+                            "on-surface-variant": "#5C5C5F",
+                            "on-surface": "#1B1B1B",
+                            "outline": "#8F8F92",
+                            "outline-variant": "#D9D9DC"
                         },
                         "spacing": {
                             "container-max": "1280px",
@@ -50,7 +51,7 @@
         <style>
             body { font-family: 'Inter', sans-serif; }
             .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
-            .bar-item { min-width: 18px; border-radius: 10px 10px 0 0; background: linear-gradient(180deg, #1565c0 0%, #004d99 100%); }
+            .bar-item { min-width: 18px; border-radius: 10px 10px 0 0; background: linear-gradient(180deg, #F97316 0%, #C92127 100%); }
         </style>
     </head>
     <body class="bg-background text-on-surface flex min-h-screen">
@@ -58,16 +59,11 @@
         <%@ include file="/views/layout/dashboard/sidebar.jsp" %>
 
         <main class="flex-1 md:ml-64 min-h-screen flex flex-col">
-            <header class="bg-white border-b h-14 sticky top-0 z-30 flex items-center px-6"
-                    style="border-color:#c2c6d4;">
-                <h1 class="font-semibold text-base text-on-background">Dashboard</h1>
-            </header>
-
             <div class="p-gutter max-w-container-max w-full mx-auto space-y-stack-lg">
-                <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div class="hs-admin-page-heading">
                     <div>
-                        <h2 class="text-3xl font-bold text-on-background">Dashboard</h2>
-                        <p class="text-body-md text-on-surface-variant mt-1">Monitor HeavenScape revenue, orders, and book sales performance.</p>
+                        <h2 class="hs-admin-page-title">Dashboard</h2>
+                        <p class="hs-admin-page-subtitle">Monitor HeavenScape revenue, orders, and book sales performance.</p>
                     </div>
                 </div>
 
@@ -82,11 +78,11 @@
                             <input type="date" name="toDate" value="${toDate}" max="${currentDate}" class="w-full rounded-xl border-outline-variant bg-surface-container-low focus:ring-primary focus:border-primary">
                         </div>
                         <div>
-                            <label class="block text-sm font-semibold text-on-surface-variant mb-2">Genre</label>
-                            <select name="genreID" class="w-full rounded-xl border-outline-variant bg-surface-container-low focus:ring-primary focus:border-primary">
-                                <option value="0">All Genres</option>
-                                <c:forEach var="g" items="${genres}">
-                                    <option value="${g.genreID}" <c:if test="${selectedGenreID == g.genreID}">selected</c:if>>${g.genreName}</option>
+                            <label class="block text-sm font-semibold text-on-surface-variant mb-2">Category</label>
+                            <select name="categoryID" class="w-full rounded-xl border-outline-variant bg-surface-container-low focus:ring-primary focus:border-primary">
+                                <option value="0">All Categories</option>
+                                <c:forEach var="g" items="${categories}">
+                                    <option value="${g.categoryID}" <c:if test="${selectedCategoryID == g.categoryID}">selected</c:if>>${g.categoryName}</option>
                                 </c:forEach>
                             </select>
                         </div>
@@ -149,7 +145,7 @@
                                 <span class="material-symbols-outlined">receipt_long</span>
                             </div>
                             <div>
-                                <p class="text-sm text-on-surface-variant">${statusEntry.key}</p>
+                                <p class="text-sm text-on-surface-variant uppercase">${statusEntry.key}</p>
                                 <p class="text-xl font-bold">${statusEntry.value}</p>
                             </div>
                         </div>
@@ -166,7 +162,7 @@
                     <div class="bg-surface rounded-2xl shadow-[0_4px_20px_rgba(21,101,192,0.08)] border border-outline-variant/30 p-6">
                         <div class="flex items-center justify-between mb-6">
                             <div>
-                                <h3 class="text-xl font-bold">Revenue by Genre</h3>
+                                <h3 class="text-xl font-bold">Revenue by Category</h3>
                                 <p class="text-sm text-on-surface-variant">
                             </div>
                             <span class="material-symbols-outlined text-primary">bar_chart</span>
@@ -180,7 +176,7 @@
                                     <c:forEach var="row" items="${revenueByCategory}">
                                         <div>
                                             <div class="flex justify-between text-sm mb-1">
-                                                <span class="font-semibold">${row.genreName}</span>
+                                                <span class="font-semibold">${row.categoryName}</span>
                                                 <span class="text-primary font-bold"><fmt:formatNumber value="${row.revenue}" type="number" groupingUsed="true"/> VND</span>
                                             </div>
                                             <div class="h-3 bg-surface-container-low rounded-full overflow-hidden">
@@ -197,7 +193,7 @@
                         <div class="flex items-center justify-between mb-6">
                             <div>
                                 <h3 class="text-xl font-bold">Best-Selling Books</h3>
-                                <p class="text-sm text-on-surface-variant">Top books for the selected date range and genre</p>
+                                <p class="text-sm text-on-surface-variant">Top books for the selected date range and category</p>
                             </div>
                             <span class="material-symbols-outlined text-primary">workspace_premium</span>
                         </div>
@@ -206,7 +202,7 @@
                                 <thead>
                                     <tr class="border-b border-outline-variant/20">
                                         <th class="py-3 text-xs uppercase text-on-surface-variant">Book</th>
-                                        <th class="py-3 text-xs uppercase text-on-surface-variant">Genre</th>
+                                        <th class="py-3 text-xs uppercase text-on-surface-variant">Category</th>
                                         <th class="py-3 text-xs uppercase text-on-surface-variant text-right">Sold</th>
                                     </tr>
                                 </thead>
@@ -214,7 +210,7 @@
                                     <c:forEach var="book" items="${topSellingBooks}">
                                         <tr>
                                             <td class="py-3 font-semibold text-sm">${book.title}</td>
-                                            <td class="py-3 text-sm text-on-surface-variant">${book.genreName}</td>
+                                            <td class="py-3 text-sm text-on-surface-variant">${book.categoryName}</td>
                                             <td class="py-3 text-sm font-bold text-primary text-right">${book.soldQuantity}</td>
                                         </tr>
                                     </c:forEach>
@@ -227,72 +223,6 @@
                     </div>
                 </div>
 
-                <div class="bg-surface rounded-2xl shadow-[0_4px_20px_rgba(21,101,192,0.08)] overflow-hidden border border-outline-variant/30">
-                    <div class="p-6 border-b border-outline-variant/30 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                        <div>
-                            <h3 class="text-xl font-bold">Orders</h3>
-                            <p class="text-sm text-on-surface-variant">
-                                <c:choose>
-                                    <c:when test="${showAll}">Showing all orders in the system.</c:when>
-                                    <c:when test="${filterRequested}">Showing orders matching the selected filters.</c:when>
-                                    <c:otherwise>Select filters or choose View All Orders to display data.</c:otherwise>
-                                </c:choose>
-                            </p>
-                        </div>
-                        <a href="${pageContext.request.contextPath}/dashboard?showAll=true"
-                           class="shrink-0 px-4 py-2.5 rounded-xl bg-white border border-outline-variant/60 text-on-surface font-semibold hover:bg-background-alt transition-colors">
-                            View All Orders
-                        </a>
-                    </div>
-
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
-                            <thead>
-                                <tr class="bg-surface-container-low/50 border-b border-outline-variant/10">
-                                    <th class="px-gutter py-4 text-xs text-on-surface-variant uppercase tracking-wider font-bold">Order Code</th>
-                                    <th class="px-gutter py-4 text-xs text-on-surface-variant uppercase tracking-wider font-bold">Customer</th>
-                                    <th class="px-gutter py-4 text-xs text-on-surface-variant uppercase tracking-wider font-bold">Order Date</th>
-                                    <th class="px-gutter py-4 text-xs text-on-surface-variant uppercase tracking-wider font-bold">Total Amount</th>
-                                    <th class="px-gutter py-4 text-xs text-on-surface-variant uppercase tracking-wider font-bold">Status</th>
-                                </tr>
-                            </thead>
-
-                            <tbody class="divide-y divide-outline-variant/5">
-                                <c:forEach var="order" items="${allOrders}">
-                                    <tr class="hover:bg-background-alt/50 transition-colors">
-                                        <td class="px-gutter py-4">
-                                            <span class="font-bold text-primary">#ORD-${order.orderID}</span>
-                                        </td>
-                                        <td class="px-gutter py-4 text-sm font-medium">${order.customerName}</td>
-                                        <td class="px-gutter py-4 text-sm text-on-surface-variant">
-                                            <fmt:formatDate value="${order.createdAt}" pattern="HH:mm - dd/MM/yyyy"/>
-                                        </td>
-                                        <td class="px-gutter py-4 font-bold text-sm">
-                                            <fmt:formatNumber value="${order.totalPrice}" type="number" groupingUsed="true"/> VND
-                                        </td>
-                                        <td class="px-gutter py-4">
-                                            <span class="inline-flex items-center px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold">
-                                                ${empty order.status ? 'unknown' : order.status}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                </c:forEach>
-
-                                <c:if test="${empty allOrders}">
-                                    <tr>
-                                        <td colspan="5" class="px-gutter py-10 text-center text-on-surface-variant">
-                                            <c:choose>
-                                                <c:when test="${showAll}">There are no orders in the system.</c:when>
-                                                <c:when test="${filterRequested}">No orders match the filters.</c:when>
-                                                <c:otherwise>The order section is currently empty.</c:otherwise>
-                                            </c:choose>
-                                        </td>
-                                    </tr>
-                                </c:if>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
             </div>
             <%@ include file="/views/layout/dashboard/footer.jsp" %>
         </main>

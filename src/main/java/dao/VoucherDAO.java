@@ -45,8 +45,7 @@ public class VoucherDAO {
 
     public List<Voucher> getAllVouchers(String keyword, String status, int offset, int pageSize) {
         List<Voucher> list = new ArrayList<>();
-        String sql
-                = "SELECT voucherID, code, discount_percent, quantity, "
+        String sql = "SELECT voucherID, code, discount_percent, quantity, "
                 + "start_date, end_date, status, is_deleted, usedCount, "
                 + "min_order_value, max_discount_value "
                 + "FROM ("
@@ -230,13 +229,13 @@ public class VoucherDAO {
     public int countActive() {
         return countBySQL(
                 "SELECT COUNT(*) FROM Voucher v "
-                + "WHERE v.is_deleted = 0 AND v.status = 'active' "
-                + "AND (v.start_date IS NULL OR v.start_date <= GETDATE()) "
-                + "AND (v.end_date   IS NULL OR v.end_date   >= GETDATE()) "
-                + "AND (v.quantity IS NULL OR v.quantity > ("
-                + "      SELECT COUNT(*) FROM CustomerVoucher cv "
-                + "      WHERE cv.voucherID = v.voucherID AND cv.is_used = 1"
-                + "    ))");
+                        + "WHERE v.is_deleted = 0 AND v.status = 'active' "
+                        + "AND (v.start_date IS NULL OR v.start_date <= GETDATE()) "
+                        + "AND (v.end_date   IS NULL OR v.end_date   >= GETDATE()) "
+                        + "AND (v.quantity IS NULL OR v.quantity > ("
+                        + "      SELECT COUNT(*) FROM CustomerVoucher cv "
+                        + "      WHERE cv.voucherID = v.voucherID AND cv.is_used = 1"
+                        + "    ))");
     }
 
     public int countExpired() {
@@ -249,7 +248,9 @@ public class VoucherDAO {
     }
 
     private int countBySQL(String sql) {
-        try (Connection conn = new DBContext().getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = new DBContext().getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
                 return rs.getInt(1);
             }
@@ -277,8 +278,7 @@ public class VoucherDAO {
                 rs.getInt("usedCount"),
                 rs.getBoolean("is_deleted"),
                 minOrderValue,
-                maxDiscountValue
-        );
+                maxDiscountValue);
     }
 
     // =================================================================
@@ -289,7 +289,8 @@ public class VoucherDAO {
      * Lấy voucher theo code (chưa bị xoá mềm). Trả về null nếu không tồn tại.
      */
     public Voucher getVoucherByCode(String code) {
-        // Add "0 AS usedCount" để tái dùng mapRow() chung, tránh lặp lại logic map thủ công (DRY)
+        // Add "0 AS usedCount" để tái dùng mapRow() chung, tránh lặp lại logic map thủ
+        // công (DRY)
         String sql = "SELECT voucherID, code, discount_percent, quantity, start_date, end_date, "
                 + "status, is_deleted, min_order_value, max_discount_value, 0 AS usedCount "
                 + "FROM Voucher WHERE UPPER(code) = ? AND is_deleted = 0";
@@ -350,12 +351,11 @@ public class VoucherDAO {
      * khách hàng này chưa dùng.
      *
      * @param customerID ID khách đang xem checkout (dùng để lọc voucher đã dùng
-     * rồi)
+     *                   rồi)
      */
     public List<Voucher> getActiveVouchers(int customerID) {
         List<Voucher> list = new ArrayList<>();
-        String sql
-                = "SELECT v.voucherID, v.code, v.discount_percent, v.quantity, "
+        String sql = "SELECT v.voucherID, v.code, v.discount_percent, v.quantity, "
                 + "       v.start_date, v.end_date, v.status, v.is_deleted, "
                 + "       v.min_order_value, v.max_discount_value, "
                 + "       COUNT(cv.customerVoucherID) AS usedCount "
@@ -415,17 +415,14 @@ public class VoucherDAO {
      *
      * @param quantity giới hạn số lượt của voucher (null = không giới hạn)
      * @return USAGE_OK / USAGE_ALREADY_USED / USAGE_OUT_OF_QUANTITY /
-     * USAGE_ERROR
+     *         USAGE_ERROR
      */
     public int insertVoucherUsage(int customerID, int voucherID, Integer quantity) {
-        String checkCustomerUsed
-                = "SELECT COUNT(*) FROM CustomerVoucher WITH (UPDLOCK, HOLDLOCK) "
+        String checkCustomerUsed = "SELECT COUNT(*) FROM CustomerVoucher WITH (UPDLOCK, HOLDLOCK) "
                 + "WHERE customerID = ? AND voucherID = ? AND is_used = 1";
-        String checkQuantity
-                = "SELECT COUNT(*) FROM CustomerVoucher WITH (UPDLOCK, HOLDLOCK) "
+        String checkQuantity = "SELECT COUNT(*) FROM CustomerVoucher WITH (UPDLOCK, HOLDLOCK) "
                 + "WHERE voucherID = ? AND is_used = 1";
-        String insert
-                = "INSERT INTO CustomerVoucher (customerID, voucherID, is_used) VALUES (?, ?, 1)";
+        String insert = "INSERT INTO CustomerVoucher (customerID, voucherID, is_used) VALUES (?, ?, 1)";
 
         Connection conn = null;
         try {

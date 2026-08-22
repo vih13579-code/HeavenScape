@@ -1,24 +1,29 @@
-<%@ page import="dao.GenreDAO" %>
-<%@ page import="model.Genre" %>
+<%@ page import="dao.CategoryDAO" %>
+<%@ page import="model.Category" %>
 <%@ page import="java.util.List" %>
 
 <%
-    GenreDAO genreDAO = new GenreDAO();
-    List<Genre> genres = genreDAO.getAllGenres();
+    CategoryDAO categoryDAO = new CategoryDAO();
+    List<Category> categories = categoryDAO.getAllCategories();
 %>
 
-<nav class="category-navbar" aria-label="Book Categories">
-    <%
-        if (genres != null && !genres.isEmpty()) {
-            for (Genre genre : genres) {
-    %>
-                <a class="cat-nav-item"
-                   href="<%= request.getContextPath() %>/products?genre=<%= genre.getGenreID() %>">
-                    <i data-lucide="book-open"></i>
-                    <%= genre.getGenreName() %>
-                </a>
-    <%
+<div class="category-navbar-shell">
+    <nav class="category-navbar" aria-label="Book Categories">
+        <a class="cat-nav-home" href="<%= request.getContextPath() %>/products">
+            <i data-lucide="layout-grid" class="icon-sm"></i>
+            All Books
+        </a>
+        <%
+            if (categories != null && !categories.isEmpty()) {
+                for (Category category : categories) {
+        %>
+                    <a class="cat-nav-item"
+                       href="<%= request.getContextPath() %>/products?category=<%= category.getCategoryID() %>">
+                        <%= category.getCategoryName() %>
+                    </a>
+        <%
+                }
             }
-        }
-    %>
-</nav>
+        %>
+    </nav>
+</div>

@@ -7,6 +7,7 @@
         <meta charset="utf-8">
         <meta content="width=device-width, initial-scale=1.0" name="viewport">
         <title>Dashboard - HeavenScape Admin</title>
+        <link rel="icon" type="image/png" href="https://res.cloudinary.com/llfxqkny/image/upload/v1787226687/heavenscape/favicon/heavenscape_favicon.png">
         <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
@@ -15,14 +16,14 @@
                 darkMode: "class",
                 theme: {extend: {
                         colors: {
-                            "primary": "#004d99", "primary-container": "#1565c0",
-                            "secondary-container": "#fdd835", "secondary": "#705d00",
-                            "background": "#f3faff", "surface": "#ffffff",
-                            "on-surface": "#071e27", "on-surface-variant": "#424752",
-                            "outline-variant": "#c2c6d4", "success": "#2E7D32",
-                            "error": "#D32F2F", "warning": "#FFA000",
-                            "error-container": "#ffdad6", "primary-fixed": "#d6e3ff",
-                            "surface-container-low": "#e6f6ff", "background-alt": "#F5F7F9"
+                            "primary": "#C92127", "primary-container": "#FDE8E9",
+                            "secondary-container": "#FFE3C2", "secondary": "#F97316",
+                            "background": "#F7F7F8", "surface": "#FFFFFF",
+                            "on-surface": "#1B1B1B", "on-surface-variant": "#5C5C5F",
+                            "outline-variant": "#D9D9DC", "success": "#2E7D32",
+                            "error": "#D32F2F", "warning": "#F9A825",
+                            "error-container": "#FFDAD6", "primary-fixed": "#FFDAD9",
+                            "surface-container-low": "#F7F7F8", "background-alt": "#FFFFFF"
                         },
                         fontFamily: {sans: ["Inter", "sans-serif"]}
                     }}
@@ -40,7 +41,7 @@
             /* Stat card hover */
             .stat-card {
                 background: #fff;
-                border: 1px solid #e0ecf8;
+                border: 1px solid #FDE8E9;
                 border-radius: 18px;
                 padding: 22px 24px;
                 display: flex;
@@ -66,7 +67,7 @@
             /* Quick action card */
             .action-card {
                 background: #fff;
-                border: 1px solid #e0ecf8;
+                border: 1px solid #FDE8E9;
                 border-radius: 16px;
                 padding: 20px;
                 display: flex;
@@ -75,20 +76,20 @@
                 gap: 10px;
                 text-align: center;
                 text-decoration: none;
-                color: #071e27;
+                color: #1B1B1B;
                 transition: box-shadow .2s, transform .2s, background .2s;
             }
             .action-card:hover {
                 box-shadow: 0 6px 22px rgba(0,77,153,.13);
                 transform: translateY(-3px);
-                background: #f0f8ff;
-                color: #004d99;
+                background: #FDE8E9;
+                color: #C92127;
             }
             .action-card .action-icon {
                 width: 48px;
                 height: 48px;
                 border-radius: 13px;
-                background: #e6f6ff;
+                background: #FDE8E9;
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -96,7 +97,7 @@
 
             /* Table row hover */
             .book-row:hover {
-                background: #f0f8ff;
+                background: #FDE8E9;
             }
 
             /* Status badge */
@@ -129,7 +130,7 @@
             .progress-bar {
                 height: 6px;
                 border-radius: 99px;
-                background: #e6f0ff;
+                background: #FDE8E9;
                 overflow: hidden;
                 margin-top: 8px;
             }
@@ -169,8 +170,8 @@
 
                     <%-- Total Books --%>
                     <div class="stat-card">
-                        <div class="stat-icon" style="background:#dbeafe;">
-                            <span class="material-symbols-outlined" style="color:#1d4ed8; font-size:26px;">library_books</span>
+                        <div class="stat-icon" style="background:#FDE8E9;">
+                            <span class="material-symbols-outlined" style="color:#C92127; font-size:26px;">library_books</span>
                         </div>
                         <div class="min-w-0">
                             <p class="text-xs font-semibold text-on-surface-variant uppercase tracking-wide">Total Books</p>
@@ -229,8 +230,8 @@
                     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
 
                         <a href="${pageContext.request.contextPath}/dashboard/product-management?action=create" class="action-card">
-                            <div class="action-icon" style="background:#e0f2fe;">
-                                <span class="material-symbols-outlined" style="color:#0284c7;">add_box</span>
+                            <div class="action-icon" style="background:#FDE8E9;">
+                                <span class="material-symbols-outlined" style="color:#F97316;">add_box</span>
                             </div>
                             <span class="text-sm font-semibold">Add Book</span>
                         </a>
@@ -286,7 +287,7 @@
                             <thead>
                                 <tr class="bg-background-alt border-b border-outline-variant/30">
                                     <th class="px-5 py-3 font-semibold text-on-surface-variant">Book</th>
-                                    <th class="px-5 py-3 font-semibold text-on-surface-variant">Genre</th>
+                                    <th class="px-5 py-3 font-semibold text-on-surface-variant">Category</th>
                                     <th class="px-5 py-3 font-semibold text-on-surface-variant text-right">Price</th>
                                     <th class="px-5 py-3 font-semibold text-on-surface-variant text-center">Stock</th>
                                     <th class="px-5 py-3 font-semibold text-on-surface-variant text-center">Status</th>
@@ -322,8 +323,8 @@
                                             </div>
                                         </td>
                                         <td class="px-5 py-3">
-                                            <c:if test="${not empty book.genreName}">
-                                                <span style="background:#dbeafe; color:#1d4ed8; font-size:11px; font-weight:700; padding:3px 9px; border-radius:20px;">${book.genreName}</span>
+                                            <c:if test="${not empty book.categoryName}">
+                                                <span style="background:#FDE8E9; color:#C92127; font-size:11px; font-weight:700; padding:3px 9px; border-radius:20px;">${book.categoryName}</span>
                                             </c:if>
                                         </td>
                                         <td class="px-5 py-3 text-right font-semibold text-primary">
@@ -405,16 +406,16 @@
 
                     <%-- Add book banner --%>
                     <div class="md:col-span-2 rounded-2xl p-6 flex items-center gap-5"
-                         style="background: linear-gradient(135deg, #004d99 0%, #1565c0 100%);">
+                         style="background: linear-gradient(135deg, #C92127 0%, #F97316 100%);">
                         <div class="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center flex-shrink-0">
                             <span class="material-symbols-outlined text-white" style="font-size:30px; font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24;">auto_stories</span>
                         </div>
                         <div class="flex-1">
                             <h3 class="text-white font-bold text-lg">Manage Book Inventory</h3>
-                            <p class="text-blue-200 text-sm mt-0.5">Add, edit, and monitor stock for every book in the system.</p>
+                            <p class="text-[#FDE8E9] text-sm mt-0.5">Add, edit, and monitor stock for every book in the system.</p>
                         </div>
                         <a href="${pageContext.request.contextPath}/dashboard/product-management"
-                           class="flex-shrink-0 bg-white text-primary font-bold px-5 py-2.5 rounded-xl text-sm hover:bg-blue-50 transition-colors">
+                           class="flex-shrink-0 bg-white text-primary font-bold px-5 py-2.5 rounded-xl text-sm hover:bg-[#FDE8E9] transition-colors">
                             Manage Books
                         </a>
                     </div>

@@ -15,8 +15,15 @@ import java.util.Properties;
  */
 public class EmailUtil {
 
-    private static final String FROM_EMAIL = "khangnpce181578@fpt.edu.vn";
-    private static final String APP_PASSWORD = "cdln botz auro shjm";
+    private static final String FROM_EMAIL = "minhnldce181159@fpt.edu.vn";
+    private static final String APP_PASSWORD = "ktue pxfq dwib djds";
+    private static final String BRAND_RED = "#C92127";
+    private static final String BRAND_RED_DARK = "#A31D22";
+    private static final String ACCENT_ORANGE = "#F47C20";
+    private static final String TEXT_DARK = "#2B2B2A";
+    private static final String TEXT_MUTED = "#767676";
+    private static final String PAGE_BG = "#f2f2f2";
+    private static final String CARD_BORDER = "#e6e6e6";
 
     public static void sendOtp(String toEmail, String otp) throws MessagingException, UnsupportedEncodingException {
         Properties props = new Properties();
@@ -41,23 +48,46 @@ public class EmailUtil {
         Transport.send(message);
     }
 
-    private static String buildEmailHtml(String otp) {
-        return "<div style=\"font-family: Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 30px 0;\">"
-                + "  <div style=\"max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0;\">"
-                // Header
-                + "    <div style=\"background-color: #134aa4; padding: 20px; text-align: center;\">"
-                + "      <div style=\"color: #ffffff; font-family: Arial, sans-serif; font-size: 28px; font-weight: 800; letter-spacing: 2px; text-align: center;\">HEAVENSCAPE</div>"
+    /*
+     * ---------- shared header/footer, Fahasa-style: solid red bar with
+     * a thin orange accent stripe, white logo wordmark ----------
+     */
+
+    private static String emailHeader() {
+        return "    <div style=\"background-color: " + BRAND_RED + "; padding: 22px 20px 18px;\">"
+                + "      <div style=\"color: #ffffff; font-family: Arial, sans-serif; font-size: 26px; font-weight: 800; letter-spacing: 1.5px; text-align: center;\">HEAVENSCAPE</div>"
                 + "    </div>"
+                + "    <div style=\"height: 4px; background-color: " + ACCENT_ORANGE + ";\"></div>";
+    }
+
+    private static String emailFooter() {
+        return "    <div style=\"background-color: #fafafa; padding: 18px 20px; text-align: center; border-top: 1px solid "
+                + CARD_BORDER + ";\">"
+                + "      <p style=\"color: #999999; font-size: 12px; margin: 0;\">"
+                + "        &copy; 2026 HeavenScape. All rights reserved."
+                + "      </p>"
+                + "    </div>";
+    }
+
+    private static String buildEmailHtml(String otp) {
+        return "<div style=\"font-family: Arial, sans-serif; background-color: " + PAGE_BG
+                + "; margin: 0; padding: 30px 0;\">"
+                + "  <div style=\"max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 4px; overflow: hidden; border: 1px solid "
+                + CARD_BORDER + ";\">"
+                + emailHeader()
                 // Content
                 + "    <div style=\"padding: 30px 40px;\">"
-                + "      <h2 style=\"color: #333333; font-size: 20px; margin-top: 0;\">Verify Your Email Address</h2>"
+                + "      <h2 style=\"color: " + TEXT_DARK
+                + "; font-size: 20px; margin-top: 0;\">Verify Your Email Address</h2>"
                 + "      <p style=\"color: #555555; font-size: 15px; line-height: 1.6;\">"
                 + "        Hello,<br><br>"
                 + "        Thank you for using HeavenScape. You requested to create an account. To complete registration, use the one-time password (OTP) below:"
                 + "      </p>"
                 // Mã OTP
                 + "      <div style=\"text-align: center; margin: 35px 0;\">"
-                + "        <span style=\"display: inline-block; font-size: 34px; font-weight: bold; color: #134aa4; background-color: #f0f5fa; padding: 15px 40px; border-radius: 6px; letter-spacing: 6px; border: 1px dashed #134aa4;\">"
+                + "        <span style=\"display: inline-block; font-size: 34px; font-weight: bold; color: " + BRAND_RED
+                + "; background-color: #fdecec; padding: 15px 40px; border-radius: 4px; letter-spacing: 6px; border: 1px dashed "
+                + BRAND_RED + ";\">"
                 + otp
                 + "        </span>"
                 + "      </div>"
@@ -70,12 +100,7 @@ public class EmailUtil {
                 + "        </p>"
                 + "      </div>"
                 + "    </div>"
-                // Footer
-                + "    <div style=\"background-color: #f9f9f9; padding: 20px; text-align: center; border-top: 1px solid #eeeeee;\">"
-                + "      <p style=\"color: #999999; font-size: 13px; margin: 0;\">"
-                + "        &copy; 2026 HeavenScape. All rights reserved."
-                + "      </p>"
-                + "    </div>"
+                + emailFooter()
                 + "  </div>"
                 + "</div>";
     }
@@ -132,15 +157,15 @@ public class EmailUtil {
         java.text.NumberFormat nf = java.text.NumberFormat.getInstance(java.util.Locale.US);
         String formattedPrice = nf.format(order.getTotalPrice()) + " VND";
 
-        return "<div style=\"font-family: Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 30px 0;\">"
-                + "  <div style=\"max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0;\">"
-                // Header
-                + "    <div style=\"background-color: #134aa4; padding: 20px; text-align: center;\">"
-                + "      <div style=\"color: #ffffff; font-family: Arial, sans-serif; font-size: 28px; font-weight: 800; letter-spacing: 2px; text-align: center;\">HEAVENSCAPE</div>"
-                + "    </div>"
+        return "<div style=\"font-family: Arial, sans-serif; background-color: " + PAGE_BG
+                + "; margin: 0; padding: 30px 0;\">"
+                + "  <div style=\"max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 4px; overflow: hidden; border: 1px solid "
+                + CARD_BORDER + ";\">"
+                + emailHeader()
                 // Content
                 + "    <div style=\"padding: 30px 40px;\">"
-                + "      <h2 style=\"color: #e65c00; font-size: 20px; margin-top: 0;\">Order Cancellation and Refund Processing</h2>"
+                + "      <h2 style=\"color: " + ACCENT_ORANGE
+                + "; font-size: 20px; margin-top: 0;\">Order Cancellation and Refund Processing</h2>"
                 + "      <p style=\"color: #555555; font-size: 15px; line-height: 1.6;\">"
                 + "        Hello,<br><br>"
                 + "        Order <strong>" + order.getOrderCode()
@@ -148,7 +173,7 @@ public class EmailUtil {
                 + "        We will process a refund for the amount paid."
                 + "      </p>"
                 // Thông tin chi tiết
-                + "      <div style=\"background-color: #fff8f0; padding: 15px; border-radius: 6px; margin: 20px 0; border: 1px solid #ffe0b2;\">"
+                + "      <div style=\"background-color: #fff8f0; padding: 15px; border-radius: 4px; margin: 20px 0; border: 1px solid #ffe0b2;\">"
                 + "        <table style=\"width: 100%; border-collapse: collapse; font-size: 14px;\">"
                 + "          <tr>"
                 + "            <td style=\"padding: 5px 0; color: #777777;\">Order Code:</td>"
@@ -157,31 +182,30 @@ public class EmailUtil {
                 + "          </tr>"
                 + "          <tr>"
                 + "            <td style=\"padding: 5px 0; color: #777777;\">Refund Amount:</td>"
-                + "            <td style=\"padding: 5px 0; font-weight: bold; color: #e65c00; text-align: right;\">"
+                + "            <td style=\"padding: 5px 0; font-weight: bold; color: " + ACCENT_ORANGE
+                + "; text-align: right;\">"
                 + formattedPrice + "</td>"
                 + "          </tr>"
                 + "          <tr>"
                 + "            <td style=\"padding: 5px 0; color: #777777;\">Refund Status:</td>"
-                + "            <td style=\"padding: 5px 0; font-weight: bold; color: #e65c00; text-align: right;\">Processing</td>"
+                + "            <td style=\"padding: 5px 0; font-weight: bold; color: " + ACCENT_ORANGE
+                + "; text-align: right;\">Processing</td>"
                 + "          </tr>"
                 + "          <tr>"
                 + "            <td style=\"padding: 5px 0; color: #777777;\">Estimated Time:</td>"
-                + "            <td style=\"padding: 5px 0; font-weight: bold; text-align: right;\">2–5 business days</td>"
+                + "            <td style=\"padding: 5px 0; font-weight: bold; text-align: right;\">After administrator approval</td>"
                 + "          </tr>"
                 + "        </table>"
                 + "      </div>"
                 + "      <p style=\"color: #555555; font-size: 15px; line-height: 1.6;\">"
-                + "        <strong>Note:</strong> The refund will be returned to the bank account or linked wallet used for the VNPAY payment. "
-                + "        You will receive a confirmation email when the refund is complete."
+                + "        <strong>Note:</strong> Approved refunds are credited to your HeavenScape internal wallet "
+                + "        and can be used to pay for future orders."
                 + "      </p>"
                 + "      <div style=\"border-top: 1px solid #eeeeee; margin-top: 30px; padding-top: 20px;\">"
                 + "        <p style=\"color: #888888; font-size: 13px; line-height: 1.5; margin: 0;\">If you need help, please contact HeavenScape support.</p>"
                 + "      </div>"
                 + "    </div>"
-                // Footer
-                + "    <div style=\"background-color: #f9f9f9; padding: 20px; text-align: center; border-top: 1px solid #eeeeee;\">"
-                + "      <p style=\"color: #999999; font-size: 13px; margin: 0;\">&copy; 2026 HeavenScape. All rights reserved.</p>"
-                + "    </div>"
+                + emailFooter()
                 + "  </div>"
                 + "</div>";
     }
@@ -190,12 +214,11 @@ public class EmailUtil {
         java.text.NumberFormat nf = java.text.NumberFormat.getInstance(java.util.Locale.US);
         String formattedPrice = nf.format(order.getTotalPrice()) + " VND";
 
-        return "<div style=\"font-family: Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 30px 0;\">"
-                + "  <div style=\"max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0;\">"
-                // Header
-                + "    <div style=\"background-color: #134aa4; padding: 20px; text-align: center;\">"
-                + "      <div style=\"color: #ffffff; font-family: Arial, sans-serif; font-size: 28px; font-weight: 800; letter-spacing: 2px; text-align: center;\">HEAVENSCAPE</div>"
-                + "    </div>"
+        return "<div style=\"font-family: Arial, sans-serif; background-color: " + PAGE_BG
+                + "; margin: 0; padding: 30px 0;\">"
+                + "  <div style=\"max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 4px; overflow: hidden; border: 1px solid "
+                + CARD_BORDER + ";\">"
+                + emailHeader()
                 // Content
                 + "    <div style=\"padding: 30px 40px;\">"
                 + "      <h2 style=\"color: #2E7D32; font-size: 20px; margin-top: 0;\">Refund Completed Successfully</h2>"
@@ -205,7 +228,7 @@ public class EmailUtil {
                 + "</strong> was successfully refunded to your account."
                 + "      </p>"
                 // Thông tin chi tiết
-                + "      <div style=\"background-color: #f0fff4; padding: 15px; border-radius: 6px; margin: 20px 0; border: 1px solid #c8e6c9;\">"
+                + "      <div style=\"background-color: #f0fff4; padding: 15px; border-radius: 4px; margin: 20px 0; border: 1px solid #c8e6c9;\">"
                 + "        <table style=\"width: 100%; border-collapse: collapse; font-size: 14px;\">"
                 + "          <tr>"
                 + "            <td style=\"padding: 5px 0; color: #777777;\">Order Code:</td>"
@@ -214,7 +237,7 @@ public class EmailUtil {
                 + "          </tr>"
                 + "          <tr>"
                 + "            <td style=\"padding: 5px 0; color: #777777;\">Refund Method:</td>"
-                + "            <td style=\"padding: 5px 0; font-weight: bold; text-align: right;\">Manual Transfer (HeavenScape)</td>"
+                + "            <td style=\"padding: 5px 0; font-weight: bold; text-align: right;\">HeavenScape Internal Wallet</td>"
                 + "          </tr>"
                 + "          <tr>"
                 + "            <td style=\"padding: 5px 0; color: #777777;\">Refunded Amount:</td>"
@@ -228,17 +251,14 @@ public class EmailUtil {
                 + "        </table>"
                 + "      </div>"
                 + "      <p style=\"color: #555555; font-size: 15px; line-height: 1.6;\">"
-                + "        The refund was transferred to your bank account or linked wallet. "
-                + "        If you have not received the funds after 1–2 business days, please contact HeavenScape support."
+                + "        The refund is now available in your HeavenScape internal wallet "
+                + "        and can be used immediately for future orders."
                 + "      </p>"
                 + "      <div style=\"border-top: 1px solid #eeeeee; margin-top: 30px; padding-top: 20px;\">"
                 + "        <p style=\"color: #888888; font-size: 13px; line-height: 1.5; margin: 0;\">Thank you for choosing HeavenScape.</p>"
                 + "      </div>"
                 + "    </div>"
-                // Footer
-                + "    <div style=\"background-color: #f9f9f9; padding: 20px; text-align: center; border-top: 1px solid #eeeeee;\">"
-                + "      <p style=\"color: #999999; font-size: 13px; margin: 0;\">&copy; 2026 HeavenScape. All rights reserved.</p>"
-                + "    </div>"
+                + emailFooter()
                 + "  </div>"
                 + "</div>";
     }
@@ -288,22 +308,22 @@ public class EmailUtil {
             String password) {
         String safeName = (fullName == null || fullName.trim().isEmpty()) ? "Staff Member" : fullName;
 
-        return "<div style=\"font-family: Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 30px 0;\">"
-                + "  <div style=\"max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0;\">"
-                // Header
-                + "    <div style=\"background-color: #134aa4; padding: 20px; text-align: center;\">"
-                + "      <div style=\"color: #ffffff; font-family: Arial, sans-serif; font-size: 28px; font-weight: 800; letter-spacing: 2px; text-align: center;\">HEAVENSCAPE</div>"
-                + "    </div>"
+        return "<div style=\"font-family: Arial, sans-serif; background-color: " + PAGE_BG
+                + "; margin: 0; padding: 30px 0;\">"
+                + "  <div style=\"max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 4px; overflow: hidden; border: 1px solid "
+                + CARD_BORDER + ";\">"
+                + emailHeader()
                 // Content
                 + "    <div style=\"padding: 30px 40px;\">"
-                + "      <h2 style=\"color: #333333; font-size: 20px; margin-top: 0;\">Staff Account Created</h2>"
+                + "      <h2 style=\"color: " + TEXT_DARK
+                + "; font-size: 20px; margin-top: 0;\">Staff Account Created</h2>"
                 + "      <p style=\"color: #555555; font-size: 15px; line-height: 1.6;\">"
                 + "        Hello <strong>" + safeName + "</strong>,<br><br>"
                 + "        Your HeavenScape staff account was created successfully. "
                 + "        Your sign-in details are shown below:"
                 + "      </p>"
                 // Thông tin tài khoản
-                + "      <div style=\"background-color: #f0f5fa; padding: 15px; border-radius: 6px; margin: 20px 0; border: 1px solid #cfe0f5;\">"
+                + "      <div style=\"background-color: #fdecec; padding: 15px; border-radius: 4px; margin: 20px 0; border: 1px solid #f5c6c7;\">"
                 + "        <table style=\"width: 100%; border-collapse: collapse; font-size: 14px;\">"
                 + "          <tr>"
                 + "            <td style=\"padding: 5px 0; color: #777777;\">Username:</td>"
@@ -312,7 +332,8 @@ public class EmailUtil {
                 + "          </tr>"
                 + "          <tr>"
                 + "            <td style=\"padding: 5px 0; color: #777777;\">Password:</td>"
-                + "            <td style=\"padding: 5px 0; font-weight: bold; color: #134aa4; text-align: right;\">"
+                + "            <td style=\"padding: 5px 0; font-weight: bold; color: " + BRAND_RED
+                + "; text-align: right;\">"
                 + password + "</td>"
                 + "          </tr>"
                 + "        </table>"
@@ -327,12 +348,7 @@ public class EmailUtil {
                 + "        </p>"
                 + "      </div>"
                 + "    </div>"
-                // Footer
-                + "    <div style=\"background-color: #f9f9f9; padding: 20px; text-align: center; border-top: 1px solid #eeeeee;\">"
-                + "      <p style=\"color: #999999; font-size: 13px; margin: 0;\">"
-                + "        &copy; 2026 HeavenScape. All rights reserved."
-                + "      </p>"
-                + "    </div>"
+                + emailFooter()
                 + "  </div>"
                 + "</div>";
     }
@@ -368,12 +384,11 @@ public class EmailUtil {
         String priceStr = String.format("%,.0f", order.getTotalPrice()) + " VND";
         String reason = (cancelReason != null && !cancelReason.trim().isEmpty()) ? cancelReason : "No reason provided";
 
-        return "<div style=\"font-family: Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 30px 0;\">"
-                + "  <div style=\"max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0;\">"
-                // Header
-                + "    <div style=\"background-color: #134aa4; padding: 20px; text-align: center;\">"
-                + "      <div style=\"color: #ffffff; font-family: Arial, sans-serif; font-size: 28px; font-weight: 800; letter-spacing: 2px; text-align: center;\">HEAVENSCAPE</div>"
-                + "    </div>"
+        return "<div style=\"font-family: Arial, sans-serif; background-color: " + PAGE_BG
+                + "; margin: 0; padding: 30px 0;\">"
+                + "  <div style=\"max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 4px; overflow: hidden; border: 1px solid "
+                + CARD_BORDER + ";\">"
+                + emailHeader()
                 // Content
                 + "    <div style=\"padding: 30px 40px;\">"
                 + "      <h2 style=\"color: #D32F2F; font-size: 20px; margin-top: 0;\">Order Cancelled</h2>"
@@ -384,17 +399,20 @@ public class EmailUtil {
                 + "      <table style=\"width: 100%; border-collapse: collapse; margin: 20px 0;\">"
                 + "        <tr style=\"background-color: #f9f9f9;\">"
                 + "          <td style=\"padding: 10px 16px; font-size: 14px; color: #555; border-bottom: 1px solid #eee;\"><b>Order Code</b></td>"
-                + "          <td style=\"padding: 10px 16px; font-size: 14px; color: #071e27; border-bottom: 1px solid #eee;\">"
+                + "          <td style=\"padding: 10px 16px; font-size: 14px; color: " + TEXT_DARK
+                + "; border-bottom: 1px solid #eee;\">"
                 + order.getOrderCode() + "</td>"
                 + "        </tr>"
                 + "        <tr>"
                 + "          <td style=\"padding: 10px 16px; font-size: 14px; color: #555; border-bottom: 1px solid #eee;\"><b>Order Date</b></td>"
-                + "          <td style=\"padding: 10px 16px; font-size: 14px; color: #071e27; border-bottom: 1px solid #eee;\">"
+                + "          <td style=\"padding: 10px 16px; font-size: 14px; color: " + TEXT_DARK
+                + "; border-bottom: 1px solid #eee;\">"
                 + createdAtStr + "</td>"
                 + "        </tr>"
                 + "        <tr style=\"background-color: #f9f9f9;\">"
                 + "          <td style=\"padding: 10px 16px; font-size: 14px; color: #555; border-bottom: 1px solid #eee;\"><b>Total Amount</b></td>"
-                + "          <td style=\"padding: 10px 16px; font-size: 14px; color: #071e27; border-bottom: 1px solid #eee;\">"
+                + "          <td style=\"padding: 10px 16px; font-size: 14px; color: " + TEXT_DARK
+                + "; border-bottom: 1px solid #eee;\">"
                 + priceStr + "</td>"
                 + "        </tr>"
                 + "        <tr>"
@@ -408,10 +426,7 @@ public class EmailUtil {
                 + "        <p style=\"color: #888888; font-size: 13px; line-height: 1.5; margin: 0;\">Thank you for using HeavenScape!</p>"
                 + "      </div>"
                 + "    </div>"
-                // Footer
-                + "    <div style=\"background-color: #f9f9f9; padding: 20px; text-align: center; border-top: 1px solid #eeeeee;\">"
-                + "      <p style=\"color: #999999; font-size: 13px; margin: 0;\">&copy; 2026 HeavenScape. All rights reserved.</p>"
-                + "    </div>"
+                + emailFooter()
                 + "  </div>"
                 + "</div>";
     }
@@ -482,12 +497,11 @@ public class EmailUtil {
                 ? "If you believe this was a mistake, please contact HeavenScape support."
                 : "If you did not request this account unlock, contact HeavenScape support immediately.";
 
-        return "<div style=\"font-family: Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 30px 0;\">"
-                + "  <div style=\"max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0;\">"
-                // Header
-                + "    <div style=\"background-color: #134aa4; padding: 20px; text-align: center;\">"
-                + "      <div style=\"color: #ffffff; font-family: Arial, sans-serif; font-size: 28px; font-weight: 800; letter-spacing: 2px; text-align: center;\">HEAVENSCAPE</div>"
-                + "    </div>"
+        return "<div style=\"font-family: Arial, sans-serif; background-color: " + PAGE_BG
+                + "; margin: 0; padding: 30px 0;\">"
+                + "  <div style=\"max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 4px; overflow: hidden; border: 1px solid "
+                + CARD_BORDER + ";\">"
+                + emailHeader()
                 // Content
                 + "    <div style=\"padding: 30px 40px;\">"
                 + "      <h2 style=\"color: " + titleColor + "; font-size: 20px; margin-top: 0;\">" + title + "</h2>"
@@ -501,12 +515,7 @@ public class EmailUtil {
                 + "        </p>"
                 + "      </div>"
                 + "    </div>"
-                // Footer
-                + "    <div style=\"background-color: #f9f9f9; padding: 20px; text-align: center; border-top: 1px solid #eeeeee;\">"
-                + "      <p style=\"color: #999999; font-size: 13px; margin: 0;\">"
-                + "        &copy; 2026 HeavenScape. All rights reserved."
-                + "      </p>"
-                + "    </div>"
+                + emailFooter()
                 + "  </div>"
                 + "</div>";
     }
@@ -534,11 +543,11 @@ public class EmailUtil {
 
     private static String buildAccountViolationLockedHtml(String fullName) {
         String safeName = (fullName == null || fullName.trim().isEmpty()) ? "Customer" : fullName;
-        return "<div style=\"font-family: Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 30px 0;\">"
-                + "  <div style=\"max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0;\">"
-                + "    <div style=\"background-color: #134aa4; padding: 20px; text-align: center;\">"
-                + "      <div style=\"color: #ffffff; font-family: Arial, sans-serif; font-size: 28px; font-weight: 800; letter-spacing: 2px; text-align: center;\">HEAVENSCAPE</div>"
-                + "    </div>"
+        return "<div style=\"font-family: Arial, sans-serif; background-color: " + PAGE_BG
+                + "; margin: 0; padding: 30px 0;\">"
+                + "  <div style=\"max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 4px; overflow: hidden; border: 1px solid "
+                + CARD_BORDER + ";\">"
+                + emailHeader()
                 + "    <div style=\"padding: 30px 40px;\">"
                 + "      <h2 style=\"color: #D32F2F; font-size: 20px; margin-top: 0;\">Account Locked for a Policy Violation</h2>"
                 + "      <p style=\"color: #555555; font-size: 15px; line-height: 1.6;\">"
@@ -553,11 +562,7 @@ public class EmailUtil {
                 + "        </p>"
                 + "      </div>"
                 + "    </div>"
-                + "    <div style=\"background-color: #f9f9f9; padding: 20px; text-align: center; border-top: 1px solid #eeeeee;\">"
-                + "      <p style=\"color: #999999; font-size: 13px; margin: 0;\">"
-                + "        &copy; 2026 HeavenScape. All rights reserved."
-                + "      </p>"
-                + "    </div>"
+                + emailFooter()
                 + "  </div>"
                 + "</div>";
     }

@@ -5,7 +5,7 @@
     <c:if test="${not empty resolvedBookId and resolvedBookId > 0}">
         <form method="post"
               action="${pageContext.request.contextPath}/wishlist"
-              class="wishlist-form absolute top-2.5 left-2.5 z-20"
+              class="wishlist-form absolute top-2.5 right-2.5 z-20"
               data-book-id="${resolvedBookId}"
               onclick="event.stopPropagation();">
             <input type="hidden" name="wishBookId" value="${resolvedBookId}">

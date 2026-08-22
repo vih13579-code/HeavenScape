@@ -1,6 +1,7 @@
 package controller;
 
 import dao.AccountDAO;
+import dao.CartDAO;
 import dao.CustomerDAO;
 import model.Account;
 import jakarta.servlet.ServletException;
@@ -105,6 +106,11 @@ public class GoogleCallbackController extends HttpServlet {
 // 6. Tạo session với account thật từ DB
         session.setAttribute("account", acc);
         session.setMaxInactiveInterval(30 * 60);
+        if ("customer".equals(acc.getRole())) {
+            CartDAO cartDAO = new CartDAO();
+            cartDAO.deleteDiscontinuedCartItems(acc.getId());
+            session.setAttribute("cartCount", cartDAO.countCartItems(acc.getId()));
+        }
         session.setAttribute("successMessage", "Google sign-in successful! Welcome " + acc.getFullname() + ".");
         response.sendRedirect(request.getContextPath() + "/home");
     }
