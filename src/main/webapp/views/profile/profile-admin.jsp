@@ -167,7 +167,8 @@ prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
       .form-panel-heading { margin-bottom:28px; }
       .form-panel-heading h2 { margin:0; color:#222327; font-size:1.3rem; font-weight:800; letter-spacing:-.015em; }
       .form-panel-heading p { margin:7px 0 0; color:var(--muted); font-size:.84rem; line-height:1.6; }
-      .form-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px; }
+      .form-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px; align-items:start; }
+      .form-field { min-width:0; }
       .form-label-modern { display:block; margin-bottom:9px; color:#3c3d42; font-size:.78rem; font-weight:700; text-transform:none; }
       .required-mark { color:var(--primary); }
       .field-wrap { position:relative; }
@@ -179,7 +180,7 @@ prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
       .field-wrap > .input-premium.field-invalid:hover,
       .field-wrap > .input-premium.field-invalid:focus { border-color:#dc2626!important; box-shadow:0 0 0 3px rgba(220,38,38,.1); }
       .field-wrap:has(.field-invalid) .field-icon { color:#dc2626; }
-      .field-message { min-height:18px; margin:7px 2px 0; color:#77787d; font-size:.72rem; line-height:1.45; }
+      .field-message { min-height:34px; margin:7px 2px 0; overflow-wrap:anywhere; color:#77787d; font-size:.72rem; line-height:1.45; }
       .field-message.is-error { color:#d32f2f; font-weight:500; }
       .form-footer { display:flex; align-items:center; justify-content:space-between; gap:18px; margin-top:28px; padding-top:24px; border-top:1px solid #ececef; }
       .form-footer-note { display:flex; align-items:center; gap:8px; color:#85868b; font-size:.73rem; }
@@ -246,7 +247,7 @@ prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
               <p class="section-kicker">Account overview</p>
               <div class="account-item">
                 <div class="account-item-icon"><span class="material-symbols-outlined">badge</span></div>
-                <div>
+                <div class="form-field">
                   <div class="account-item-label">Account ID</div>
                   <div class="account-item-value">#${account.id}</div>
                 </div>
@@ -258,15 +259,7 @@ prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
                   <div class="account-item-value">${fn:escapeXml(account.email)}</div>
                 </div>
               </div>
-              <button type="button" id="openChangeEmailBtn" class="secondary-action">
-                <span class="secondary-action-icon"><span class="material-symbols-outlined" style="font-size:18px">mail</span></span>
-                <span class="secondary-action-text">
-                  <span class="secondary-action-title">Change Email</span>
-                  <span class="secondary-action-caption">Verify a new address via OTP</span>
-                </span>
-                <span class="material-symbols-outlined secondary-action-chevron" style="font-size:18px">chevron_right</span>
-              </button>
-              <a href="${pageContext.request.contextPath}/profile/change-password" class="secondary-action">
+              <a href="${pageContext.request.contextPath}/dashboard/profile/change-password" class="secondary-action">
                 <span class="secondary-action-icon"><span class="material-symbols-outlined" style="font-size:18px">lock_reset</span></span>
                 <span class="secondary-action-text">
                   <span class="secondary-action-title">Change Password</span>
@@ -283,12 +276,12 @@ prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
               </div>
 
             <form
-              action="${pageContext.request.contextPath}/profile"
+              action="${pageContext.request.contextPath}/dashboard/profile"
               method="post"
               id="profileForm"
             >
               <div class="form-grid">
-                <div>
+                <div class="form-field">
                   <label class="form-label-modern" for="fullname">
                     Full Name <span class="required-mark">*</span>
                   </label>
@@ -354,211 +347,191 @@ prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
     <%@ include file="/views/layout/common/toast.jsp" %>
 
-    <!-- Modal đổi email -->
-    <div
-      id="changeEmailModal"
-      class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50"
-    >
-      <div class="bg-white rounded-2xl p-6 w-full max-w-md mx-4 card-modern">
-        <h3 class="text-xl font-bold mb-2 text-slate-800">Change Email Address</h3>
-        <p class="text-slate-500 text-sm mb-4">
-          We will send an OTP to the new email address for verification before updating it.
-        </p>
-        <form
-          action="${pageContext.request.contextPath}/profile/change-email"
-          method="post"
-        >
-          <label class="form-label-modern" for="newEmail">New Email</label>
-          <input
-            type="email"
-            name="newEmail"
-            id="newEmail"
-            required
-            placeholder="email-moi@example.com"
-            class="input-premium mb-4"
-          />
-          <div class="flex justify-end gap-3">
-            <button
-              type="button"
-              id="closeChangeEmailBtn"
-              class="px-5 py-3 rounded-full border-2 border-slate-200 text-slate-500 font-semibold text-sm hover:border-slate-300 hover:bg-slate-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-slate-300"
-            >
-              Cancel
-            </button>
-            <button type="submit" class="btn-submit">
-              <span class="material-symbols-outlined">send</span>
-              Send OTP
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-
     <script>
-      const openChangeEmailBtn = document.getElementById("openChangeEmailBtn");
-      const closeChangeEmailBtn = document.getElementById(
-        "closeChangeEmailBtn",
-      );
-      const changeEmailModal = document.getElementById("changeEmailModal");
+  const form = document.getElementById("profileForm");
+  const saveBtn = document.getElementById("saveBtn");
+  const fullnameInput = document.getElementById("fullname");
+  const fullnameMessage = document.getElementById("fullnameMessage");
+  const phoneInput = document.getElementById("phone");
+  const phoneMessage = document.getElementById("phoneMessage");
+  const initialValues = {
+    fullname: fullnameInput.dataset.initialValue || "",
+    phone: phoneInput.dataset.initialValue || "",
+  };
 
-      openChangeEmailBtn.addEventListener("click", () => {
-        changeEmailModal.classList.remove("hidden");
-        changeEmailModal.classList.add("flex");
-      });
-      closeChangeEmailBtn.addEventListener("click", () => {
-        changeEmailModal.classList.add("hidden");
-        changeEmailModal.classList.remove("flex");
-      });
-      changeEmailModal.addEventListener("click", (e) => {
-        if (e.target === changeEmailModal) {
-          changeEmailModal.classList.add("hidden");
-          changeEmailModal.classList.remove("flex");
-        }
-      });
-    </script>
+  const fieldHelp = {
+    fullname: "Use your full name with at least two words.",
+    phone: "Enter 10 digits, starting with 0.",
+  };
 
-    <script>
-      const initialValues = {
-        fullname: "${account.fullname}",
-        phone: "${account.phone}",
-      };
+  const touchedFields = {
+    fullname: false,
+    phone: false,
+  };
 
-      const form = document.getElementById("profileForm");
-      const saveBtn = document.getElementById("saveBtn");
-      const fullnameInput = document.getElementById("fullname");
-      const fullnameMessage = document.getElementById("fullnameMessage");
-      const phoneInput = document.getElementById("phone");
-      const phoneMessage = document.getElementById("phoneMessage");
+  function setFieldError(inputEl, messageEl, message, helpText, showError) {
+    if (message && showError) {
+      messageEl.textContent = message;
+      messageEl.classList.add("is-error");
+      inputEl.classList.add("field-invalid");
+      inputEl.setAttribute("aria-invalid", "true");
+    } else {
+      messageEl.textContent = helpText;
+      messageEl.classList.remove("is-error");
+      inputEl.classList.remove("field-invalid");
+      inputEl.removeAttribute("aria-invalid");
+    }
+  }
 
-      const fieldHelp = {
-        fullname: "Use your full name with at least two words.",
-        phone: "Enter 10 digits, starting with 0.",
-      };
+  function validateFullname(
+    showError = touchedFields.fullname && fullnameInput.value.trim() !== initialValues.fullname
+  ) {
+    const value = fullnameInput.value.trim();
+    let message = "";
 
-      const touchedFields = {
-        fullname: false,
-        phone: false,
-      };
+    if (!value) {
+      message = "Full name is required";
+    } else if (/\s{2,}/.test(value)) {
+      message = "Full name cannot contain consecutive spaces";
+    } else if (!/^[\p{L}]+( [\p{L}]+)+$/u.test(value)) {
+      message =
+        value.split(" ").filter(Boolean).length < 2
+          ? 'Enter at least two words, for example: "John Doe"'
+          : "Full name may contain only letters and spaces";
+    } else if (value.length > 50) {
+      message = "Full name cannot exceed 50 characters";
+    }
 
-      function setFieldError(inputEl, messageEl, message, helpText, showError) {
-        if (message && showError) {
-          messageEl.textContent = message;
-          messageEl.classList.add("is-error");
-          inputEl.classList.add("field-invalid");
-          inputEl.setAttribute("aria-invalid", "true");
-        } else {
-          messageEl.textContent = helpText;
-          messageEl.classList.remove("is-error");
-          inputEl.classList.remove("field-invalid");
-          inputEl.removeAttribute("aria-invalid");
-        }
-      }
+    setFieldError(
+      fullnameInput,
+      fullnameMessage,
+      message,
+      fieldHelp.fullname,
+      showError,
+    );
+    return message === "";
+  }
 
-      function validateFullname(showError = touchedFields.fullname) {
-        const value = fullnameInput.value.trim();
-        let message = "";
+  function validatePhone(
+    showError = touchedFields.phone && phoneInput.value.trim() !== initialValues.phone
+  ) {
+    const value = phoneInput.value.trim();
+    let message = "";
 
-        if (!value) {
-          message = "Full name is required";
-        } else if (/\s{2,}/.test(value)) {
-          message = "Full name cannot contain consecutive spaces";
-        } else if (!/^[\p{L}]+( [\p{L}]+)+$/u.test(value)) {
-          message =
-            value.split(" ").filter(Boolean).length < 2
-              ? 'Full name must contain at least two words, for example: "John Doe"'
-              : "Full name may contain only letters and spaces";
-        } else if (value.length > 50) {
-          message = "Full name cannot exceed 50 characters";
-        }
+    if (!value) {
+      message = "Phone number is required";
+    } else if (!/^0\d{9}$/.test(value)) {
+      message = "Phone number must contain 10 digits and start with 0";
+    }
 
-        setFieldError(
-          fullnameInput,
-          fullnameMessage,
-          message,
-          fieldHelp.fullname,
-          showError,
-        );
-        return message === "";
-      }
+    setFieldError(
+      phoneInput,
+      phoneMessage,
+      message,
+      fieldHelp.phone,
+      showError,
+    );
+    return message === "";
+  }
 
-      function validatePhone(showError = touchedFields.phone) {
-        const value = phoneInput.value.trim();
-        let message = "";
+  // Helper: field chỉ cần hợp lệ nếu nó ĐÃ được người dùng thay đổi.
+  // Dữ liệu cũ (đã lưu từ trước, có thể không còn khớp rule mới) không bị
+  // ép buộc phải hợp lệ nếu user không đụng tới field đó.
+  function getFieldState() {
+    const currentFullname = fullnameInput.value.trim();
+    const currentPhone = phoneInput.value.trim();
 
-        if (!value) {
-          message = "Phone number is required";
-        } else if (!/^0\d{9}$/.test(value)) {
-          message = "Phone number must contain 10 digits and start with 0";
-        }
+    const fullnameChanged = currentFullname !== initialValues.fullname;
+    const phoneChanged = currentPhone !== initialValues.phone;
 
-        setFieldError(
-          phoneInput,
-          phoneMessage,
-          message,
-          fieldHelp.phone,
-          showError,
-        );
-        return message === "";
-      }
+    const fullnameValid = validateFullname();
+    const phoneValid = validatePhone();
 
-      function checkFormChanges() {
-        const fullnameValid = validateFullname();
-        const phoneValid = validatePhone();
-        const currentFullname = fullnameInput.value.trim();
-        const currentPhone = phoneInput.value.trim();
+    return {
+      currentFullname,
+      currentPhone,
+      fullnameChanged,
+      phoneChanged,
+      fullnameValid,
+      phoneValid,
+    };
+  }
 
-        if (!fullnameValid || !phoneValid) {
-          saveBtn.disabled = true;
-          return;
-        }
+  function checkFormChanges() {
+    const {
+      fullnameChanged,
+      phoneChanged,
+      fullnameValid,
+      phoneValid,
+    } = getFieldState();
 
-        const hasChanges =
-          currentFullname !== initialValues.fullname ||
-          currentPhone !== initialValues.phone;
-        saveBtn.disabled = !hasChanges;
-      }
+    // Chỉ chặn Save nếu field ĐÃ thay đổi mà lại không hợp lệ.
+    const blockedByFullname = fullnameChanged && !fullnameValid;
+    const blockedByPhone = phoneChanged && !phoneValid;
 
-      form.addEventListener("submit", function (e) {
-        touchedFields.fullname = true;
-        touchedFields.phone = true;
-        const fullnameValid = validateFullname(true);
-        const phoneValid = validatePhone(true);
+    if (blockedByFullname || blockedByPhone) {
+      saveBtn.disabled = true;
+      return;
+    }
 
-        if (!fullnameValid || !phoneValid) {
-          e.preventDefault();
-          const firstError = !fullnameValid
-            ? fullnameMessage.textContent
-            : phoneMessage.textContent;
-          const focusTarget = !fullnameValid ? fullnameInput : phoneInput;
-          focusTarget.focus();
-          showToast(firstError, true);
-        }
-      });
+    const hasChanges = fullnameChanged || phoneChanged;
+    saveBtn.disabled = !hasChanges;
+  }
 
-      ["input", "change"].forEach((evt) => {
-        fullnameInput.addEventListener(evt, () => {
-          touchedFields.fullname = true;
-          checkFormChanges();
-        });
-        phoneInput.addEventListener(evt, () => {
-          touchedFields.phone = true;
-          checkFormChanges();
-        });
-      });
+  form.addEventListener("submit", function (e) {
+    touchedFields.fullname = fullnameInput.value.trim() !== initialValues.fullname;
+    touchedFields.phone = phoneInput.value.trim() !== initialValues.phone;
 
+    const {
+      fullnameChanged,
+      phoneChanged,
+      fullnameValid,
+      phoneValid,
+    } = getFieldState();
+
+    // Hiển thị lỗi trên UI (để user thấy rõ) nhưng chỉ chặn submit
+    // nếu field bị lỗi đó thực sự đã bị thay đổi.
+    validateFullname(fullnameChanged);
+    validatePhone(phoneChanged);
+
+    const blockedByFullname = fullnameChanged && !fullnameValid;
+    const blockedByPhone = phoneChanged && !phoneValid;
+
+    if (blockedByFullname || blockedByPhone) {
+      e.preventDefault();
+      const firstError = blockedByFullname
+        ? fullnameMessage.textContent
+        : phoneMessage.textContent;
+      const focusTarget = blockedByFullname ? fullnameInput : phoneInput;
+      focusTarget.focus();
+      showToast(firstError, true);
+    }
+  });
+
+  ["input", "change"].forEach((evt) => {
+    fullnameInput.addEventListener(evt, () => {
+      touchedFields.fullname = true;
       checkFormChanges();
+    });
+    phoneInput.addEventListener(evt, () => {
+      touchedFields.phone = true;
+      checkFormChanges();
+    });
+  });
 
-      document.addEventListener("DOMContentLoaded", function () {
-        const msgEl = document.getElementById("toastMessageData");
-        const errEl = document.getElementById("toastErrorData");
+  checkFormChanges();
 
-        if (msgEl && typeof showToast === "function") {
-          showToast(msgEl.dataset.message);
-        }
-        if (errEl && typeof showToast === "function") {
-          showToast(errEl.dataset.message, true);
-        }
-      });
-    </script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const msgEl = document.getElementById("toastMessageData");
+    const errEl = document.getElementById("toastErrorData");
+
+    if (msgEl && typeof showToast === "function") {
+      showToast(msgEl.dataset.message);
+    }
+    if (errEl && typeof showToast === "function") {
+      showToast(errEl.dataset.message, true);
+    }
+  });
+</script>
   </body>
 </html>

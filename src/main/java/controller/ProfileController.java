@@ -30,10 +30,18 @@ public class ProfileController extends HttpServlet {
         }
 
         Account loginUser = (Account) session.getAttribute("account");
+        boolean isCustomer = "customer".equalsIgnoreCase(loginUser.getRole());
+        String profilePath = isCustomer ? "/profile" : "/dashboard/profile";
+
+        if (!isCustomer && !isDashboardRequest(request)) {
+            response.sendRedirect(request.getContextPath() + profilePath + "?id=" + loginUser.getId());
+            return;
+        }
+
         String idParam = request.getParameter("id");
 
         if (idParam == null || idParam.trim().isEmpty()) {
-            response.sendRedirect(request.getContextPath() + "/profile?id=" + loginUser.getId());
+            response.sendRedirect(request.getContextPath() + profilePath + "?id=" + loginUser.getId());
             return;
         }
         idParam = idParam.trim();
@@ -57,7 +65,7 @@ public class ProfileController extends HttpServlet {
                     .forward(request, response);
             return;
         }
-        if ("customer".equalsIgnoreCase(loginUser.getRole())) {
+        if (isCustomer) {
             CustomerDAO customerDao = new CustomerDAO();
             Customer customer = customerDao.getCustomerById(id);
             request.setAttribute("customer", customer);
@@ -85,26 +93,37 @@ public class ProfileController extends HttpServlet {
         }
 
         Account acc = (Account) session.getAttribute("account");
+        boolean isCustomer = "customer".equalsIgnoreCase(acc.getRole());
+        String profileUrl = request.getContextPath()
+                + (isCustomer ? "/profile?id=" : "/dashboard/profile?id=")
+                + acc.getId();
+
+        if (!isCustomer && !isDashboardRequest(request)) {
+            response.sendRedirect(profileUrl);
+            return;
+        }
 
         String fullname = safeTrim(request.getParameter("fullname"));
         String phone = safeTrim(request.getParameter("phone"));
         String gender = request.getParameter("gender");
         String dob = request.getParameter("dob");
+        boolean fullnameChanged = !fullname.equals(safeTrim(acc.getFullname()));
         if (fullname.isEmpty()) {
             session.setAttribute("error", "Full name is required");
-            response.sendRedirect(request.getContextPath() + "/profile?id=" + acc.getId());
+            response.sendRedirect(profileUrl);
             return;
         }
-        if (fullname.matches(".*\\s{2,}.*")) {
+        if (fullnameChanged && fullname.matches(".*\\s{2,}.*")) {
             session.setAttribute("error", "Full name cannot contain consecutive spaces");
-            response.sendRedirect(request.getContextPath() + "/profile?id=" + acc.getId());
+            response.sendRedirect(profileUrl);
             return;
         }
         // Chỉ chứa chữ cái, các từ cách nhau đúng 1 dấu cách, tối thiểu 2 từ (vd: "Duy
         // Minh")
-        if (!fullname.matches("^[\\p{L}]+( [\\p{L}]+)+$") || fullname.length() > 50) {
+        if (fullnameChanged
+                && (!fullname.matches("^[\\p{L}]+( [\\p{L}]+)+$") || fullname.length() > 50)) {
             session.setAttribute("error", "Full name must contain at least two words, use letters only, and have single spaces between words");
-            response.sendRedirect(request.getContextPath() + "/profile?id=" + acc.getId());
+            response.sendRedirect(profileUrl);
             return;
         }
 
@@ -112,11 +131,9 @@ public class ProfileController extends HttpServlet {
             phone = "";
         if (!phone.matches("^0\\d{9}$")) {
             session.setAttribute("error", "Phone number must contain 10 digits and start with 0");
-            response.sendRedirect(request.getContextPath() + "/profile?id=" + acc.getId());
+            response.sendRedirect(profileUrl);
             return;
         }
-
-        boolean isCustomer = "customer".equalsIgnoreCase(acc.getRole());
 
         if (isCustomer) {
             dob = safeTrim(dob);
@@ -126,18 +143,18 @@ public class ProfileController extends HttpServlet {
                     LocalDate today = LocalDate.now();
                     if (birthDate.isAfter(today)) {
                         session.setAttribute("error", "Invalid date of birth");
-                        response.sendRedirect(request.getContextPath() + "/profile?id=" + acc.getId());
+                        response.sendRedirect(profileUrl);
                         return;
                     }
                     int age = Period.between(birthDate, today).getYears();
                     if (age < 18 || age > 120) {
                         session.setAttribute("error", "You must be between 18 and 119 years old");
-                        response.sendRedirect(request.getContextPath() + "/profile?id=" + acc.getId());
+                        response.sendRedirect(profileUrl);
                         return;
                     }
                 } catch (Exception ex) {
                     session.setAttribute("error", "Invalid date-of-birth format");
-                    response.sendRedirect(request.getContextPath() + "/profile?id=" + acc.getId());
+                    response.sendRedirect(profileUrl);
                     return;
                 }
             } else {
@@ -171,7 +188,7 @@ public class ProfileController extends HttpServlet {
                 session.setAttribute("error", "Update failed!");
             }
 
-            response.sendRedirect(request.getContextPath() + "/profile?id=" + acc.getId());
+            response.sendRedirect(profileUrl);
             return;
         }
         AccountDAO accountDao = new AccountDAO();
@@ -193,7 +210,11 @@ public class ProfileController extends HttpServlet {
             session.removeAttribute("message");
             session.setAttribute("error", "Update failed!");
         }
-        response.sendRedirect(request.getContextPath() + "/profile?id=" + acc.getId());
+        response.sendRedirect(profileUrl);
+    }
+
+    private boolean isDashboardRequest(HttpServletRequest request) {
+        return request.getServletPath().startsWith("/dashboard/");
     }
 
     private String safeTrim(String s) {

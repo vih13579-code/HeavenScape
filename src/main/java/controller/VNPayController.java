@@ -2,6 +2,8 @@ package controller;
 
 import dao.BookDAO;
 import dao.CartDAO;
+import dao.AddressDAO;
+import dao.VoucherDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -9,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import model.Account;
 import model.CartItem;
+import model.Voucher;
 import utils.VNPayConfig;
 
 import java.io.IOException;
@@ -68,6 +71,12 @@ public class VNPayController extends HttpServlet {
             return;
         }
 
+        if (new AddressDAO().getAddressByIdAndCustomer(addressID, account.getId()) == null) {
+            session.setAttribute("errorMessage", "The selected shipping address no longer exists or is invalid.");
+            response.sendRedirect(request.getContextPath() + "/checkout");
+            return;
+        }
+
         CartDAO cartDAO = new CartDAO();
         List<CartItem> cartItems = cartDAO.getCartItems(account.getId());
 
@@ -105,15 +114,19 @@ public class VNPayController extends HttpServlet {
 
         BigDecimal total = cartDAO.calcSubtotal(cartItems);
 
-        Double discountObj = (Double) session.getAttribute("appliedVoucherDiscount");
-        if (discountObj != null) {
-            if (discountObj > 0) {
-                BigDecimal discount = BigDecimal.valueOf(discountObj);
-                total = total.subtract(discount);
-                if (total.compareTo(BigDecimal.ZERO) < 0) {
-                    total = BigDecimal.ZERO;
-                }
+        Integer voucherID = (Integer) session.getAttribute("appliedVoucherID");
+        if (voucherID != null) {
+            BigDecimal discount = validateAndCalculateVoucher(
+                    session, account.getId(), voucherID, total);
+            if (discount == null) {
+                clearVoucher(session);
+                session.setAttribute("errorMessage",
+                        "The selected voucher is no longer valid. Please review your order before payment.");
+                response.sendRedirect(request.getContextPath() + "/checkout");
+                return;
             }
+            session.setAttribute("appliedVoucherDiscount", discount.doubleValue());
+            total = total.subtract(discount).max(BigDecimal.ZERO);
         }
 
         String txnRef = VNPayConfig.getRandomNumber(12);
@@ -181,6 +194,40 @@ public class VNPayController extends HttpServlet {
         String secureHash = VNPayConfig.hmacSHA512(VNPayConfig.vnp_HashSecret, hashData.toString());
         query.append("&vnp_SecureHash=").append(secureHash);
         return VNPayConfig.vnp_PayUrl + "?" + query.toString();
+    }
+
+    private BigDecimal validateAndCalculateVoucher(HttpSession session, int customerID,
+            int voucherID, BigDecimal subtotal) {
+        VoucherDAO dao = new VoucherDAO();
+        String code = (String) session.getAttribute("appliedVoucherCode");
+        if (code == null || code.trim().isEmpty()) {
+            return null;
+        }
+        Voucher voucher = dao.getVoucherByCode(code);
+        java.sql.Timestamp now = new java.sql.Timestamp(System.currentTimeMillis());
+        if (voucher == null || voucher.getVoucherID() != voucherID
+                || !"active".equalsIgnoreCase(voucher.getStatus())
+                || (voucher.getStartDate() != null && voucher.getStartDate().after(now))
+                || (voucher.getEndDate() != null && voucher.getEndDate().before(now))
+                || (voucher.getMinOrderValue() != null
+                    && subtotal.compareTo(BigDecimal.valueOf(voucher.getMinOrderValue())) < 0)
+                || (voucher.getQuantity() != null
+                    && dao.getUsedCount(voucherID) >= voucher.getQuantity())
+                || dao.hasCustomerUsedVoucher(customerID, voucherID)) {
+            return null;
+        }
+        BigDecimal discount = subtotal.multiply(BigDecimal.valueOf(voucher.getDiscountPercent()))
+                .divide(BigDecimal.valueOf(100), 2, java.math.RoundingMode.HALF_UP);
+        if (voucher.getMaxDiscountValue() != null) {
+            discount = discount.min(BigDecimal.valueOf(voucher.getMaxDiscountValue()));
+        }
+        return discount.min(subtotal);
+    }
+
+    private void clearVoucher(HttpSession session) {
+        session.removeAttribute("appliedVoucherID");
+        session.removeAttribute("appliedVoucherCode");
+        session.removeAttribute("appliedVoucherDiscount");
     }
 
     private boolean isEmpty(String value) {

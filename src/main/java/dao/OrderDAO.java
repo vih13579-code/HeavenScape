@@ -15,12 +15,24 @@ import java.util.List;
 
 public class OrderDAO {
 
+    private static final String CANCELLED_BY_NAME_SELECT
+            = "CASE "
+            + "WHEN LOWER(LTRIM(RTRIM(o.cancelled_by))) = 'system' THEN 'System' "
+            + "WHEN LOWER(LTRIM(RTRIM(o.cancelled_by))) = 'staff' THEN 'Staff' "
+            + "WHEN LOWER(LTRIM(RTRIM(o.cancelled_by))) = 'user' THEN c.fullname "
+            + "WHEN LOWER(LTRIM(RTRIM(o.status))) = 'cancelled' AND o.processed_by IS NOT NULL THEN 'Staff' "
+            + "WHEN LOWER(LTRIM(RTRIM(o.status))) = 'cancelled' THEN c.fullname "
+            + "ELSE NULL END AS cancelledByName, ";
+
     private static final String BASE_SELECT_ORDER
             = "SELECT o.orderID, o.customerID, o.addressID, o.processed_by, o.status, "
             + "       o.payment_method, o.payment_status, o.total_price, o.created_at, o.cancel_reason, "
+            + "       o.cancelled_by, o.voucherID, "
+            + CANCELLED_BY_NAME_SELECT
             + "       a.street, a.district, a.city, a.recipient_name, a.recipient_phone "
             + "FROM [Order] o "
-            + "LEFT JOIN Address a ON a.addressID = o.addressID ";
+            + "LEFT JOIN Address a ON a.addressID = o.addressID "
+            + "LEFT JOIN Customer c ON c.customerID = o.customerID ";
 
     public int createOrder(int customerID, int addressID,
             String paymentMethod, BigDecimal totalPrice) {
@@ -108,6 +120,8 @@ public class OrderDAO {
     public Order getOrderByID(int orderID) {
         String sql = "SELECT o.orderID, o.customerID, o.addressID, o.processed_by, o.status, "
                 + "       o.payment_method, o.payment_status, o.total_price, o.created_at, o.cancel_reason, "
+                + "       o.cancelled_by, o.voucherID, "
+                + CANCELLED_BY_NAME_SELECT
                 + "       a.street, a.district, a.city, a.recipient_name, a.recipient_phone, "
                 + "       c.fullname AS customerName, "
                 + "       c.email AS customerEmail, c.phone AS customerPhone "
@@ -272,7 +286,7 @@ public class OrderDAO {
     }
 
     public boolean cancelOrder(int orderID, int customerID, String cancelReason) {
-        String sql = "UPDATE [Order] SET status = 'cancelled', cancel_reason = ? "
+        String sql = "UPDATE [Order] SET status = 'cancelled', cancel_reason = ?, cancelled_by = 'user' "
                 + "WHERE orderID = ? AND customerID = ? AND status = 'pending'";
 
         try (Connection conn = new DBContext().getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -291,7 +305,7 @@ public class OrderDAO {
 
     public boolean requestCodRefund(int orderID, int customerID, String refundReason) {
         String sql = "UPDATE [Order] "
-                + "SET status = 'cancelled', payment_status = 'pending_refund', cancel_reason = ? "
+                + "SET status = 'cancelled', payment_status = 'pending_refund', cancel_reason = ?, cancelled_by = 'user' "
                 + "WHERE orderID = ? AND customerID = ? "
                 + "AND status = 'completed' AND payment_method = 'cod' AND payment_status = 'paid'";
 
@@ -363,6 +377,19 @@ public class OrderDAO {
             order.setCancelReason(rs.getString("cancel_reason"));
         } catch (Exception ignored) {
         }
+        try {
+            order.setCancelledBy(rs.getString("cancelled_by"));
+        } catch (Exception ignored) {
+        }
+        try {
+            order.setCancelledByName(rs.getString("cancelledByName"));
+        } catch (Exception ignored) {
+        }
+        try {
+            int voucherID = rs.getInt("voucherID");
+            order.setVoucherID(rs.wasNull() ? null : voucherID);
+        } catch (Exception ignored) {
+        }
         return order;
     }
 
@@ -406,7 +433,7 @@ public class OrderDAO {
                     boolean isPaid = "paid".equalsIgnoreCase(overdueOrder.getPaymentStatus());
                     if (isCod && isPaid) {
                         String autoCancelReason = "Order was not approved within two days";
-                        String sqlAutoCancel = "UPDATE [Order] SET status = 'cancelled', cancel_reason = ? WHERE orderID = ?";
+                        String sqlAutoCancel = "UPDATE [Order] SET status = 'cancelled', cancel_reason = ?, cancelled_by = 'system' WHERE orderID = ?";
                         try (Connection connAC = new DBContext().getConnection(); PreparedStatement psAC = connAC.prepareStatement(sqlAutoCancel)) {
                             psAC.setString(1, autoCancelReason);
                             psAC.setInt(2, overdueOrderID);
@@ -429,7 +456,7 @@ public class OrderDAO {
                         }).start();
                     } else {
                         String autoCancelReason = "Order was not approved within two days";
-                        String sqlAutoCancel = "UPDATE [Order] SET status = 'cancelled', cancel_reason = ? WHERE orderID = ?";
+                        String sqlAutoCancel = "UPDATE [Order] SET status = 'cancelled', cancel_reason = ?, cancelled_by = 'system' WHERE orderID = ?";
                         try (Connection connAC = new DBContext().getConnection(); PreparedStatement psAC = connAC.prepareStatement(sqlAutoCancel)) {
                             psAC.setString(1, autoCancelReason);
                             psAC.setInt(2, overdueOrderID);
@@ -480,6 +507,8 @@ public class OrderDAO {
         if (isRefundStatus) {
             sql = "SELECT o.orderID, o.customerID, o.addressID, o.processed_by, o.status, "
                     + "       o.payment_method, o.payment_status, o.total_price, o.created_at, o.cancel_reason, "
+                    + "       o.cancelled_by, o.voucherID, "
+                    + CANCELLED_BY_NAME_SELECT
                     + "       a.street, a.district, a.city, a.recipient_name, a.recipient_phone, "
                     + "       c.fullname AS customerName, "
                     + "       c.email AS customerEmail, c.phone AS customerPhone "
@@ -491,6 +520,8 @@ public class OrderDAO {
         } else {
             sql = "SELECT o.orderID, o.customerID, o.addressID, o.processed_by, o.status, "
                     + "       o.payment_method, o.payment_status, o.total_price, o.created_at, o.cancel_reason, "
+                    + "       o.cancelled_by, o.voucherID, "
+                    + CANCELLED_BY_NAME_SELECT
                     + "       a.street, a.district, a.city, a.recipient_name, a.recipient_phone, "
                     + "       c.fullname AS customerName, "
                     + "       c.email AS customerEmail, c.phone AS customerPhone "
@@ -596,7 +627,11 @@ public class OrderDAO {
             ps.setString(1, status);
             ps.setInt(2, staffID);
             ps.setInt(3, orderID);
-            return ps.executeUpdate() > 0;
+            boolean updated = ps.executeUpdate() > 0;
+            if (updated && "completed".equalsIgnoreCase(status)) {
+                new VoucherDAO().recordUsageForCompletedOrder(orderID);
+            }
+            return updated;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -604,7 +639,7 @@ public class OrderDAO {
     }
 
     public boolean updateOrderStatusAndStaff(int orderID, String status, int staffID, String cancelReason) {
-        String sql = "UPDATE [Order] SET status = ?, processed_by = ?, cancel_reason = ? WHERE orderID = ?";
+        String sql = "UPDATE [Order] SET status = ?, processed_by = ?, cancel_reason = ?, cancelled_by = 'staff' WHERE orderID = ?";
         try (Connection conn = new DBContext().getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, status);
             ps.setInt(2, staffID);
@@ -669,10 +704,28 @@ public class OrderDAO {
     public int createOrderWithStockCheck(int customerID, int addressID, String paymentMethod,
             BigDecimal totalPrice, List<CartItem> cartItems) {
 
-        String sqlCheckStock = "SELECT stock_quantity FROM Book WHERE bookID = ?";
+        return createOrderWithStockCheck(customerID, addressID, paymentMethod,
+                totalPrice, cartItems, null);
+    }
+
+    public int createOrderWithStockCheck(int customerID, int addressID, String paymentMethod,
+            BigDecimal totalPrice, List<CartItem> cartItems, Integer voucherID) {
+
+        String sqlCheckAddress = "SELECT 1 FROM Address WITH (UPDLOCK, HOLDLOCK) "
+                + "WHERE addressID = ? AND customerID = ? AND (country IS NULL OR country <> '__DELETED__') "
+                + "AND NULLIF(LTRIM(RTRIM(street)), '') IS NOT NULL "
+                + "AND NULLIF(LTRIM(RTRIM(district)), '') IS NOT NULL "
+                + "AND NULLIF(LTRIM(RTRIM(city)), '') IS NOT NULL "
+                + "AND NULLIF(LTRIM(RTRIM(recipient_name)), '') IS NOT NULL "
+                + "AND recipient_phone LIKE '0[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'";
+        String sqlCheckStock = "SELECT stock_quantity, status FROM Book WITH (UPDLOCK, HOLDLOCK) WHERE bookID = ?";
+        String sqlCheckVoucher = "SELECT v.status, v.start_date, v.end_date, v.quantity, v.min_order_value, "
+                + "(SELECT COUNT(*) FROM [Order] usedOrder WITH (UPDLOCK, HOLDLOCK) WHERE usedOrder.voucherID = v.voucherID AND LOWER(LTRIM(RTRIM(usedOrder.status))) = 'completed') AS used_count, "
+                + "(SELECT COUNT(*) FROM [Order] own WITH (UPDLOCK, HOLDLOCK) WHERE own.voucherID = v.voucherID AND own.customerID = ? AND LOWER(LTRIM(RTRIM(own.status))) = 'completed') AS customer_used "
+                + "FROM Voucher v WITH (UPDLOCK, HOLDLOCK) WHERE v.voucherID = ? AND v.is_deleted = 0";
         String sqlOrder = "INSERT INTO [Order] (customerID, addressID, status, payment_method, "
-                + "payment_status, total_price, created_at) "
-                + "VALUES (?, ?, N'pending', ?, 'unpaid', ?, GETDATE())";
+                + "payment_status, total_price, created_at, voucherID) "
+                + "VALUES (?, ?, N'pending', ?, 'unpaid', ?, GETDATE(), ?)";
         String sqlDetail = "INSERT INTO OrderDetail (orderID, bookID, quantity, unit_price) "
                 + "VALUES (?, ?, ?, ?)";
 
@@ -680,6 +733,18 @@ public class OrderDAO {
         try {
             conn = new DBContext().getConnection();
             conn.setAutoCommit(false);
+            conn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+
+            try (PreparedStatement psAddress = conn.prepareStatement(sqlCheckAddress)) {
+                psAddress.setInt(1, addressID);
+                psAddress.setInt(2, customerID);
+                try (ResultSet rs = psAddress.executeQuery()) {
+                    if (!rs.next()) {
+                        conn.rollback();
+                        return -3;
+                    }
+                }
+            }
 
             for (CartItem item : cartItems) {
                 try (PreparedStatement psCheck = conn.prepareStatement(sqlCheckStock)) {
@@ -687,7 +752,9 @@ public class OrderDAO {
                     try (ResultSet rs = psCheck.executeQuery()) {
                         if (rs.next()) {
                             int currentStock = rs.getInt("stock_quantity");
-                            if (currentStock < item.getQuantity()) {
+                            if (currentStock < item.getQuantity()
+                                    || item.getQuantity() < 1
+                                    || !"available".equalsIgnoreCase(rs.getString("status"))) {
                                 conn.rollback();
                                 return -2;
                             }
@@ -699,12 +766,45 @@ public class OrderDAO {
                 }
             }
 
+            if (voucherID != null) {
+                BigDecimal subtotal = BigDecimal.ZERO;
+                for (CartItem item : cartItems) {
+                    subtotal = subtotal.add(item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
+                }
+                java.sql.Timestamp now = new java.sql.Timestamp(System.currentTimeMillis());
+                try (PreparedStatement psVoucher = conn.prepareStatement(sqlCheckVoucher)) {
+                    psVoucher.setInt(1, customerID);
+                    psVoucher.setInt(2, voucherID);
+                    try (ResultSet rs = psVoucher.executeQuery()) {
+                        boolean invalid = !rs.next();
+                        if (!invalid) {
+                            invalid = !"active".equalsIgnoreCase(rs.getString("status"))
+                                    || (rs.getTimestamp("start_date") != null && rs.getTimestamp("start_date").after(now))
+                                    || (rs.getTimestamp("end_date") != null && rs.getTimestamp("end_date").before(now))
+                                    || (rs.getObject("quantity") != null && rs.getInt("used_count") >= rs.getInt("quantity"))
+                                    || rs.getInt("customer_used") > 0
+                                    || (rs.getBigDecimal("min_order_value") != null
+                                        && subtotal.compareTo(rs.getBigDecimal("min_order_value")) < 0);
+                        }
+                        if (invalid) {
+                            conn.rollback();
+                            return -4;
+                        }
+                    }
+                }
+            }
+
             int orderID = -1;
             try (PreparedStatement psOrder = conn.prepareStatement(sqlOrder, PreparedStatement.RETURN_GENERATED_KEYS)) {
                 psOrder.setInt(1, customerID);
                 psOrder.setInt(2, addressID);
                 psOrder.setString(3, paymentMethod);
                 psOrder.setBigDecimal(4, totalPrice);
+                if (voucherID == null) {
+                    psOrder.setNull(5, java.sql.Types.INTEGER);
+                } else {
+                    psOrder.setInt(5, voucherID);
+                }
                 psOrder.executeUpdate();
 
                 try (ResultSet rs = psOrder.getGeneratedKeys()) {
@@ -842,6 +942,7 @@ public class OrderDAO {
                 } catch (Exception ignored) {
                 }
             }
+
             e.printStackTrace();
         } finally {
             if (conn != null) {
@@ -853,6 +954,20 @@ public class OrderDAO {
             }
         }
         return false;
+    }
+
+    public boolean cancelOrderBySystem(int orderID, String cancelReason) {
+        String sql = "UPDATE [Order] SET status = 'cancelled', cancel_reason = ?, "
+                + "cancelled_by = 'system' WHERE orderID = ? AND status <> 'completed'";
+        try (Connection conn = new DBContext().getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, cancelReason);
+            ps.setInt(2, orderID);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     private boolean restoreStock(Connection conn, int orderID) throws SQLException {

@@ -3,7 +3,6 @@ package controller;
 import dao.AccountDAO;
 import dao.BookDAO;
 import dao.DashboardDAO;
-import dao.CategoryDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,11 +10,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import model.Account;
 import model.Book;
-import model.Category;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.Collections;
@@ -25,7 +22,6 @@ import java.util.Map;
 public class DashboardController extends HttpServlet {
 
     private final DashboardDAO dashboardDAO = new DashboardDAO();
-    private final CategoryDAO categoryDAO = new CategoryDAO();
     private final BookDAO bookDAO = new BookDAO();
     private final AccountDAO accountDAO = new AccountDAO();
 
@@ -39,7 +35,6 @@ public class DashboardController extends HttpServlet {
 
         String fromDate = trimToNull(request.getParameter("fromDate"));
         String toDate = trimToNull(request.getParameter("toDate"));
-        Integer categoryID = parseCategoryID(request.getParameter("categoryID"));
 
         boolean showAll = "true".equalsIgnoreCase(request.getParameter("showAll"));
         boolean filterRequested = "filter".equalsIgnoreCase(request.getParameter("action"));
@@ -59,31 +54,27 @@ public class DashboardController extends HttpServlet {
             filterRequested = false;
         }
 
-        // Code mới: số liệu bán hàng, lọc ngày và lọc category.
-        BigDecimal totalRevenue = dashboardDAO.getTotalRevenue(fromDate, toDate, categoryID);
-        int totalOrders = dashboardDAO.getTotalOrders(fromDate, toDate, categoryID);
-        int totalCustomers = dashboardDAO.getTotalCustomers(fromDate, toDate, categoryID);
-        int totalBooks = dashboardDAO.getTotalBooks(categoryID);
-        int totalSoldBooks = dashboardDAO.getTotalSoldBooks(fromDate, toDate, categoryID);
+        BigDecimal totalRevenue = dashboardDAO.getTotalRevenue(fromDate, toDate, null);
+        int totalOrders = dashboardDAO.getTotalOrders(fromDate, toDate, null);
+        int totalCustomers = dashboardDAO.getTotalCustomers(fromDate, toDate, null);
+        int totalBooks = dashboardDAO.getTotalBooks(null);
+        int totalSoldBooks = dashboardDAO.getTotalSoldBooks(fromDate, toDate, null);
         Map<String, Integer> statusSummary = dashboardDAO.getOrderStatusSummary(
-                fromDate, toDate, categoryID);
-        List<Map<String, Object>> revenueByCategory = dashboardDAO.getRevenueByCategory(
-                fromDate, toDate, categoryID);
-        addRevenuePercentages(revenueByCategory);
+                fromDate, toDate, null);
         List<Map<String, Object>> topSellingBooks = dashboardDAO.getTopSellingBooks(
-                fromDate, toDate, categoryID);
+                fromDate, toDate, null);
+        List<Map<String, Object>> revenueTrend = dashboardDAO.getRevenueTrend(fromDate, toDate);
         List<Map<String, Object>> allOrders;
         if (showAll) {
-            // Nút "View All Orders": không áp dụng bộ lọc ngày/category.
+            // "View All Orders" does not apply the date filter.
             allOrders = dashboardDAO.getAllOrders(null, null, null);
         } else if (filterRequested && dateError == null) {
             // Chỉ hiển thị danh sách đơn khi users dùng thật sự bấm nút Filter.
-            allOrders = dashboardDAO.getAllOrders(fromDate, toDate, categoryID);
+            allOrders = dashboardDAO.getAllOrders(fromDate, toDate, null);
         } else {
             // Lần đầu mở dashboard hoặc bấm Delete: để trống khu vực đơn hàng.
             allOrders = Collections.emptyList();
         }
-        List<Category> categories = categoryDAO.getAllCategories();
 
         // Giữ code cũ: thống kê kho sách và nhân viên.
         int allBooks = bookDAO.countAllBooks();
@@ -99,13 +90,11 @@ public class DashboardController extends HttpServlet {
         request.setAttribute("totalBooks", totalBooks);
         request.setAttribute("totalSoldBooks", totalSoldBooks);
         request.setAttribute("statusSummary", statusSummary);
-        request.setAttribute("revenueByCategory", revenueByCategory);
         request.setAttribute("topSellingBooks", topSellingBooks);
+        request.setAttribute("revenueTrend", revenueTrend);
         request.setAttribute("allOrders", allOrders);
-        request.setAttribute("categories", categories);
         request.setAttribute("fromDate", fromDate);
         request.setAttribute("toDate", toDate);
-        request.setAttribute("selectedCategoryID", categoryID);
         request.setAttribute("showAll", showAll);
         request.setAttribute("filterRequested", filterRequested);
         request.setAttribute("currentDate", LocalDate.now().toString());
@@ -144,36 +133,6 @@ public class DashboardController extends HttpServlet {
         }
     }
 
-    private void addRevenuePercentages(List<Map<String, Object>> rows) {
-        BigDecimal max = BigDecimal.ZERO;
-        for (Map<String, Object> row : rows) {
-            Object value = row.get("revenue");
-            BigDecimal revenue = toBigDecimal(value);
-            if (revenue.compareTo(max) > 0) {
-                max = revenue;
-            }
-        }
-
-        for (Map<String, Object> row : rows) {
-            BigDecimal revenue = toBigDecimal(row.get("revenue"));
-            int percentage = max.signum() == 0 ? 0
-                    : revenue.multiply(BigDecimal.valueOf(100))
-                            .divide(max, 0, RoundingMode.HALF_UP)
-                            .intValue();
-            row.put("percentage", Math.max(0, Math.min(100, percentage)));
-        }
-    }
-
-    private BigDecimal toBigDecimal(Object value) {
-        if (value instanceof BigDecimal) {
-            return (BigDecimal) value;
-        }
-        if (value instanceof Number) {
-            return BigDecimal.valueOf(((Number) value).doubleValue());
-        }
-        return BigDecimal.ZERO;
-    }
-
     private boolean isAdminOrStaff(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
 
@@ -192,17 +151,6 @@ public class DashboardController extends HttpServlet {
             return false;
         }
         return true;
-    }
-
-    private Integer parseCategoryID(String raw) {
-        try {
-            if (raw == null || raw.trim().isEmpty() || "0".equals(raw.trim())) {
-                return null;
-            }
-            return Integer.parseInt(raw.trim());
-        } catch (NumberFormatException e) {
-            return null;
-        }
     }
 
     private String trimToNull(String value) {

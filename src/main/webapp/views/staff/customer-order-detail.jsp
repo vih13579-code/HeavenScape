@@ -335,6 +335,15 @@
 
                                 <c:choose>
                                     <c:when test="${order.status == 'cancelled'}">
+                                        <div class="mb-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-700">
+                                            <c:choose>
+                                                <c:when test="${order.paymentStatus == 'refunded'}"><strong>Refund by:</strong> Staff</c:when>
+                                                <c:otherwise>
+                                                    <strong>Cancelled by:</strong>
+                                                    <c:choose><c:when test="${not empty order.cancelledByName}"><c:out value="${order.cancelledByName}" /></c:when><c:otherwise>Account unavailable</c:otherwise></c:choose>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </div>
                                         <c:choose>
                                             <c:when test="${order.paymentMethod == 'cod' && order.paymentStatus == 'pending_refund'}">
                                                 <div class="space-y-3">
@@ -348,7 +357,7 @@
                                                         </div>
                                                         <c:if test="${not empty order.cancelReason}">
                                                             <p class="text-xs text-amber-600 pl-8">
-                                                                <strong>Cancellation Reason:</strong> ${order.cancelReason}
+                                                                <strong>Cancellation Reason:</strong> <c:out value="${order.cancelReason}" />
                                                             </p>
                                                         </c:if>
                                                     </div>
@@ -376,7 +385,7 @@
                                                     </div>
                                                     <c:if test="${not empty order.cancelReason}">
                                                         <p class="text-xs text-green-600 pl-8">
-                                                            <strong>Cancellation Reason:</strong> ${order.cancelReason}
+                                                            <strong>Cancellation Reason:</strong> <c:out value="${order.cancelReason}" />
                                                         </p>
                                                     </c:if>
                                                 </div>
@@ -390,7 +399,7 @@
                                                     </div>
                                                     <c:if test="${not empty order.cancelReason}">
                                                         <p class="text-xs text-[#D32F2F] pl-8">
-                                                            <strong>Cancellation Reason:</strong> ${order.cancelReason}
+                                                            <strong>Cancellation Reason:</strong> <c:out value="${order.cancelReason}" />
                                                         </p>
                                                     </c:if>
                                                 </div>
@@ -460,6 +469,7 @@
                     <span class="material-symbols-outlined text-[16px]">error</span>
                     <span id="cancelReasonErrorText"></span>
                 </div>
+                <label for="cancelReasonText" class="mb-1 block text-sm font-semibold">Cancellation Reason <span class="text-red-600 text-xs">*</span></label>
                 <textarea id="cancelReasonText" rows="4" maxlength="50"
                           class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300"
                           placeholder="Enter a cancellation reason (10–50 characters, including at least one letter)"></textarea>

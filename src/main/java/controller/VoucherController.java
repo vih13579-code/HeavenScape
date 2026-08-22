@@ -13,6 +13,7 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import model.Account;
+import model.Voucher;
 
 public class VoucherController extends HttpServlet {
 
@@ -332,5 +333,27 @@ public class VoucherController extends HttpServlet {
             if (errorMsg != null)
                 session.setAttribute("errorMessage", errorMsg);
         }
+    }
+
+    private static final class VoucherInput {
+
+        String code;
+        double discount;
+        Integer quantity;
+        Timestamp startDate;
+        Timestamp endDate;
+        String status;
+        Double minOrderValue;
+        Double maxDiscountValue;
+        String errorField;
+        String errorMsg;
+    }
+
+    static final class VoucherValidationResult {
+
+        boolean success;
+        String message;
+        Voucher voucher;
+        double discountAmount;
     }
 }

@@ -178,7 +178,7 @@
 
                     <form class="space-y-stack-md" action="${pageContext.request.contextPath}/login" method="POST">
                         <div class="space-y-2">
-                            <label class="font-label-md text-label-md text-on-surface" for="email">Email</label>
+                            <label class="font-label-md text-label-md text-on-surface" for="email">Email <span class="text-error text-xs">*</span></label>
                             <div class="relative">
                                 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">mail</span>
 
@@ -194,7 +194,7 @@
 
                         <div class="space-y-2">
                             <div class="flex justify-between items-center">
-                                <label class="font-label-md text-label-md text-on-surface" for="password">Password</label>
+                                <label class="font-label-md text-label-md text-on-surface" for="password">Password <span class="text-error text-xs">*</span></label>
                                 <a class="font-label-sm text-label-sm text-primary hover:underline transition-all" href="${pageContext.request.contextPath}/forgot-password">Forgot Password?</a>
                             </div>
                             <div class="relative">

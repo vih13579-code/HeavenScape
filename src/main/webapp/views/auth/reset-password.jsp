@@ -131,7 +131,7 @@
 
                         <%-- New Password --%>
                         <div class="space-y-2">
-                            <label class="font-label-md text-label-md text-on-surface" for="newPassword">New Password</label>
+                            <label class="font-label-md text-label-md text-on-surface" for="newPassword">New Password <span class="text-error text-xs">*</span></label>
                             <div class="relative">
                                 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">lock</span>
                                 <input class="w-full pl-10 pr-12 py-3 bg-surface border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all font-body-md text-body-md outline-none"
@@ -153,7 +153,7 @@
 
                         <%-- Confirm Password --%>
                         <div class="space-y-2">
-                            <label class="font-label-md text-label-md text-on-surface" for="confirmPassword">Confirm Password</label>
+                            <label class="font-label-md text-label-md text-on-surface" for="confirmPassword">Confirm Password <span class="text-error text-xs">*</span></label>
                             <div class="relative">
                                 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">lock_clock</span>
                                 <input class="w-full pl-10 pr-12 py-3 bg-surface border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all font-body-md text-body-md outline-none"

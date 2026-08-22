@@ -339,14 +339,14 @@
 
         <div class="modal-grid">
             <div>
-                <label class="modal-label">Province / City</label>
+                <label class="modal-label">Province / City <span class="text-red-600 text-xs">*</span></label>
                 <select id="modalCity" class="modal-field">
                     <option value="">Select Province / City</option>
                 </select>
             </div>
 
             <div>
-                <label class="modal-label">Ward / Commune</label>
+                <label class="modal-label">Ward / Commune <span class="text-red-600 text-xs">*</span></label>
                 <select id="modalWard" class="modal-field">
                     <option value="">Select Ward / Commune</option>
                 </select>
@@ -354,7 +354,7 @@
         </div>
 
         <div>
-            <label class="modal-label">Street Address</label>
+            <label class="modal-label">Street Address <span class="text-red-600 text-xs">*</span></label>
             <textarea id="modalStreet"
                       rows="4"
                       class="modal-field"

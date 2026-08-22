@@ -29,6 +29,9 @@ public class Order {
     private String street;
     private String district;
     private String cancelReason;
+    private String cancelledBy;
+    private String cancelledByName;
+    private Integer voucherID;
     private String customerName;
     private String customerEmail;
     private String customerPhone;
@@ -191,6 +194,30 @@ public class Order {
 
     public void setCancelReason(String cancelReason) {
         this.cancelReason = cancelReason;
+    }
+
+    public String getCancelledBy() {
+        return cancelledBy;
+    }
+
+    public void setCancelledBy(String cancelledBy) {
+        this.cancelledBy = cancelledBy;
+    }
+
+    public String getCancelledByName() {
+        return cancelledByName;
+    }
+
+    public void setCancelledByName(String cancelledByName) {
+        this.cancelledByName = cancelledByName;
+    }
+
+    public Integer getVoucherID() {
+        return voucherID;
+    }
+
+    public void setVoucherID(Integer voucherID) {
+        this.voucherID = voucherID;
     }
 
     public List<OrderDetail> getOrderDetails() {

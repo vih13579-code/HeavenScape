@@ -211,20 +211,20 @@
                                             </c:if>
                                         </td>
                                         <td class="px-4 py-3 text-right">
-                                            <div class="flex items-center justify-end gap-2">
+                                            <div class="action-group">
                                                 <a href="${pageContext.request.contextPath}/dashboard/product-management?action=edit&id=${book.bookID}"
-                                                   class="w-8 h-8 flex items-center justify-center rounded-lg border border-primary/30 text-primary hover:bg-primary/10 transition-colors"
-                                                   title="Edit">
-                                                    <span class="material-symbols-outlined" style="font-size:17px">edit</span>
+                                                   class="btn-action btn-action-edit"
+                                                   title="Edit" aria-label="Edit book">
+                                                    <span class="material-symbols-outlined" aria-hidden="true">edit</span>
                                                 </a>
                                                 <c:if test="${book.status != 'discontinued'}">
                                                     <button type="button"
                                                             data-book-id="${book.bookID}"
                                                             data-book-title="${book.title}"
                                                             onclick="confirmDelete(this)"
-                                                            class="w-8 h-8 flex items-center justify-center rounded-lg border border-red-200 text-error hover:bg-red-50 transition-colors"
-                                                            title="Discontinued">
-                                                        <span class="material-symbols-outlined" style="font-size:17px">block</span>
+                                                            class="btn-action btn-action-disable"
+                                                            title="Discontinue" aria-label="Discontinue book">
+                                                        <span class="material-symbols-outlined" aria-hidden="true">block</span>
                                                     </button>
                                                 </c:if>
                                                 <c:if test="${book.status == 'discontinued'}">
@@ -232,9 +232,9 @@
                                                             data-book-id="${book.bookID}"
                                                             data-book-title="${book.title}"
                                                             onclick="confirmRestore(this)"
-                                                            class="w-8 h-8 flex items-center justify-center rounded-lg border border-green-200 text-success hover:bg-green-50 transition-colors"
-                                                            title="Relist">
-                                                        <span class="material-symbols-outlined" style="font-size:17px">restore</span>
+                                                            class="btn-action btn-action-success"
+                                                            title="Relist" aria-label="Relist book">
+                                                        <span class="material-symbols-outlined" aria-hidden="true">restore</span>
                                                     </button>
                                                 </c:if>
                                             </div>

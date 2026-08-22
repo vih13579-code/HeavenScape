@@ -201,7 +201,7 @@
                                 <c:choose>
                                     <c:when test="${not empty reviews}">
                                         <c:forEach items="${reviews}" var="review">
-                                            <tr class="hover:bg-surface-container-lowest transition-colors group ${review.isHidden ? 'opacity-50 bg-gray-100' : ''}">
+                                            <tr class="hover:bg-surface-container-lowest transition-colors ${review.isHidden ? 'bg-gray-100' : ''}">
                                                 <td class="px-6 py-5">
                                                     <div class="flex items-center gap-3">
                                                         <span class="font-label-md text-label-md text-on-surface">${review.customerName}</span>
@@ -233,9 +233,11 @@
                                                                 <div class="mb-1 flex items-center justify-between gap-2 text-primary">
                                                                     <div class="flex items-center gap-1.5">
                                                                         <span class="material-symbols-outlined text-[16px]" data-icon="reply">reply</span>
-                                                                        <span class="font-label-sm text-label-sm">Staff/Admin reply</span>
+                                                                        <span class="font-label-sm text-label-sm">
+                                                                            <c:choose><c:when test="${not empty review.replyAuthorName}"><c:out value="${review.replyAuthorName}" /> (<c:out value="${review.replyAuthorRole}" />)</c:when><c:otherwise>Staff/Admin reply</c:otherwise></c:choose>
+                                                                        </span>
                                                                     </div>
-                                                                    <div class="flex items-center gap-1">
+                                                                    <div class="action-group">
                                                                         <button type="button" data-edit-reply-btn
                                                                                 data-review-id="${review.reviewID}"
                                                                                 data-customer-name="${fn:escapeXml(review.customerName)}"
@@ -243,15 +245,15 @@
                                                                                 data-rating="${review.rating}"
                                                                                 data-comment="${fn:escapeXml(review.comment)}"
                                                                                 data-reply="${fn:escapeXml(review.adminReply)}"
-                                                                                class="rounded p-1 hover:bg-primary/10"
-                                                                                title="Update Staff/Admin Reply">
-                                                                            <span class="material-symbols-outlined text-[16px]">edit</span>
+                                                                                class="btn-action btn-action-edit"
+                                                                                title="Update Staff/Admin Reply" aria-label="Update Staff/Admin Reply">
+                                                                            <span class="material-symbols-outlined" aria-hidden="true">edit</span>
                                                                         </button>
                                                                         <button type="button" data-delete-reply-btn
                                                                                 data-review-id="${review.reviewID}"
-                                                                                class="rounded p-1 text-error hover:bg-error/10"
-                                                                                title="Delete Staff/Admin Reply">
-                                                                            <span class="material-symbols-outlined text-[16px]">delete</span>
+                                                                                class="btn-action btn-action-delete"
+                                                                                title="Delete Staff/Admin Reply" aria-label="Delete Staff/Admin Reply">
+                                                                            <span class="material-symbols-outlined" aria-hidden="true">delete</span>
                                                                         </button>
                                                                     </div>
                                                                 </div>
@@ -284,34 +286,34 @@
                                                     </c:choose>
                                                 </td>
                                                 <td class="px-6 py-5 text-right">
-                                                    <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <div class="action-group">
                                                         <c:if test="${review.status != 'Approved' && !review.isHidden && review.customerStatus == 'active'}">
-                                                            <button data-reply-btn 
+                                                            <button type="button" data-reply-btn
                                                                     data-review-id="${review.reviewID}"
                                                                     data-customer-name="${review.customerName}"
                                                                     data-book-title="${review.bookTitle}"
                                                                     data-rating="${review.rating}"
                                                                     data-comment="${review.comment}"
-                                                                    class="p-2 hover:bg-surface-container-low rounded-lg text-primary transition-all border border-transparent hover:border-primary/20" 
-                                                                    title="Reply">
-                                                                <span class="material-symbols-outlined text-[20px]" data-icon="reply">reply</span>
+                                                                    class="btn-action btn-action-reply"
+                                                                    title="Reply" aria-label="Reply to review">
+                                                                <span class="material-symbols-outlined" data-icon="reply" aria-hidden="true">reply</span>
                                                             </button>
                                                         </c:if>
-                                                        <button data-hide-btn 
+                                                        <button type="button" data-hide-btn
                                                                 data-review-id="${review.reviewID}"
-                                                                class="p-2 hover:bg-warning/10 rounded-lg text-warning transition-all border border-transparent hover:border-warning/20" 
-                                                                title="${review.isHidden ? 'Show Review' : 'Hide Review'}">
-                                                            <span class="material-symbols-outlined text-[20px]" data-icon="${review.isHidden ? 'visibility' : 'visibility_off'}">
+                                                                class="btn-action ${review.isHidden ? 'btn-action-success' : 'btn-action-warning'}"
+                                                                title="${review.isHidden ? 'Show Review' : 'Hide Review'}" aria-label="${review.isHidden ? 'Show review' : 'Hide review'}">
+                                                            <span class="material-symbols-outlined" data-icon="${review.isHidden ? 'visibility' : 'visibility_off'}" aria-hidden="true">
                                                                 ${review.isHidden ? 'visibility' : 'visibility_off'}
                                                             </span>
                                                         </button>
-                                                        <button data-lock-btn 
+                                                        <button type="button" data-lock-btn
                                                                 data-review-id="${review.reviewID}"
                                                                 data-customer-id="${review.customerID}"
                                                                 ${review.customerStatus == 'inactive' ? 'disabled' : ''}
-                                                                class="p-2 hover:bg-error/10 rounded-lg text-error transition-all border border-transparent hover:border-error/20 ${review.customerStatus == 'inactive' ? 'opacity-50 cursor-not-allowed' : ''}" 
-                                                                title="${review.customerStatus == 'inactive' ? 'Account is locked' : 'Lock Account'}">
-                                                            <span class="material-symbols-outlined text-[20px]" data-icon="lock">lock</span>
+                                                                class="btn-action btn-action-lock"
+                                                                title="${review.customerStatus == 'inactive' ? 'Account is locked' : 'Lock Account'}" aria-label="${review.customerStatus == 'inactive' ? 'Account is locked' : 'Lock account'}">
+                                                            <span class="material-symbols-outlined" data-icon="lock" aria-hidden="true">lock</span>
                                                         </button>
                                                     </div>
                                                 </td>
@@ -440,7 +442,7 @@
                                 <input type="hidden" id="replyAction" name="action" value="reply">
                                 
                                 <div class="mb-4">
-                                    <label class="block font-semibold mb-2">Your Reply</label>
+                                    <label class="block font-semibold mb-2">Your Reply <span class="text-error text-xs">*</span></label>
                                     <textarea 
                                         name="reply" 
                                         id="replyContent"

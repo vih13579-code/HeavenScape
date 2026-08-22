@@ -18,9 +18,10 @@ public class ReviewDAO {
     public List<Review> getReviewsByBook(int bookID) {
         List<Review> list = new ArrayList<>();
         String sql
-                = "SELECT r.*, c.fullname "
+                = "SELECT r.*, c.fullname, responder.fullname AS replyAuthorName, responder.role AS replyAuthorRole "
                 + "FROM Review r "
                 + "JOIN Customer c ON r.customerID = c.customerID "
+                + "LEFT JOIN Account responder ON responder.accountID = r.adminID "
                 + "WHERE r.bookID = ? AND r.isHidden = 0 "
                 + "ORDER BY r.created_at DESC";
         try {
@@ -42,6 +43,8 @@ public class ReviewDAO {
                 review.setAdminID(rs.getInt("adminID"));
                 review.setAdminReply(rs.getString("adminReply"));
                 review.setAdminReplyDate(rs.getTimestamp("adminReplyDate"));
+                review.setReplyAuthorName(rs.getString("replyAuthorName"));
+                review.setReplyAuthorRole(rs.getString("replyAuthorRole"));
 
                 list.add(review);
             }
@@ -159,10 +162,12 @@ public class ReviewDAO {
 
         StringBuilder sql = new StringBuilder(
                 "SELECT r.*, c.fullname, c.status as customerStatus, "
-                + "b.title as bookTitle, b.thumbnail as bookCover "
+                + "b.title as bookTitle, b.thumbnail as bookCover, "
+                + "responder.fullname AS replyAuthorName, responder.role AS replyAuthorRole "
                 + "FROM Review r "
                 + "JOIN Customer c ON r.customerID = c.customerID "
                 + "JOIN Book b ON r.bookID = b.bookID "
+                + "LEFT JOIN Account responder ON responder.accountID = r.adminID "
                 + "WHERE 1=1 "
         );
 
@@ -223,6 +228,8 @@ public class ReviewDAO {
                 review.setAdminID(rs.getInt("adminID") == 0 ? null : rs.getInt("adminID"));
                 review.setAdminReply(rs.getString("adminReply"));
                 review.setAdminReplyDate(rs.getTimestamp("adminReplyDate"));
+                review.setReplyAuthorName(rs.getString("replyAuthorName"));
+                review.setReplyAuthorRole(rs.getString("replyAuthorRole"));
                 review.setIsHidden(rs.getInt("isHidden") == 1);
 
                 if (rs.getTimestamp("created_at") != null) {
@@ -343,10 +350,12 @@ public class ReviewDAO {
     }
 
     public Review getReviewByID(int reviewID) {
-        String sql = "SELECT r.*, c.fullname, c.status as customerStatus, b.title as bookTitle "
+        String sql = "SELECT r.*, c.fullname, c.status as customerStatus, b.title as bookTitle, "
+                + "responder.fullname AS replyAuthorName, responder.role AS replyAuthorRole "
                 + "FROM Review r "
                 + "JOIN Customer c ON r.customerID = c.customerID "
                 + "JOIN Book b ON r.bookID = b.bookID "
+                + "LEFT JOIN Account responder ON responder.accountID = r.adminID "
                 + "WHERE r.reviewID = ?";
 
         try {
@@ -371,6 +380,8 @@ public class ReviewDAO {
                 review.setAdminID(rs.getInt("adminID") == 0 ? null : rs.getInt("adminID"));
                 review.setAdminReply(rs.getString("adminReply"));
                 review.setAdminReplyDate(rs.getTimestamp("adminReplyDate"));
+                review.setReplyAuthorName(rs.getString("replyAuthorName"));
+                review.setReplyAuthorRole(rs.getString("replyAuthorRole"));
 
                 conn.close();
                 return review;

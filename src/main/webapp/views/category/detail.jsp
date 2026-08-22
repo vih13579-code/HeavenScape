@@ -26,18 +26,6 @@
 
 
 
-                <c:if test="${not empty sessionScope.success}">
-                    <div class="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-semibold text-green-700">
-                        ${sessionScope.success}
-                    </div>
-                    <c:remove var="success" scope="session"/>
-                </c:if>
-                <c:if test="${not empty sessionScope.error}">
-                    <div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
-                        ${sessionScope.error}
-                    </div>
-                    <c:remove var="error" scope="session"/>
-                </c:if>
                 <section class="bg-surface rounded-2xl border border-outline-variant shadow-card overflow-hidden">
                     <div class="px-6 py-5 border-b border-outline-variant flex items-center justify-between">
                         <div>
@@ -56,7 +44,7 @@
                     <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div class="rounded-xl bg-surface-container-low p-5">
                             <p class="text-sm font-semibold text-on-surface-variant">Category ID</p>
-                            <p class="text-2xl font-extrabold text-primary mt-2">#CAT-${category.categoryID}</p>
+                            <p class="text-2xl font-extrabold text-primary mt-2">HSC-${category.categoryID}</p>
                         </div>
                         <div class="rounded-xl bg-surface-container-low p-5 md:col-span-2">
                             <p class="text-sm font-semibold text-on-surface-variant">Category Name</p>
@@ -87,7 +75,7 @@
                             <input type="hidden" name="id" value="${category.categoryID}">
 
                             <div>
-                                <label class="block text-sm font-bold mb-2">Category Name</label>
+                                <label class="block text-sm font-bold mb-2">Category Name <span class="text-red-600 text-xs">*</span></label>
                                 <input type="text" name="category_name" required maxlength="100" value="${category.categoryName}"
                                        class="w-full rounded-xl border-outline-variant bg-surface-container-low px-4 py-3 text-sm focus:border-primary focus:ring-primary">
                                 <p class="text-xs text-on-surface-variant mt-2">The category name is required and must be unique.</p>
@@ -123,5 +111,6 @@
                 </script>
             </div>
         </main>
+        <%@ include file="/views/layout/common/toast.jsp" %>
     </body>
 </html>

@@ -232,6 +232,30 @@ public class DashboardDAO {
         return list;
     }
 
+    public List<Map<String, Object>> getRevenueTrend(String fromDate, String toDate) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        String sql = "SELECT CAST(o.created_at AS DATE) AS saleDate, "
+                + "ISNULL(SUM(o.total_price), 0) AS revenue "
+                + "FROM [Order] o "
+                + "WHERE LOWER(LTRIM(RTRIM(o.status))) = 'completed' "
+                + buildDateFilter()
+                + "GROUP BY CAST(o.created_at AS DATE) ORDER BY saleDate";
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            setCommonParams(ps, fromDate, toDate, null);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> row = new LinkedHashMap<>();
+                    row.put("saleDate", rs.getDate("saleDate"));
+                    row.put("revenue", rs.getBigDecimal("revenue"));
+                    list.add(row);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
     /**
      * Lấy toàn bộ đơn hàng theo bộ lọc hiện tại.
      * Unlimited TOP 5 và không loại bỏ trạng thái completed/cancelled.

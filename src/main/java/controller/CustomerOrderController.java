@@ -207,7 +207,7 @@ public class CustomerOrderController extends HttpServlet {
             boolean stockOk = orderDAO.deductStock(orderID);
             if (!stockOk) {
                 String outOfStockReason = "The product was out of stock when the order was reviewed";
-                orderDAO.updateOrderStatusAndStaff(orderID, "cancelled", staff.getId(), outOfStockReason);
+                orderDAO.cancelOrderBySystem(orderID, outOfStockReason);
                 if (order != null && order.getCustomerEmail() != null) {
                     final model.Order finalOrder = order;
                     new Thread(new Runnable() {

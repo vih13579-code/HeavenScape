@@ -192,16 +192,16 @@
                                     </button>
                                 </div>
                             </div>
-                            <div class="bg-[#FDE8E9] border border-[#FFB3B0] rounded-xl p-4">
+                            <div id="passwordPolicyError" class="hidden bg-[#FDE8E9] border border-[#FFB3B0] rounded-xl p-4" role="alert">
                                 <p class="text-sm text-blue-700">
-                                    Password must be 8–15 characters long,
+                                    Password must be 8-15 characters long,
                                     including uppercase and lowercase letters, numbers,
                                     and a special character.
                                 </p>
                             </div>
                             <div class="flex justify-end gap-3">
 
-                                <a href="${pageContext.request.contextPath}/login" class="px-6 py-3 border border-slate-300 rounded-full font-semibold hover:bg-slate-50">
+                                <a href="${pageContext.request.contextPath}/dashboard/profile" class="px-6 py-3 border border-slate-300 rounded-full font-semibold hover:bg-slate-50">
                                     Back
                                 </a>
                                 <button type="submit" id="changeBtn" class="btn-submit">
@@ -233,6 +233,13 @@
                     icon.textContent = "visibility";
                 }
             }
+            document.getElementById("newPassword").addEventListener("input", function () {
+                const policyError = document.getElementById("passwordPolicyError");
+                const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.#^_+=-])[A-Za-z\d@$!%*?&.#^_+=-]{8,15}$/;
+                if (passwordPattern.test(this.value)) {
+                    policyError.classList.add("hidden");
+                }
+            });
             document.getElementById("changePasswordForm")
                     .addEventListener("submit", async function (e) {
                         e.preventDefault();
@@ -241,6 +248,15 @@
 
                         const newPassword = document.getElementById("newPassword").value;
                         const confirmPassword = document.getElementById("confirmPassword").value;
+                        const policyError = document.getElementById("passwordPolicyError");
+                        const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.#^_+=-])[A-Za-z\d@$!%*?&.#^_+=-]{8,15}$/;
+
+                        if (!passwordPattern.test(newPassword)) {
+                            policyError.classList.remove("hidden");
+                            btn.disabled = false;
+                            return;
+                        }
+                        policyError.classList.add("hidden");
 
                         if (newPassword !== confirmPassword) {
                             showToast("Passwords do not match", true);
@@ -254,7 +270,7 @@
                         formData.append("newPassword", document.getElementById("newPassword").value);
                         formData.append("confirmPassword", document.getElementById("confirmPassword").value);
                         try {
-                            const response = await fetch("${pageContext.request.contextPath}/profile/change-password",
+                            const response = await fetch("${pageContext.request.contextPath}/dashboard/profile/change-password",
                                     {
                                         method: "POST",
                                         headers: {

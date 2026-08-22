@@ -182,7 +182,8 @@ public class CategoryManagementController extends HttpServlet {
 
             int bookCount = categoryDAO.countBooksByCategory(id);
             if (bookCount > 0) {
-                setFlash(request, "error", "A category containing books cannot be deleted.");
+                request.getSession().setAttribute(
+                        "errorMessage", "A category containing books cannot be deleted.");
                 response.sendRedirect(redirectUrl);
                 return;
             }
@@ -243,6 +244,7 @@ public class CategoryManagementController extends HttpServlet {
     }
 
     private void setFlash(HttpServletRequest request, String type, String message) {
-        request.getSession().setAttribute(type, message);
+        String attribute = "success".equals(type) ? "successMessage" : "errorMessage";
+        request.getSession().setAttribute(attribute, message);
     }
 }

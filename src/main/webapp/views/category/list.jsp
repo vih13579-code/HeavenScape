@@ -50,18 +50,6 @@
                     </c:if>
                 </div>
 
-                <c:if test="${not empty sessionScope.success}">
-                    <div class="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-semibold text-green-700">
-                        ${sessionScope.success}
-                    </div>
-                    <c:remove var="success" scope="session"/>
-                </c:if>
-                <c:if test="${not empty sessionScope.error}">
-                    <div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
-                        ${sessionScope.error}
-                    </div>
-                    <c:remove var="error" scope="session"/>
-                </c:if>
 
                 <section class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div class="bg-surface rounded-2xl border border-outline-variant p-5 shadow-card">
@@ -116,7 +104,7 @@
                             <tbody class="divide-y divide-outline-variant">
                                 <c:forEach var="category" items="${categories}">
                                     <tr class="hover:bg-surface-container-low transition">
-                                        <td class="px-6 py-4 text-sm font-bold text-primary">#CAT-${category.categoryID}</td>
+                                        <td class="px-6 py-4 text-sm font-bold text-primary">HSC-${category.categoryID}</td>
                                         <td class="px-6 py-4 text-sm font-semibold text-on-surface">${category.categoryName}</td>
                                         <td class="px-6 py-4 text-sm text-on-surface-variant">${category.bookCount}</td>
                                         <td class="px-6 py-4">

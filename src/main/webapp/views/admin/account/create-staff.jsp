@@ -127,7 +127,7 @@
                                            placeholder="example@heavenscape.vn" type="email"/>
                                 </div>
                                 <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-semibold text-on-surface">Phone Number</label>
+                                    <label class="text-sm font-semibold text-on-surface">Phone Number <span class="text-error">*</span></label>
                                     <input id="phone" name="phone"
                                            class="w-full h-12 px-4 rounded-lg border border-outline-variant bg-white text-base"
                                            placeholder="094 4567 234" type="tel"/>
@@ -141,7 +141,7 @@
                             </h3>
                             <div class="space-y-4">
                                 <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-semibold text-on-surface">Role</label>
+                                    <label class="text-sm font-semibold text-on-surface">Role <span class="text-error">*</span></label>
                                     <input
                                         type="text"
                                         value="Staff"
@@ -169,7 +169,7 @@
                                     </div>
                                 </div>
                                 <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-semibold text-on-surface">Status</label>
+                                    <label class="text-sm font-semibold text-on-surface">Status <span class="text-error">*</span></label>
                                     <input
                                         type="text"
                                         value="Active"

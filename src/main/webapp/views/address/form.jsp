@@ -21,12 +21,12 @@ Address a = (Address) request.getAttribute("address");
     <input type="hidden" name="id"
            value="<%=a != null ? a.getAddressID() : ""%>">
 
-    Customer ID:
+    <label>Customer ID: <span style="color:#d32f2f;font-size:12px">*</span></label>
     <input type="number" name="customerID" required
            value="<%=a != null ? a.getCustomerID() : 2%>">
     <br><br>
 
-    Street:
+    <label>Street: <span style="color:#d32f2f;font-size:12px">*</span></label>
     <input type="text" name="street" required
            value="<%=a != null ? a.getStreet() : ""%>">
     <br><br>

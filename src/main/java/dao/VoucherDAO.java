@@ -52,11 +52,12 @@ public class VoucherDAO {
                 + "  SELECT v.voucherID, v.code, v.discount_percent, v.quantity,"
                 + "         v.start_date, v.end_date, v.status, v.is_deleted,"
                 + "         v.min_order_value, v.max_discount_value,"
-                + "         COUNT(cv.customerVoucherID) AS usedCount,"
+                + "         COUNT(usedOrder.orderID) AS usedCount,"
                 + "         ROW_NUMBER() OVER (ORDER BY v.voucherID DESC) AS rn"
                 + "  FROM Voucher v"
-                + "  LEFT JOIN CustomerVoucher cv "
-                + "       ON v.voucherID = cv.voucherID AND cv.is_used = 1"
+                + "  LEFT JOIN [Order] usedOrder "
+                + "       ON v.voucherID = usedOrder.voucherID "
+                + "      AND LOWER(LTRIM(RTRIM(usedOrder.status))) = 'completed'"
                 + "  " + buildWhere(keyword, status)
                 + "  GROUP BY v.voucherID, v.code, v.discount_percent, v.quantity,"
                 + "           v.start_date, v.end_date, v.status, v.is_deleted,"
@@ -163,7 +164,8 @@ public class VoucherDAO {
     }
 
     public int deleteVoucher(int voucherID) {
-        String checkUsed = "SELECT COUNT(*) FROM CustomerVoucher WHERE voucherID = ? AND is_used = 1";
+        String checkUsed = "SELECT COUNT(*) FROM [Order] WHERE voucherID = ? "
+                + "AND LOWER(LTRIM(RTRIM(status))) = 'completed'";
         String doDelete = "UPDATE Voucher SET is_deleted = 1 WHERE voucherID = ? AND is_deleted = 0";
 
         Connection conn = null;
@@ -233,8 +235,9 @@ public class VoucherDAO {
                         + "AND (v.start_date IS NULL OR v.start_date <= GETDATE()) "
                         + "AND (v.end_date   IS NULL OR v.end_date   >= GETDATE()) "
                         + "AND (v.quantity IS NULL OR v.quantity > ("
-                        + "      SELECT COUNT(*) FROM CustomerVoucher cv "
-                        + "      WHERE cv.voucherID = v.voucherID AND cv.is_used = 1"
+                        + "      SELECT COUNT(*) FROM [Order] usedOrder "
+                        + "      WHERE usedOrder.voucherID = v.voucherID "
+                        + "        AND LOWER(LTRIM(RTRIM(usedOrder.status))) = 'completed'"
                         + "    ))");
     }
 
@@ -244,7 +247,8 @@ public class VoucherDAO {
     }
 
     public int countTotalUsed() {
-        return countBySQL("SELECT COUNT(*) FROM CustomerVoucher WHERE is_used = 1");
+        return countBySQL("SELECT COUNT(*) FROM [Order] "
+                + "WHERE voucherID IS NOT NULL AND LOWER(LTRIM(RTRIM(status))) = 'completed'");
     }
 
     private int countBySQL(String sql) {
@@ -308,11 +312,11 @@ public class VoucherDAO {
     }
 
     /**
-     * Số lượt voucher đã được sử dụng (is_used = 1), dùng để so với quantity
-     * giới hạn.
+     * Number of current Completed orders that used this voucher.
      */
     public int getUsedCount(int voucherID) {
-        String sql = "SELECT COUNT(*) FROM CustomerVoucher WHERE voucherID = ? AND is_used = 1";
+        String sql = "SELECT COUNT(*) FROM [Order] WHERE voucherID = ? "
+                + "AND LOWER(LTRIM(RTRIM(status))) = 'completed'";
         try (Connection conn = new DBContext().getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, voucherID);
             try (ResultSet rs = ps.executeQuery()) {
@@ -327,10 +331,11 @@ public class VoucherDAO {
     }
 
     /**
-     * Customer này đã sử dụng voucher này (is_used = 1) hay chưa.
+     * Whether this customer has a current Completed order using this voucher.
      */
     public boolean hasCustomerUsedVoucher(int customerID, int voucherID) {
-        String sql = "SELECT COUNT(*) FROM CustomerVoucher WHERE customerID = ? AND voucherID = ? AND is_used = 1";
+        String sql = "SELECT COUNT(*) FROM [Order] WHERE customerID = ? AND voucherID = ? "
+                + "AND LOWER(LTRIM(RTRIM(status))) = 'completed'";
         try (Connection conn = new DBContext().getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, customerID);
             ps.setInt(2, voucherID);
@@ -346,42 +351,30 @@ public class VoucherDAO {
     }
 
     /**
-     * Lấy danh sách voucher khả dụng để hiển thị ở modal "Store Vouchers"
-     * trên trang checkout. Điều kiện: đang active, trong thời hạn, còn lượt, và
-     * khách hàng này chưa dùng.
-     *
-     * @param customerID ID khách đang xem checkout (dùng để lọc voucher đã dùng
-     *                   rồi)
+     * Returns vouchers visible in the checkout modal. Customer/order-specific
+     * eligibility is evaluated by CheckoutController so an invalid voucher can
+     * be displayed as disabled together with the exact reason.
      */
     public List<Voucher> getActiveVouchers(int customerID) {
         List<Voucher> list = new ArrayList<>();
         String sql = "SELECT v.voucherID, v.code, v.discount_percent, v.quantity, "
                 + "       v.start_date, v.end_date, v.status, v.is_deleted, "
                 + "       v.min_order_value, v.max_discount_value, "
-                + "       COUNT(cv.customerVoucherID) AS usedCount "
+                + "       COUNT(usedOrder.orderID) AS usedCount "
                 + "FROM Voucher v "
-                + "LEFT JOIN CustomerVoucher cv "
-                + "       ON v.voucherID = cv.voucherID AND cv.is_used = 1 "
+                + "LEFT JOIN [Order] usedOrder "
+                + "       ON v.voucherID = usedOrder.voucherID "
+                + "      AND LOWER(LTRIM(RTRIM(usedOrder.status))) = 'completed' "
                 + "WHERE v.is_deleted = 0 "
                 + "  AND v.status = 'active' "
                 + "  AND (v.start_date IS NULL OR v.start_date <= GETDATE()) "
                 + "  AND (v.end_date IS NULL OR v.end_date >= GETDATE()) "
-                // Loại bỏ voucher khách hàng này đã sử dụng rồi
-                + "  AND NOT EXISTS ( "
-                + "      SELECT 1 FROM CustomerVoucher used "
-                + "      WHERE used.voucherID = v.voucherID "
-                + "        AND used.customerID = ? "
-                + "        AND used.is_used = 1 "
-                + "  ) "
                 + "GROUP BY v.voucherID, v.code, v.discount_percent, v.quantity, "
                 + "         v.start_date, v.end_date, v.status, v.is_deleted, "
                 + "         v.min_order_value, v.max_discount_value "
-                // Chỉ lấy voucher còn lượt (quantity NULL = không giới hạn)
-                + "HAVING v.quantity IS NULL OR COUNT(cv.customerVoucherID) < v.quantity "
                 + "ORDER BY v.end_date ASC";
 
         try (Connection conn = new DBContext().getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, customerID);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     list.add(mapRow(rs));
@@ -402,8 +395,8 @@ public class VoucherDAO {
     public static final int USAGE_ERROR = -2;
 
     /**
-     * Ghi nhận voucher đã được khách hàng sử dụng (gọi sau khi tạo đơn hàng
-     * thành công).
+     * Legacy compatibility API. Usage statistics no longer read this table;
+     * they are derived directly from orders whose current status is Completed.
      *
      * FIX race condition: bước kiểm tra (đã dùng chưa / còn lượt không) và bước
      * ghi nhận được gộp vào CÙNG MỘT transaction, dùng khóa đọc (UPDLOCK,
@@ -485,6 +478,38 @@ public class VoucherDAO {
                     ex.printStackTrace();
                 }
             }
+        }
+    }
+
+    /**
+     * Counts a voucher as used only after its order reaches Completed. The
+     * unique customer/voucher constraint makes this operation idempotent.
+     */
+    public boolean recordUsageForCompletedOrder(int orderID) {
+        String update = "UPDATE cv SET is_used = 1 FROM CustomerVoucher cv "
+                + "JOIN [Order] o ON o.customerID = cv.customerID AND o.voucherID = cv.voucherID "
+                + "WHERE o.orderID = ? AND LOWER(LTRIM(RTRIM(o.status))) = 'completed'";
+        String insert = "INSERT INTO CustomerVoucher (customerID, voucherID, is_used) "
+                + "SELECT o.customerID, o.voucherID, 1 FROM [Order] o "
+                + "WHERE o.orderID = ? AND LOWER(LTRIM(RTRIM(o.status))) = 'completed' "
+                + "AND o.voucherID IS NOT NULL "
+                + "AND NOT EXISTS (SELECT 1 FROM CustomerVoucher cv "
+                + "WHERE cv.customerID = o.customerID AND cv.voucherID = o.voucherID)";
+        try (Connection conn = new DBContext().getConnection()) {
+            conn.setAutoCommit(false);
+            try (PreparedStatement ps = conn.prepareStatement(update)) {
+                ps.setInt(1, orderID);
+                ps.executeUpdate();
+            }
+            try (PreparedStatement ps = conn.prepareStatement(insert)) {
+                ps.setInt(1, orderID);
+                ps.executeUpdate();
+            }
+            conn.commit();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
         }
     }
 

@@ -179,6 +179,10 @@
         <url-pattern>/profile</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
+        <servlet-name>ProfileController</servlet-name>
+        <url-pattern>/dashboard/profile</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
         <servlet-name>ProductController</servlet-name>
         <url-pattern>/products</url-pattern>
     </servlet-mapping>
@@ -205,6 +209,10 @@
     <servlet-mapping>
         <servlet-name>ChangePasswordController</servlet-name>
         <url-pattern>/profile/change-password</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ChangePasswordController</servlet-name>
+        <url-pattern>/dashboard/profile/change-password</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>AccountManagementController</servlet-name>

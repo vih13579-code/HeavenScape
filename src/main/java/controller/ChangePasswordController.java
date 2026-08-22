@@ -28,8 +28,14 @@ public class ChangePasswordController extends HttpServlet {
         }
 
         Account acc = (Account) session.getAttribute("account");
+        boolean isCustomer = "customer".equalsIgnoreCase(acc.getRole());
 
-        if ("customer".equalsIgnoreCase(acc.getRole())) {
+        if (!isCustomer && !isDashboardRequest(request)) {
+            response.sendRedirect(request.getContextPath() + "/dashboard/profile/change-password");
+            return;
+        }
+
+        if (isCustomer) {
             request.getRequestDispatcher(
                     "/views/profile/changePassword.jsp"
             ).forward(request, response);
@@ -63,6 +69,14 @@ public class ChangePasswordController extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write(
                     "{\"success\":false,\"message\":\"Not signed in\"}"
+            );
+            return;
+        }
+
+        if (!"customer".equalsIgnoreCase(acc.getRole()) && !isDashboardRequest(request)) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.getWriter().write(
+                    "{\"success\":false,\"message\":\"Use the protected dashboard endpoint\"}"
             );
             return;
         }
@@ -176,6 +190,10 @@ public class ChangePasswordController extends HttpServlet {
         }
 
         return null;
+    }
+
+    private boolean isDashboardRequest(HttpServletRequest request) {
+        return request.getServletPath().startsWith("/dashboard/");
     }
 
     private String validateNewPassword(String newPassword) {

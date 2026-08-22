@@ -123,14 +123,14 @@
 
         <a href="${pageContext.request.contextPath}/dashboard"
            class="sidebar-link <%= isDashboardPage ? "active" : ""%>">
-            <span class="material-symbols-outlined">dashboard</span>
+            <span class="material-symbols-outlined">monitoring</span>
             Dashboard
         </a>
 
         <c:choose><c:when test="${sessionScope.account.role == 'staff'}">
         <a href="${pageContext.request.contextPath}/dashboard/customer-order"
            class="sidebar-link <%= currentPage.contains("customer-order") ? "active" : ""%>">
-            <span class="material-symbols-outlined">shopping_cart</span>
+            <span class="material-symbols-outlined">local_mall</span>
             Orders
         </a>
         </c:when></c:choose>
@@ -141,7 +141,7 @@
         %>
         <a href="${pageContext.request.contextPath}/dashboard/product-management"
            class="sidebar-link <%= khoHangActive ? "active" : ""%>">
-            <span class="material-symbols-outlined">inventory_2</span>
+            <span class="material-symbols-outlined">warehouse</span>
             Inventory
         </a>
         <% } %>
@@ -151,7 +151,7 @@
         <% if (isStaffUser) { %>
         <a href="${pageContext.request.contextPath}/dashboard/category-management"
            class="sidebar-link <%= sidebarCurrentPath.startsWith("/dashboard/category-management") ? "active" : ""%>">
-            <span class="material-symbols-outlined">category</span>
+            <span class="material-symbols-outlined">account_tree</span>
             Category
         </a>
         <% } %>
@@ -159,13 +159,13 @@
         <% if (isStaffOrAdmin) { %>
         <a href="${pageContext.request.contextPath}/dashboard/account-management"
            class="sidebar-link <%= currentPage.contains("account-management") ? "active" : ""%>">
-            <span class="material-symbols-outlined">group</span>
+            <span class="material-symbols-outlined">manage_accounts</span>
             Account
         </a>
 
         <a href="${pageContext.request.contextPath}/dashboard/review-management"
            class="sidebar-link <%= currentPage.contains("review") ? "active" : ""%>">
-            <span class="material-symbols-outlined">rate_review</span>
+            <span class="material-symbols-outlined">reviews</span>
             Review
         </a>
         <% } %>
@@ -173,7 +173,7 @@
         <% if (isStaffUser) { %>
         <a href="${pageContext.request.contextPath}/dashboard/voucher-management"
            class="sidebar-link <%= currentPage.contains("voucher") ? "active" : ""%>">
-            <span class="material-symbols-outlined">sell</span>
+            <span class="material-symbols-outlined">confirmation_number</span>
             Voucher
         </a>
         <% } %>
@@ -183,13 +183,13 @@
 
     <div class="hs-admin-user-area">
         <div class="user-popup" id="userPopup">
-            <a href="${pageContext.request.contextPath}/profile">
+            <a href="${pageContext.request.contextPath}/dashboard/profile">
                 <span class="material-symbols-outlined" style="font-size:18px;">
                     manage_accounts
                 </span>
                 Personal Profile
             </a>
-            <a href="${pageContext.request.contextPath}/profile/change-password">
+            <a href="${pageContext.request.contextPath}/dashboard/profile/change-password">
                 <span class="material-symbols-outlined" style="font-size:18px;">
                     lock_reset
                 </span>

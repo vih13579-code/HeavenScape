@@ -14,3 +14,95 @@
 .hs-admin-page input:not([type=checkbox]):not([type=radio]):not([type=hidden]),.hs-admin-page select,.hs-admin-page textarea{border-color:#d7d7d7!important;border-radius:6px!important;background:#fff!important;color:#333!important;box-shadow:none!important}.hs-admin-page input:focus,.hs-admin-page select:focus,.hs-admin-page textarea:focus{border-color:var(--admin-primary)!important;box-shadow:0 0 0 2px rgba(201,33,39,.1)!important;outline:0!important}
 .hs-admin-mobile-bar,.hs-admin-overlay{display:none}@media(max-width:767px){.hs-admin-page main,.hs-admin-page main.ml-64,.hs-admin-page header.md\:ml-64{margin-left:0!important}.hs-admin-page main{padding-top:64px!important;width:100%!important;overflow-x:hidden}.hs-admin-mobile-bar{display:flex;align-items:center;justify-content:space-between;position:fixed;inset:0 0 auto;z-index:60;height:58px;padding:0 14px;border-bottom:1px solid var(--admin-border);background:#fff;color:var(--admin-primary)}.hs-admin-mobile-bar button{width:40px;height:40px;border:0;border-radius:6px;background:var(--admin-primary);color:#fff}.hs-admin-sidebar{transform:translateX(-102%)}.hs-admin-sidebar.open{transform:translateX(0)}.hs-admin-overlay{position:fixed;inset:0;z-index:65;background:rgba(0,0,0,.42)}.hs-admin-overlay.open{display:block}}
 @media(max-width:640px){.hs-admin-page-heading{align-items:stretch;flex-direction:column}.hs-admin-page-title{font-size:26px!important}.hs-admin-page-subtitle{font-size:14px!important}}
+
+/* Shared action controls used by all management tables. */
+.hs-admin-page .action-group{
+    display:inline-flex;
+    align-items:center;
+    justify-content:flex-end;
+    flex:0 0 auto;
+    gap:8px;
+    white-space:nowrap;
+}
+.hs-admin-page .action-group form{
+    display:inline-flex;
+    margin:0;
+    box-shadow:none!important;
+}
+.hs-admin-page .btn-action{
+    appearance:none;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    flex:0 0 38px;
+    width:38px;
+    height:38px;
+    min-width:38px;
+    padding:0;
+    border:1px solid #d7dade;
+    border-radius:9px;
+    background:#fff;
+    color:#5f6368;
+    line-height:1;
+    text-decoration:none;
+    cursor:pointer;
+    opacity:1!important;
+    visibility:visible!important;
+    transition:background-color .16s ease,border-color .16s ease,color .16s ease,box-shadow .16s ease,transform .16s ease;
+}
+.hs-admin-page .btn-action .material-symbols-outlined{
+    font-size:20px!important;
+    line-height:1;
+    pointer-events:none;
+    font-variation-settings:'FILL' 0,'wght' 500,'GRAD' 0,'opsz' 20;
+}
+.hs-admin-page .btn-action:hover:not(:disabled){
+    border-color:#b9bdc4;
+    background:#f5f6f7;
+    color:#34373b;
+    transform:translateY(-1px);
+}
+.hs-admin-page .btn-action:focus-visible{
+    outline:0;
+    box-shadow:0 0 0 3px rgba(201,33,39,.16);
+}
+.hs-admin-page .btn-action:active:not(:disabled){transform:translateY(0)}
+.hs-admin-page .btn-action:disabled,
+.hs-admin-page .btn-action[aria-disabled="true"]{
+    border-color:#e1e3e6!important;
+    background:#f4f5f6!important;
+    color:#a4a7ac!important;
+    cursor:not-allowed;
+    opacity:.55!important;
+    transform:none;
+}
+.hs-admin-page .btn-action-view{border-color:#bed5ee;color:#1565c0}
+.hs-admin-page .btn-action-view:hover:not(:disabled){border-color:#8db8e5;background:#edf5ff;color:#0d54a5}
+.hs-admin-page .btn-action-edit,
+.hs-admin-page .btn-action-reply{border-color:#efb9bc;color:var(--admin-primary)}
+.hs-admin-page .btn-action-edit:hover:not(:disabled),
+.hs-admin-page .btn-action-reply:hover:not(:disabled){border-color:#df858a;background:var(--admin-soft);color:var(--admin-dark)}
+.hs-admin-page .btn-action-delete,
+.hs-admin-page .btn-action-lock{border-color:#f0b9b7;color:var(--admin-error)}
+.hs-admin-page .btn-action-delete:hover:not(:disabled),
+.hs-admin-page .btn-action-lock:hover:not(:disabled){border-color:#df8581;background:#fff0f0;color:#b71c1c}
+.hs-admin-page .btn-action-warning,
+.hs-admin-page .btn-action-disable{border-color:#efd09f;color:#b56500}
+.hs-admin-page .btn-action-warning:hover:not(:disabled),
+.hs-admin-page .btn-action-disable:hover:not(:disabled){border-color:#dfa84e;background:#fff7e8;color:#914f00}
+.hs-admin-page .btn-action-success,
+.hs-admin-page .btn-action-enable{border-color:#b9dfc5;color:var(--admin-success)}
+.hs-admin-page .btn-action-success:hover:not(:disabled),
+.hs-admin-page .btn-action-enable:hover:not(:disabled){border-color:#7fc292;background:#edf8f0;color:#1f6b31}
+.hs-admin-page .action-select{
+    height:38px;
+    min-width:104px;
+    padding:0 32px 0 10px!important;
+    border:1px solid #d7dade!important;
+    border-radius:9px!important;
+    background-color:#fff!important;
+    color:#4b4f55!important;
+    font-size:12px;
+    font-weight:600;
+    cursor:pointer;
+}

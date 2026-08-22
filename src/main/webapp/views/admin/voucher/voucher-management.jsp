@@ -158,7 +158,7 @@
             .vm-panel { overflow: hidden; border: 1px solid #e2e2e2; border-radius: 8px; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
             .vm-filters { padding: 15px 16px; border-bottom: 1px solid #e5e5e5; background: #fff; }
             .vm-filter-form { display: grid; grid-template-columns: minmax(260px, 1fr) 180px auto auto; align-items: end; gap: 12px; }
-            .vm-filter-form, .vm-actions form { box-shadow: none !important; }
+            .vm-filter-form { box-shadow: none !important; }
             .vm-field { min-width: 0; }
             .vm-field label { display: block; margin-bottom: 6px; color: #555; font-size: 11px; font-weight: 700; }
             .vm-search { position: relative; }
@@ -185,13 +185,6 @@
             .vm-badge.active { background: #e6f6eb; color: #16833b; }
             .vm-badge.inactive { background: #fff3dd; color: #b66a00; }
             .vm-badge.expired { background: #eff0f2; color: #6b6d72; }
-            .vm-actions { display: flex; align-items: center; justify-content: flex-end; gap: 4px; }
-            .vm-action { width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; border-radius: 5px; color: #666; }
-            .vm-action:hover { background: #f2f2f3; color: #c92127; }
-            .vm-action.warning { color: #b66a00; }
-            .vm-action.success { color: #16833b; }
-            .vm-action.delete { color: #c92127; }
-            .vm-action .material-symbols-outlined { font-size: 17px; }
             .vm-table-footer { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 58px; padding: 10px 16px; color: #666; font-size: 11px; }
             .vm-pagination { display: flex; align-items: center; gap: 5px; }
             .vm-page { width: 31px; height: 31px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid #dedede; border-radius: 5px; background: #fff; color: #555; font-size: 11px; }
@@ -356,10 +349,10 @@
                                                     </c:choose>
                                                 </td>
                                                 <td>
-                                                    <div class="vm-actions">
-                                                        <button type="button" class="vm-action" title="Edit voucher"
+                                                    <div class="action-group">
+                                                        <button type="button" class="btn-action btn-action-edit" title="Edit voucher" aria-label="Edit voucher"
                                                                 onclick="openEditModal(${v.voucherID}, '${v.code}', ${v.discountPercent}, ${v.quantity != null ? v.quantity : 0}, '${v.startDate}', '${v.endDate}', '${v.status}', ${v.minOrderValue != null ? v.minOrderValue : 0}, ${v.maxDiscountValue != null ? v.maxDiscountValue : 0})">
-                                                            <span class="material-symbols-outlined">edit</span>
+                                                            <span class="material-symbols-outlined" aria-hidden="true">edit</span>
                                                         </button>
                                                         <c:choose>
                                                             <c:when test="${v.status == 'active'}">
@@ -367,7 +360,7 @@
                                                                     <input type="hidden" name="action" value="toggle" />
                                                                     <input type="hidden" name="voucherID" value="${v.voucherID}" />
                                                                     <input type="hidden" name="newStatus" value="inactive" />
-                                                                    <button type="submit" class="vm-action warning" title="Disable voucher"><span class="material-symbols-outlined">pause_circle</span></button>
+                                                                    <button type="submit" class="btn-action btn-action-disable" title="Disable voucher" aria-label="Disable voucher"><span class="material-symbols-outlined" aria-hidden="true">pause_circle</span></button>
                                                                 </form>
                                                             </c:when>
                                                             <c:when test="${v.status == 'inactive'}">
@@ -375,12 +368,12 @@
                                                                     <input type="hidden" name="action" value="toggle" />
                                                                     <input type="hidden" name="voucherID" value="${v.voucherID}" />
                                                                     <input type="hidden" name="newStatus" value="active" />
-                                                                    <button type="submit" class="vm-action success" title="Activate voucher"><span class="material-symbols-outlined">play_circle</span></button>
+                                                                    <button type="submit" class="btn-action btn-action-enable" title="Activate voucher" aria-label="Activate voucher"><span class="material-symbols-outlined" aria-hidden="true">play_circle</span></button>
                                                                 </form>
                                                             </c:when>
                                                         </c:choose>
-                                                        <button type="button" class="vm-action delete" title="Delete voucher" onclick="confirmDelete(${v.voucherID}, '${v.code}')">
-                                                            <span class="material-symbols-outlined">delete</span>
+                                                        <button type="button" class="btn-action btn-action-delete" title="Delete voucher" aria-label="Delete voucher" onclick="confirmDelete(${v.voucherID}, '${v.code}')">
+                                                            <span class="material-symbols-outlined" aria-hidden="true">delete</span>
                                                         </button>
                                                     </div>
                                                 </td>
@@ -641,9 +634,7 @@
                 // Hiện toggle trạng thái khi edit
                 document.getElementById('statusSection').classList.remove('hidden');
                 const isActive = status === 'active';
-                document.getElementById('inputStatus').checked = isActive;
-                document.getElementById('toggleBg').style.background = isActive ? '#2E7D32' : '#D9D9DC';
-                document.getElementById('statusLabel').textContent    = isActive ? 'Active' : 'Disable';
+                document.getElementById('inputStatus').value = isActive ? 'active' : 'inactive';
 
                 updatePreview();
                 document.getElementById('voucherModal').classList.remove('hidden');
@@ -704,11 +695,6 @@
             }
 
             // ---- Toggle style (chỉ dùng khi edit) ----
-            document.getElementById('inputStatus').addEventListener('change', function () {
-                document.getElementById('toggleBg').style.background = this.checked ? '#2E7D32' : '#D9D9DC';
-                document.getElementById('statusLabel').textContent    = this.checked ? 'Active' : 'Disable';
-            });
-
             document.querySelectorAll('#voucherForm input:not([type="hidden"])').forEach(function (field) {
                 const clearCurrentError = function () {
                     clearVoucherFieldError(field.name);

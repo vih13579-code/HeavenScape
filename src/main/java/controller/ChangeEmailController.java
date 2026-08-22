@@ -31,6 +31,12 @@ public class ChangeEmailController extends HttpServlet {
 
         Account acc = (Account) session.getAttribute("account");
 
+        if (!"customer".equalsIgnoreCase(acc.getRole())) {
+            session.setAttribute("error", "Staff and administrator email addresses cannot be changed.");
+            response.sendRedirect(request.getContextPath() + "/profile?id=" + acc.getId());
+            return;
+        }
+
         String newEmail = request.getParameter("newEmail");
         newEmail = (newEmail == null) ? "" : newEmail.trim().toLowerCase();
 

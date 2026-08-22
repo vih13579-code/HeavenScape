@@ -380,6 +380,18 @@
         background: #C92127 !important;
     }
 
+    .voucher-card--disabled {
+        opacity: .45;
+        filter: grayscale(.85);
+        cursor: not-allowed;
+        background: #f3f4f6 !important;
+        border-color: #cbd5e1 !important;
+    }
+
+    .voucher-card--disabled .btn-copy-voucher {
+        cursor: not-allowed;
+    }
+
     #grandTotalDisplay {
         color: #C92127 !important;
         font-size: 22px !important;
@@ -512,12 +524,13 @@
                                     </c:choose>
                                 </div>
 
-                                <div class="flex-grow">
-                                    <div class="flex justify-between items-start">
-                                        <div>
+                                <div class="flex-grow min-w-0">
+                                    <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                                        <div class="min-w-0 flex-1">
                                             <h3
-                                                class="text-[15px] font-bold text-on-surface mb-1">
-                                                ${item.title}</h3>
+                                                class="text-[15px] font-bold text-on-surface mb-1 truncate"
+                                                title="${fn:escapeXml(item.title)}">
+                                                <c:out value="${item.title}" /></h3>
                                             <p class="text-[13px] text-on-surface-variant">
                                                 ${item.authorsDisplay}</p>
                                             <div class="mt-4">
@@ -529,7 +542,7 @@
                                         </div>
 
                                         <span
-                                            class="text-[17px] font-bold text-primary whitespace-nowrap">
+                                            class="shrink-0 text-[17px] font-bold text-primary whitespace-nowrap sm:ml-4 sm:text-right">
                                             <fmt:formatNumber value="${item.subtotal}"
                                                               type="number" groupingUsed="true" /> VND
                                         </span>
@@ -674,7 +687,7 @@
                             <div class="p-5 space-y-4">
                                 <div id="newRecipientFields" class="grid grid-cols-2 gap-3">
                                     <div>
-                                        <label class="block text-[12px] font-bold mb-1">Recipient Name</label>
+                                        <label class="block text-[12px] font-bold mb-1">Recipient Name <span class="text-red-600">*</span></label>
                                         <input id="newFullname" type="text"
                                                placeholder="Enter full name"
                                                value="${sessionScope.account.fullname}"
@@ -682,7 +695,7 @@
                                     </div>
 
                                     <div>
-                                        <label class="block text-[12px] font-bold mb-1">Phone Number</label>
+                                        <label class="block text-[12px] font-bold mb-1">Phone Number <span class="text-red-600">*</span></label>
                                         <input id="newPhone" type="text"
                                                placeholder="Enter phone number"
                                                value="${sessionScope.account.phone}"
@@ -692,7 +705,7 @@
 
                                 <div class="grid grid-cols-2 gap-3">
                                     <div>
-                                        <label class="block text-[12px] font-bold mb-1">Province / City</label>
+                                        <label class="block text-[12px] font-bold mb-1">Province / City <span class="text-red-600">*</span></label>
                                         <select id="newCity"
                                                 class="w-full border border-outline-variant rounded px-3 py-2 text-[13px]">
                                             <option value="">Loading...</option>
@@ -700,7 +713,7 @@
                                     </div>
 
                                     <div>
-                                        <label class="block text-[12px] font-bold mb-1">Ward / Commune</label>
+                                        <label class="block text-[12px] font-bold mb-1">Ward / Commune <span class="text-red-600">*</span></label>
                                         <select id="newWard"
                                                 class="w-full border border-outline-variant rounded px-3 py-2 text-[13px]">
                                             <option value="">Select Ward / Commune</option>
@@ -709,7 +722,7 @@
                                 </div>
 
                                 <div>
-                                    <label class="block text-[12px] font-bold mb-1">Street Address</label>
+                                    <label class="block text-[12px] font-bold mb-1">Street Address <span class="text-red-600">*</span></label>
                                     <textarea id="newStreet" rows="3"
                                               placeholder="House number, street name..."
                                               class="w-full border border-outline-variant rounded px-3 py-2 text-[13px]"></textarea>
@@ -741,7 +754,7 @@
                 <section
                     class="bg-surface rounded-xl style-card border border-outline-variant p-6">
                     <h2 class="text-[16px] font-bold text-primary flex items-center gap-2 mb-6">
-                        <i data-lucide="wallet-cards"></i> Payment Method
+                        <i data-lucide="wallet-cards"></i> Payment Method <span class="text-red-600 text-xs">*</span>
                     </h2>
 
                     <div class="space-y-3" id="paymentGroup">
@@ -1530,6 +1543,10 @@
         }
 
         function renderVoucherItem(v) {
+            var disabledClass = v.eligible ? '' : ' voucher-card--disabled';
+            var disabledAttributes = v.eligible ? '' : ' disabled tabindex="-1" aria-disabled="true"';
+            var eligibilityHtml = v.eligible ? ''
+                    : '<p class="mt-2 text-[12px] font-semibold text-red-600">' + escapeHtml(v.ineligibleReason || 'This voucher is not eligible for the current order.') + '</p>';
             var minOrderHtml = (v.minOrderValue !== null && v.minOrderValue !== undefined)
                     ? '<span class="inline-flex items-center gap-1"><i data-lucide="shopping-cart" class="w-3 h-3"></i>Minimum order ' + formatCurrencyVND(v.minOrderValue) + '</span>'
                     : '';
@@ -1544,13 +1561,13 @@
             }
 
             return ''
-                    + '<div class="border border-dashed border-primary/40 rounded-lg p-4 bg-primary/[0.03]">'
+                    + '<div class="border border-dashed border-primary/40 rounded-lg p-4 bg-primary/[0.03]' + disabledClass + '" aria-disabled="' + (!v.eligible) + '">'
                     + '  <div class="flex items-center justify-between gap-3">'
                     + '    <div>'
                     + '      <p class="text-[15px] font-black text-primary">Save ' + v.discountPercent + '%</p>'
                     + '      <div class="flex items-center gap-2 mt-1">'
                     + '        <span class="px-2 py-1 bg-white border border-outline-variant rounded text-[13px] font-bold tracking-wide">' + escapeHtml(v.code) + '</span>'
-                    + '        <button type="button" class="btn-copy-voucher text-primary hover:opacity-70" data-code="' + escapeHtml(v.code) + '" title="Copy Code">'
+                    + '        <button type="button" class="btn-copy-voucher text-primary hover:opacity-70" data-code="' + escapeHtml(v.code) + '" title="' + (v.eligible ? 'Copy Code' : 'Voucher is not eligible') + '"' + disabledAttributes + '>'
                     + '          <i data-lucide="copy" class="w-4 h-4"></i>'
                     + '        </button>'
                     + '      </div>'
@@ -1558,6 +1575,7 @@
                     + '    <span class="text-[11px] text-on-surface-variant whitespace-nowrap">Expires: ' + v.endDate + '</span>'
                     + '  </div>'
                     + conditionsHtml
+                    + eligibilityHtml
                     + '</div>';
         }
 

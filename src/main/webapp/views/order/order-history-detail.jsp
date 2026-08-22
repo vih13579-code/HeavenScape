@@ -146,6 +146,16 @@
                 <c:when test="${order.status == 'cancelled'}">
                     <div class="od-cancel-info">
                         <c:choose>
+                            <c:when test="${order.paymentStatus == 'refunded'}"><strong>Refund by:</strong> Staff</c:when>
+                            <c:otherwise>
+                                <strong>Cancelled by:</strong>
+                                <c:choose>
+                                    <c:when test="${not empty order.cancelledByName}"><c:out value="${order.cancelledByName}" /></c:when>
+                                    <c:otherwise>Account unavailable</c:otherwise>
+                                </c:choose>
+                            </c:otherwise>
+                        </c:choose><br>
+                        <c:choose>
                             <c:when test="${not empty order.cancelReason}"><strong>Cancellation reason:</strong> <c:out value="${order.cancelReason}" /></c:when>
                             <c:otherwise>This order was cancelled.</c:otherwise>
                         </c:choose>
@@ -296,6 +306,7 @@
             <h3 class="text-lg font-bold text-[#c92127] mb-2" id="customerOrderModalTitle">Cancel Order</h3>
             <p class="text-sm text-gray-500 mb-3" id="customerOrderModalDescription">Please enter the reason you want to cancel this order.</p>
             <div id="cancelModalError" class="hidden mb-3 px-3 py-2 bg-red-50 border border-red-300 text-red-600 text-sm rounded"></div>
+            <label for="customerCancelReasonText" class="mb-1 block text-sm font-semibold">Reason <span class="text-red-600 text-xs">*</span></label>
             <textarea id="customerCancelReasonText" rows="4" maxlength="50" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300" placeholder="Enter a cancellation reason (10-50 characters, including at least one letter)"></textarea>
             <div class="flex justify-end gap-3 mt-4">
                 <button type="button" onclick="closeCustomerCancelModal()" class="px-4 py-2 border border-gray-300 rounded text-sm hover:bg-gray-100">Close</button>

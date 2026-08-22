@@ -213,9 +213,21 @@
                                                         class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-red-50 text-[#D32F2F] text-xs font-semibold">Cancelled</span>
                                                     </c:otherwise>
                                                 </c:choose>
+                                                <c:if test="${order.status == 'cancelled'}">
+                                                    <div class="mt-1 max-w-[220px] text-xs text-on-surface-variant">
+                                                        <c:choose>
+                                                            <c:when test="${order.paymentStatus == 'refunded'}"><strong>Refund by:</strong> Staff</c:when>
+                                                            <c:otherwise>
+                                                                <strong>Cancelled by:</strong>
+                                                                <c:choose><c:when test="${not empty order.cancelledByName}"><c:out value="${order.cancelledByName}" /></c:when><c:otherwise>Account unavailable</c:otherwise></c:choose>
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                        <c:if test="${not empty order.cancelReason}"><br><strong>Reason:</strong> <c:out value="${order.cancelReason}" /></c:if>
+                                                    </div>
+                                                </c:if>
                                         </td>
                                         <td class="px-6 py-3.5 text-right">
-                                            <div class="flex items-center justify-end gap-2">
+                                            <div class="action-group">
 
                                                 <c:choose>
                                                     <c:when test="${order.status == 'pending'}">
@@ -230,7 +242,7 @@
                                                                    class="cancelReasonInput" value="">
                                                             <select name="status"
                                                                     onchange="confirmStatusChange(this)"
-                                                                    class="bg-white border border-gray-300 text-gray-700 rounded-lg text-xs focus:ring-[#C92127] focus:border-[#C92127] px-2 py-1 cursor-pointer">
+                                                                    class="action-select">
                                                                 <option value="" disabled selected>--
                                                                     Select
                                                                     --</option>
@@ -254,7 +266,7 @@
                                                                    class="cancelReasonInput" value="">
                                                             <select name="status"
                                                                     onchange="confirmStatusChange(this)"
-                                                                    class="bg-white border border-gray-300 text-gray-700 rounded-lg text-xs focus:ring-[#C92127] focus:border-[#C92127] px-2 py-1 cursor-pointer">
+                                                                    class="action-select">
                                                                 <option value="" disabled selected>--
                                                                     Select
                                                                     --</option>
@@ -278,7 +290,7 @@
                                                                    class="cancelReasonInput" value="">
                                                             <select name="status"
                                                                     onchange="confirmStatusChange(this)"
-                                                                    class="bg-white border border-gray-300 text-gray-700 rounded-lg text-xs focus:ring-[#C92127] focus:border-[#C92127] px-2 py-1 cursor-pointer">
+                                                                    class="action-select">
                                                                 <option value="" disabled selected>-- Select --</option>
                                                                 <option value="completed">Completed
                                                                 </option>
@@ -291,10 +303,9 @@
 
 
                                                 <a href="${pageContext.request.contextPath}/dashboard/customer-order?action=view&orderID=${order.orderID}"
-                                                   class="p-1.5 bg-white border border-gray-300 text-[#C92127] rounded-lg hover:bg-[#FDE8E9] transition-all inline-flex items-center active:scale-95"
-                                                   title="View Details">
-                                                    <span
-                                                        class="material-symbols-outlined text-[18px]">visibility</span>
+                                                   class="btn-action btn-action-view"
+                                                   title="View Details" aria-label="View order details">
+                                                    <span class="material-symbols-outlined" aria-hidden="true">visibility</span>
                                                 </a>
                                             </div>
                                         </td>
@@ -369,6 +380,7 @@
                     <span class="material-symbols-outlined text-[16px]">error</span>
                     <span id="listCancelErrorText"></span>
                 </div>
+                <label for="listCancelReasonText" class="mb-1 block text-sm font-semibold">Cancellation Reason <span class="text-red-600 text-xs">*</span></label>
                 <textarea id="listCancelReasonText" rows="4" maxlength="50"
                           class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300"
                           placeholder="Enter a cancellation reason (10–50 characters, including at least one letter)"></textarea>

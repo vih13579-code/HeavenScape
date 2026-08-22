@@ -14,6 +14,8 @@ public class Review {
     private Integer adminID;
     private String adminReply;
     private Timestamp adminReplyDate;
+    private String replyAuthorName;
+    private String replyAuthorRole;
     private String customerName;
     private String bookTitle;
     private String bookCover;
@@ -105,6 +107,22 @@ public class Review {
 
     public void setAdminReplyDate(Timestamp adminReplyDate) {
         this.adminReplyDate = adminReplyDate;
+    }
+
+    public String getReplyAuthorName() {
+        return replyAuthorName;
+    }
+
+    public void setReplyAuthorName(String replyAuthorName) {
+        this.replyAuthorName = replyAuthorName;
+    }
+
+    public String getReplyAuthorRole() {
+        return replyAuthorRole;
+    }
+
+    public void setReplyAuthorRole(String replyAuthorRole) {
+        this.replyAuthorRole = replyAuthorRole;
     }
 
     public String getCustomerName() {

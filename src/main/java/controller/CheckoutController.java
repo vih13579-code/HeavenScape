@@ -119,7 +119,7 @@ public class CheckoutController extends HttpServlet {
         if (voucherIdObj != null) {
             String code = (String) session.getAttribute(SESSION_VOUCHER_CODE);
             VoucherDAO voucherDAO = new VoucherDAO();
-            VoucherValidationResult recheck = validateVoucher(code, account.getId(), total, voucherDAO);
+            VoucherController.VoucherValidationResult recheck = validateVoucher(code, account.getId(), total, voucherDAO);
 
             if (recheck.success) {
                 session.setAttribute(SESSION_VOUCHER_DISCOUNT, recheck.discountAmount);
@@ -234,7 +234,7 @@ public class CheckoutController extends HttpServlet {
         if (appliedVoucherID != null) {
             VoucherDAO voucherDAO = new VoucherDAO();
             String appliedCode = (String) session.getAttribute(SESSION_VOUCHER_CODE);
-            VoucherValidationResult recheck = validateVoucher(appliedCode, account.getId(), total, voucherDAO);
+            VoucherController.VoucherValidationResult recheck = validateVoucher(appliedCode, account.getId(), total, voucherDAO);
 
             if (recheck.success) {
                 finalTotal = total.subtract(BigDecimal.valueOf(recheck.discountAmount));
@@ -286,11 +286,23 @@ public class CheckoutController extends HttpServlet {
             return;
         }
 
-        int orderID = orderDAO.createOrderWithStockCheck(account.getId(), addressID, paymentMethod, finalTotal, cartItems);
+        int orderID = orderDAO.createOrderWithStockCheck(
+                account.getId(), addressID, paymentMethod, finalTotal, cartItems, appliedVoucherID);
 
         if (orderID == -2) {
             request.getSession().setAttribute("errorMessage", "An item in your cart went out of stock because another customer purchased it first. Please review your cart!");
             response.sendRedirect(request.getContextPath() + "/cart");
+            return;
+        } else if (orderID == -3) {
+            request.getSession().setAttribute("errorMessage", "The selected shipping address no longer exists or is invalid. Please choose another address.");
+            response.sendRedirect(request.getContextPath() + "/checkout");
+            return;
+        } else if (orderID == -4) {
+            session.removeAttribute(SESSION_VOUCHER_ID);
+            session.removeAttribute(SESSION_VOUCHER_CODE);
+            session.removeAttribute(SESSION_VOUCHER_DISCOUNT);
+            request.getSession().setAttribute("errorMessage", "The selected voucher is no longer valid. Please review your order and try again.");
+            response.sendRedirect(request.getContextPath() + "/checkout");
             return;
         } else if (orderID == -1) {
             request.getSession().setAttribute("errorMessage", "Could not create the order. Please try again!");
@@ -300,46 +312,9 @@ public class CheckoutController extends HttpServlet {
 
         orderDAO.clearCart(account.getId());
 
-        if (appliedVoucherID != null) {
-            VoucherDAO voucherDAO2 = new VoucherDAO();
-            Integer voucherQuantity = null;
-            // Lấy lại quantity của voucher để truyền vào hàm atomic (đảm bảo đúng ràng buộc hiện tại)
-            Voucher appliedVoucher = voucherDAO2.getVoucherByCode(
-                    (String) session.getAttribute(SESSION_VOUCHER_CODE));
-            if (appliedVoucher != null) {
-                voucherQuantity = appliedVoucher.getQuantity();
-            }
-
-            int usageResult = voucherDAO2
-                    .insertVoucherUsage(account.getId(), appliedVoucherID, voucherQuantity);
-
-            if (usageResult != dao.VoucherDAO.USAGE_OK) {
-                String voucherErrorMsg;
-                if (usageResult == dao.VoucherDAO.USAGE_OUT_OF_QUANTITY) {
-                    voucherErrorMsg = "The voucher reached its usage limit because another customer used it first. "
-                            + "The order was still placed successfully without the discount.";
-                } else if (usageResult == dao.VoucherDAO.USAGE_ALREADY_USED) {
-                    voucherErrorMsg = "You have already used this voucher. "
-                            + "The order was still placed successfully without the discount.";
-                } else {
-                    voucherErrorMsg = "An error occurred while processing the voucher. "
-                            + "The order was still placed successfully without the discount.";
-                }
-                System.err.println("[Voucher] insertVoucherUsage failed (error code=" + usageResult
-                        + ") cho customerID=" + account.getId()
-                        + ", voucherID=" + appliedVoucherID
-                        + ". Restoring order #" + orderID + " to its original total: " + total);
-
-                // Update lại total về giá gốc (không giảm) trên DB
-                orderDAO.updateOrderTotal(orderID, total);
-
-                request.getSession().setAttribute("warningMessage", voucherErrorMsg);
-            }
-
-            session.removeAttribute(SESSION_VOUCHER_ID);
-            session.removeAttribute(SESSION_VOUCHER_CODE);
-            session.removeAttribute(SESSION_VOUCHER_DISCOUNT);
-        }
+        session.removeAttribute(SESSION_VOUCHER_ID);
+        session.removeAttribute(SESSION_VOUCHER_CODE);
+        session.removeAttribute(SESSION_VOUCHER_DISCOUNT);
 
         request.getSession().setAttribute("cartCount", 0);
         request.getSession().setAttribute("just_placed_order_id", orderID);
@@ -395,9 +370,9 @@ public class CheckoutController extends HttpServlet {
     private static final String SESSION_VOUCHER_CODE = "appliedVoucherCode";
     private static final String SESSION_VOUCHER_DISCOUNT = "appliedVoucherDiscount";
 
-    private VoucherValidationResult validateVoucher(String code, int customerID, BigDecimal orderTotal,
+    private VoucherController.VoucherValidationResult validateVoucher(String code, int customerID, BigDecimal orderTotal,
             VoucherDAO voucherDAO) {
-        VoucherValidationResult r = new VoucherValidationResult();
+        VoucherController.VoucherValidationResult r = new VoucherController.VoucherValidationResult();
 
         if (code == null || code.trim().isEmpty()) {
             r.message = "Please enter a voucher code.";
@@ -484,7 +459,7 @@ public class CheckoutController extends HttpServlet {
         BigDecimal total = cartDAO.calcSubtotal(cartItems);
 
         VoucherDAO voucherDAO = new VoucherDAO();
-        VoucherValidationResult result = validateVoucher(code, account.getId(), total, voucherDAO);
+        VoucherController.VoucherValidationResult result = validateVoucher(code, account.getId(), total, voucherDAO);
 
         if (!result.success) {
             response.getWriter().write("{\"success\":false,\"message\":\"" + escapeJson(result.message) + "\"}");
@@ -527,11 +502,18 @@ public class CheckoutController extends HttpServlet {
         VoucherDAO voucherDAO = new VoucherDAO();
         Account account = getAccount(request);
         List<Voucher> vouchers = voucherDAO.getActiveVouchers(account.getId());
+        List<CartItem> cartItems = new CartDAO().getCartItems(account.getId());
+        cartItems.removeIf(item -> item.getQuantity() <= 0
+                || item.getStockQuantity() <= 0
+                || !"available".equalsIgnoreCase(item.getStatus()));
+        BigDecimal orderTotal = new CartDAO().calcSubtotal(cartItems);
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
         StringBuilder json = new StringBuilder("{\"success\":true,\"vouchers\":[");
         for (int i = 0; i < vouchers.size(); i++) {
             Voucher v = vouchers.get(i);
+            VoucherController.VoucherValidationResult eligibility = validateVoucher(
+                    v.getCode(), account.getId(), orderTotal, voucherDAO);
             if (i > 0) {
                 json.append(",");
             }
@@ -543,7 +525,10 @@ public class CheckoutController extends HttpServlet {
                     .append("\"maxDiscountValue\":")
                     .append(v.getMaxDiscountValue() == null ? "null" : v.getMaxDiscountValue()).append(",")
                     .append("\"endDate\":\"")
-                    .append(v.getEndDate() == null ? "No Expiration" : sdf.format(v.getEndDate())).append("\"")
+                    .append(v.getEndDate() == null ? "No Expiration" : sdf.format(v.getEndDate())).append("\",")
+                    .append("\"eligible\":").append(eligibility.success).append(",")
+                    .append("\"ineligibleReason\":\"")
+                    .append(escapeJson(eligibility.success ? "" : eligibility.message)).append("\"")
                     .append("}");
         }
         json.append("]}");

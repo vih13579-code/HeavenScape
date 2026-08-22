@@ -63,6 +63,8 @@ git clone: https://github.com/vih13579-code/HeavenScape.git
 # Configure Apache Tomcat 10.1
 # Create the SQL Server database and configure the database connection
 #   (see src/main/java/utils/DBContext.java)
+# Run web/database/20260822_order_cancellation_voucher.sql after the base dump
+#   to add cancellation-source and order-voucher tracking columns
 # Configure Google OAuth and VNPAY credentials in web.xml / VNPayConfig
 # Build and run the application
 

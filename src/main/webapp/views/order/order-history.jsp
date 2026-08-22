@@ -39,6 +39,7 @@
     .oh-product-quantity { color: #444; font-weight: 600; }
     .oh-product-price { color: #c92127; font-size: 15px; font-weight: 800; text-align: right; white-space: nowrap; }
     .oh-card-footer { padding: 13px 18px 14px; border-top: 1px solid #e8e8e8; }
+    .oh-cancel-note { margin-bottom: 10px; padding: 9px 11px; border-radius: 5px; background: #fff2f3; color: #8f171b; font-size: 11px; line-height: 1.5; }
     .oh-footer-summary { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: 18px; }
     .oh-payment { color: #555; font-size: 11px; }
     .oh-payment strong { margin-right: 7px; color: #333; }
@@ -153,6 +154,22 @@
                                 </div>
 
                                 <footer class="oh-card-footer">
+                                    <c:if test="${order.status == 'cancelled'}">
+                                        <div class="oh-cancel-note">
+                                            <c:choose>
+                                                <c:when test="${order.paymentStatus == 'refunded'}"><strong>Refund by:</strong> Staff</c:when>
+                                                <c:otherwise>
+                                                    <strong>Cancelled by:</strong>
+                                                    <c:choose>
+                                                        <c:when test="${not empty order.cancelledByName}"><c:out value="${order.cancelledByName}" /></c:when>
+                                                        <c:otherwise>Account unavailable</c:otherwise>
+                                                    </c:choose>
+                                                </c:otherwise>
+                                            </c:choose>
+                                            <br><strong>Reason:</strong>
+                                            <c:choose><c:when test="${not empty order.cancelReason}"><c:out value="${order.cancelReason}" /></c:when><c:otherwise>No reason was recorded.</c:otherwise></c:choose>
+                                        </div>
+                                    </c:if>
                                     <div class="oh-footer-summary">
                                         <p class="oh-payment">
                                             <strong>Payment:</strong>
@@ -247,6 +264,7 @@
         <h3 class="text-lg font-bold text-[#c92127] mb-2" id="cancelModalTitle">Cancel Order</h3>
         <p class="text-sm text-gray-500 mb-3" id="cancelModalDescription">Please enter the reason you want to cancel this order.</p>
         <div id="cancelModalError" class="hidden mb-3 px-3 py-2 bg-red-50 border border-red-300 text-red-600 text-sm rounded"></div>
+        <label for="customerCancelReasonText" class="mb-1 block text-sm font-semibold">Reason <span class="text-red-600 text-xs">*</span></label>
         <textarea id="customerCancelReasonText" rows="4" maxlength="50" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300" placeholder="Enter a cancellation reason (10-50 characters, including at least one letter)"></textarea>
         <div class="flex justify-end gap-3 mt-4">
             <button type="button" onclick="closeCustomerCancelModal()" class="px-4 py-2 border border-gray-300 rounded text-sm hover:bg-gray-100">Close</button>

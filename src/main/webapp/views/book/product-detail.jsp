@@ -398,7 +398,7 @@
                     Author:
                     <c:forEach var="author" items="${book.authors}" varStatus="s">
                         <span
-                            class="text-primary font-semibold not-italic hover:underline cursor-pointer">${author}</span>
+                            class="text-primary font-semibold not-italic hover: cursor-pointer">${author}</span>
                         <c:if test="${!s.last}">, </c:if>
                     </c:forEach>
                 </p>
@@ -567,17 +567,7 @@
                         </c:choose>
                     </span>
                 </div>
-                <div class="flex flex-col gap-1 px-4">
-                    <span
-                        class="text-[12px] font-bold text-gray-500 uppercase tracking-wide">Origin</span>
-                    <span class="text-[16px] font-medium text-[#222222]">
-                        <c:choose>
-                            <c:when test="${not empty book.originName}">${book.originName}
-                            </c:when>
-                            <c:otherwise>—</c:otherwise>
-                        </c:choose>
-                    </span>
-                </div>
+
                 <div class="flex flex-col gap-1 px-4">
                     <span
                         class="text-[12px] font-bold text-gray-500 uppercase tracking-wide">Series</span>
@@ -666,17 +656,7 @@
                             </c:choose>
                         </td>
                     </tr>
-                    <tr class="border-b border-gray-100">
-                        <td class="py-3 font-semibold text-gray-500">Origin</td>
-                        <td class="py-3 text-gray-800">
-                            <c:choose>
-                                <c:when test="${not empty book.originName}">
-                                    ${book.originName}
-                                </c:when>
-                                <c:otherwise>—</c:otherwise>
-                            </c:choose>
-                        </td>
-                    </tr>
+
                     <tr class="border-b border-gray-100">
                         <td class="py-3 font-semibold text-gray-500">Series</td>
                         <td class="py-3 text-gray-800">
@@ -806,11 +786,14 @@
                                     <div
                                         class="mt-5 ml-6 p-4 bg-[#FDE8E9] rounded-lg border-l-4 border-primary">
                                         <div class="flex items-center gap-2 mb-2">
-                                            <span
-                                                class="font-bold text-primary">HeavenScape</span>
+                                            <span class="font-bold text-primary">
+                                                <c:choose><c:when test="${not empty review.replyAuthorName}"><c:out value="${review.replyAuthorName}" /></c:when><c:otherwise>HeavenScape Team</c:otherwise></c:choose>
+                                            </span>
+                                            <span class="rounded-full bg-white px-2 py-0.5 text-[10px] font-semibold uppercase text-primary">
+                                                <c:choose><c:when test="${not empty review.replyAuthorRole}"><c:out value="${review.replyAuthorRole}" /></c:when><c:otherwise>Staff/Admin</c:otherwise></c:choose>
+                                            </span>
                                         </div>
-                                        <p class="text-gray-700 text-sm leading-relaxed">
-                                            ${review.adminReply}</p>
+                                        <p class="text-gray-700 text-sm leading-relaxed"><c:out value="${review.adminReply}" /></p>
                                             <c:if test="${review.adminReplyDate != null}">
                                             <div class="text-xs text-gray-400 mt-2">
                                                 <fmt:formatDate
@@ -849,7 +832,7 @@
                 <input type="hidden" name="bookID" value="${book.bookID}">
                 <input type="hidden" id="ratingValue" name="rating" value="5">
                 <div class="mb-4">
-                    <label class="font-semibold block mb-2">Your Rating</label>
+                    <label class="font-semibold block mb-2">Your Rating <span class="text-red-600 text-xs">*</span></label>
                     <div id="ratingStars" class="flex gap-2 text-3xl cursor-pointer">
                         <span class="star text-yellow-400" data-value="1">★</span>
                         <span class="star text-yellow-400" data-value="2">★</span>
@@ -860,6 +843,7 @@
                     <p class="text-sm text-gray-500 mt-2">Your selection: <span
                             id="ratingText">5</span> sao</p>
                 </div>
+                <label class="font-semibold block mb-2" for="commentInput">Your Review <span class="text-red-600 text-xs">*</span></label>
                 <textarea id="commentInput" name="comment" rows="5" required
                           placeholder="Share your thoughts..."
                           class="w-full border rounded-lg p-4"></textarea>
@@ -875,7 +859,7 @@
     <c:if test="${not empty relatedBooks}">
         <section class="fhs-block p-5 md:p-7">
             <div class="flex items-center justify-between mb-5">
-                <h2 class="section-title-left text-[20px] font-bold text-primary">📚 You May Also Like</h2>
+                <h2 class="section-title-left text-[20px] font-bold text-primary">You May Also Like</h2>
                 <div class="flex gap-2">
                     <button id="sliderPrev"
                             class="w-[34px] h-[34px] border border-gray-200 rounded-full flex items-center justify-center hover:border-primary hover:text-primary transition-colors">

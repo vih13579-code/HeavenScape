@@ -143,10 +143,15 @@ public class BookDAO {
     public List<Book> getFeaturedByOrders(int limit) {
         String sql = BOOK_SELECT
                 + "WHERE " + PUBLIC_STATUS + " "
+                + "AND EXISTS (SELECT 1 FROM OrderDetail sold "
+                + "            JOIN [Order] completedOrder ON completedOrder.orderID = sold.orderID "
+                + "            WHERE sold.bookID = b.bookID "
+                + "              AND LOWER(LTRIM(RTRIM(completedOrder.status))) = 'completed') "
                 + "ORDER BY (SELECT ISNULL(SUM(od.quantity), 0) "
                 + "          FROM OrderDetail od "
                 + "          JOIN [Order] ord ON ord.orderID = od.orderID "
-                + "          WHERE od.bookID = b.bookID AND ord.status = 'completed') DESC, "
+                + "          WHERE od.bookID = b.bookID "
+                + "            AND LOWER(LTRIM(RTRIM(ord.status))) = 'completed') DESC, "
                 + "avg_rating DESC "
                 + "OFFSET 0 ROWS FETCH NEXT ? ROWS ONLY";
 
@@ -187,7 +192,7 @@ public class BookDAO {
     public List<Book> getRelatedBooks(int bookID, int categoryID, int limit) {
         String sql = BOOK_SELECT
                 + "WHERE " + PUBLIC_STATUS + " "
-                + "AND b.bookID <> ? AND b.categoryID = ? "
+                + "AND b.bookID != ? AND b.categoryID = ? "
                 + "ORDER BY review_count DESC "
                 + "OFFSET 0 ROWS FETCH NEXT ? ROWS ONLY";
 
@@ -363,11 +368,11 @@ public class BookDAO {
     public Map<Integer, String> getCatalogAuthorMap() {
         return getLookupMap(
                 "SELECT DISTINCT a.authorID, a.fullname "
-                + "FROM Author a "
-                + "JOIN BookAuthor ba ON ba.authorID = a.authorID "
-                + "JOIN Book b ON b.bookID = ba.bookID "
-                + "WHERE b.status IN ('available', 'out_of_stock') "
-                + "ORDER BY a.fullname",
+                        + "FROM Author a "
+                        + "JOIN BookAuthor ba ON ba.authorID = a.authorID "
+                        + "JOIN Book b ON b.bookID = ba.bookID "
+                        + "WHERE b.status IN ('available', 'out_of_stock') "
+                        + "ORDER BY a.fullname",
                 "authorID", "fullname");
     }
 

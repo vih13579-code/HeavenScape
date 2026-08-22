@@ -90,7 +90,7 @@ public class VNPayReturnController extends HttpServlet {
 
             List<CartItem> availableItems = new java.util.ArrayList<>();
             for (CartItem item : cartItems) {
-                if (item.getStockQuantity() > 0) {
+                if (item.getStockQuantity() > 0 && item.getQuantity() > 0) {
                     availableItems.add(item);
                 }
             }
@@ -109,8 +109,9 @@ public class VNPayReturnController extends HttpServlet {
 
             // Kiểm tồn + tạo đơn pending — KHÔNG trừ kho ngay.
             // Kho thật sẽ trừ khi Staff duyệt.
+            Integer appliedVoucherID = (Integer) session.getAttribute("appliedVoucherID");
             int orderID = orderDAO.createOrderWithStockCheck(
-                    account.getId(), addressID, "vnpay", total, cartItems);
+                    account.getId(), addressID, "vnpay", total, cartItems, appliedVoucherID);
 
             if (orderID == -2) {
                 // Out of Stock tại thời điểm VNPay return — tiền đã thu, cần hoàn
@@ -124,6 +125,20 @@ public class VNPayReturnController extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/cart");
                 return;
             }
+            if (orderID == -3) {
+                session.setAttribute("errorMessage",
+                        "The selected shipping address no longer exists or is invalid. Please contact support for the payment refund.");
+                clearPaymentSession(session);
+                response.sendRedirect(request.getContextPath() + "/checkout");
+                return;
+            }
+            if (orderID == -4) {
+                session.setAttribute("errorMessage",
+                        "The voucher became invalid during payment. Please contact support for the payment refund.");
+                clearPaymentSession(session);
+                response.sendRedirect(request.getContextPath() + "/checkout");
+                return;
+            }
             if (orderID == -1) {
                 session.setAttribute("errorMessage", "Could not create the order!");
                 response.sendRedirect(request.getContextPath() + "/checkout");
@@ -135,19 +150,7 @@ public class VNPayReturnController extends HttpServlet {
 
             orderDAO.clearCart(account.getId());
 
-            Integer appliedVoucherID = (Integer) session.getAttribute("appliedVoucherID");
             if (appliedVoucherID != null) {
-                String appliedCode = (String) session.getAttribute("appliedVoucherCode");
-                dao.VoucherDAO voucherDAO = new dao.VoucherDAO();
-                model.Voucher v = voucherDAO.getVoucherByCode(appliedCode);
-                Integer vQty;
-                if (v != null) {
-                    vQty = v.getQuantity();
-                } else {
-                    vQty = null;
-                }
-                voucherDAO.insertVoucherUsage(account.getId(), appliedVoucherID, vQty);
-
                 session.removeAttribute("appliedVoucherID");
                 session.removeAttribute("appliedVoucherCode");
                 session.removeAttribute("appliedVoucherDiscount");
@@ -195,5 +198,15 @@ public class VNPayReturnController extends HttpServlet {
             }
             response.sendRedirect(request.getContextPath() + "/checkout");
         }
+    }
+
+    private void clearPaymentSession(HttpSession session) {
+        session.removeAttribute("vnpay_txnRef");
+        session.removeAttribute("vnpay_addressID");
+        session.removeAttribute("vnpay_total");
+        session.removeAttribute("vnpay_cartItems");
+        session.removeAttribute("appliedVoucherID");
+        session.removeAttribute("appliedVoucherCode");
+        session.removeAttribute("appliedVoucherDiscount");
     }
 }

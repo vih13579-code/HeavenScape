@@ -138,7 +138,7 @@
 
                         <%-- Full Name --%>
                         <div class="space-y-2">
-                            <label class="font-label-md text-label-md text-on-surface" for="fullname">Full Name</label>
+                            <label class="font-label-md text-label-md text-on-surface" for="fullname">Full Name <span class="text-error text-xs">*</span></label>
                             <div class="relative">
                                 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">person</span>
                                 <input class="w-full pl-10 pr-4 py-3 bg-surface border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all font-body-md text-body-md outline-none"
@@ -149,7 +149,7 @@
 
                         <%-- Email --%>
                         <div class="space-y-2">
-                            <label class="font-label-md text-label-md text-on-surface" for="email">Email</label>
+                            <label class="font-label-md text-label-md text-on-surface" for="email">Email <span class="text-error text-xs">*</span></label>
                             <div class="relative">
                                 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">mail</span>
                                 <input class="w-full pl-10 pr-4 py-3 bg-surface border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all font-body-md text-body-md outline-none"
@@ -160,7 +160,7 @@
 
                         <%-- Phone Number --%>
                         <div class="space-y-2">
-                            <label class="font-label-md text-label-md text-on-surface" for="phone">Phone Number</label>
+                            <label class="font-label-md text-label-md text-on-surface" for="phone">Phone Number <span class="text-error text-xs">*</span></label>
                             <div class="relative">
                                 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">call</span>
                                 <input class="w-full pl-10 pr-4 py-3 bg-surface border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all font-body-md text-body-md outline-none"
@@ -171,7 +171,7 @@
 
                         <%-- Password --%>
                         <div class="space-y-2">
-                            <label class="font-label-md text-label-md text-on-surface" for="password">Password</label>
+                            <label class="font-label-md text-label-md text-on-surface" for="password">Password <span class="text-error text-xs">*</span></label>
                             <div class="relative">
                                 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">lock</span>
                                 <input class="w-full pl-10 pr-12 py-3 bg-surface border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all font-body-md text-body-md outline-none"
@@ -185,7 +185,7 @@
 
                         <%-- Confirm Password --%>
                         <div class="space-y-2">
-                            <label class="font-label-md text-label-md text-on-surface" for="confirmPassword">Confirm Password</label>
+                            <label class="font-label-md text-label-md text-on-surface" for="confirmPassword">Confirm Password <span class="text-error text-xs">*</span></label>
                             <div class="relative">
                                 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">enhanced_encryption</span>
                                 <input class="w-full pl-10 pr-12 py-3 bg-surface border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all font-body-md text-body-md outline-none"

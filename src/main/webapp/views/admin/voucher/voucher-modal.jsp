@@ -147,13 +147,16 @@
                 </div>
 
                 <div id="statusSection" class="hidden">
-                    <label class="block text-sm font-semibold mb-1.5" style="color:#1B1B1B;">Status</label>
-                    <label class="inline-flex items-center cursor-pointer gap-3">
-                        <input id="inputStatus" name="statusToggle" type="checkbox" class="sr-only peer"/>
-                        <div class="relative w-11 h-6 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"
-                             style="background:#D9D9DC;" id="toggleBg"></div>
-                        <span class="text-sm" style="color:#1B1B1B;" id="statusLabel">Disable</span>
+                    <label class="block text-sm font-semibold mb-1.5" style="color:#1B1B1B;">
+                        Status <span style="color:#D32F2F;">*</span>
                     </label>
+                    <select id="inputStatus" name="status"
+                            required
+                            class="w-full border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 bg-white"
+                            style="border-color:#D9D9DC;">
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
                 </div>
 
             </form>

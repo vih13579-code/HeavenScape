@@ -173,18 +173,18 @@
                                             </span>
                                         </td>
                                         <td class="px-6 py-4 text-right">
-                                            <div class="flex justify-end gap-2">
-                                                <button type="button" class="edit-btn text-primary hover:text-primary/80 p-2 rounded hover:bg-surface-container transition"
+                                            <div class="action-group">
+                                                <button type="button" class="edit-btn btn-action btn-action-edit"
                                                         data-id="${c.customerID}" data-type="customer"
                                                         data-fullname="${c.fullname}" data-phone="${c.phone}"
                                                         data-status="${c.status}" data-email="${c.email}"
-                                                        title="Update Information">
-                                                    <span class="material-symbols-outlined text-sm">edit</span>
+                                                        title="Update Information" aria-label="Update customer information">
+                                                    <span class="material-symbols-outlined" aria-hidden="true">edit</span>
                                                 </button>
-                                                <button class="toggle-status-btn text-warning hover:text-warning/80 p-2 rounded hover:bg-surface-container transition"
+                                                <button type="button" class="toggle-status-btn btn-action ${c.status == 'active' ? 'btn-action-lock' : 'btn-action-success'}"
                                                         data-account-id="${c.customerID}" data-role="customer" data-current-status="${c.status}"
-                                                        title="${c.status == 'active' ? 'Lock Account' : 'Unlock Account'}">
-                                                    <span class="material-symbols-outlined text-sm">${c.status == 'active' ? 'lock' : 'lock_open'}</span>
+                                                        title="${c.status == 'active' ? 'Lock Account' : 'Unlock Account'}" aria-label="${c.status == 'active' ? 'Lock customer account' : 'Unlock customer account'}">
+                                                    <span class="material-symbols-outlined" aria-hidden="true">${c.status == 'active' ? 'lock' : 'lock_open'}</span>
                                                 </button>
                                             </div>
                                         </td>
@@ -218,19 +218,19 @@
                                                 </span>
                                             </td>
                                             <td class="px-6 py-4 text-right">
-                                                <div class="flex justify-end gap-2">
-                                                    <button type="button" class="edit-btn text-primary hover:text-primary/80 p-2 rounded hover:bg-surface-container transition"
+                                                <div class="action-group">
+                                                    <button type="button" class="edit-btn btn-action btn-action-edit"
                                                             data-id="${s.id}" data-type="staff"
                                                             data-fullname="${s.fullname}" data-phone="${s.phone}"
                                                             data-status="${s.status}" data-role-value="${s.role}" data-email="${s.email}"
-                                                            title="Update Information">
-                                                        <span class="material-symbols-outlined text-sm">edit</span>
+                                                            title="Update Information" aria-label="Update staff information">
+                                                        <span class="material-symbols-outlined" aria-hidden="true">edit</span>
                                                     </button>
                                                     <c:if test="${s.role ne 'admin'}">
-                                                        <button class="toggle-status-btn text-warning hover:text-warning/80 p-2 rounded hover:bg-surface-container transition"
+                                                        <button type="button" class="toggle-status-btn btn-action ${s.status == 'active' ? 'btn-action-lock' : 'btn-action-success'}"
                                                                 data-account-id="${s.id}" data-role="staff" data-current-status="${s.status}"
-                                                                title="${s.status == 'active' ? 'Lock Account' : 'Unlock Account'}">
-                                                            <span class="material-symbols-outlined text-sm">${s.status == 'active' ? 'lock' : 'lock_open'}</span>
+                                                                title="${s.status == 'active' ? 'Lock Account' : 'Unlock Account'}" aria-label="${s.status == 'active' ? 'Lock staff account' : 'Unlock staff account'}">
+                                                            <span class="material-symbols-outlined" aria-hidden="true">${s.status == 'active' ? 'lock' : 'lock_open'}</span>
                                                         </button>
                                                     </c:if>
                                                 </div>
@@ -296,13 +296,13 @@
                         </div>
                         <div class="space-y-3">
                             <div>
-                                <label class="block text-xs font-medium text-on-surface-variant mb-1">Full Name</label>
+                                <label class="block text-xs font-medium text-on-surface-variant mb-1">Full Name <span class="text-error">*</span></label>
                                 <input type="text" id="updateFullname"
                                        class="w-full h-11 px-4 border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition">
                             </div>
                             <div class="grid grid-cols-2 gap-3">
                                 <div>
-                                    <label class="block text-xs font-medium text-on-surface-variant mb-1">Phone Number</label>
+                                    <label class="block text-xs font-medium text-on-surface-variant mb-1">Phone Number <span class="text-error">*</span></label>
                                     <input type="text" id="updatePhone"
                                            class="w-full h-11 px-4 border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition">
                                 </div>
@@ -339,7 +339,7 @@
                         </div>
                         <div class="space-y-3">
                             <div id="updateRoleWrapper" class="hidden">
-                                <label class="block text-xs font-medium text-on-surface-variant mb-1">System Role</label>
+                                <label class="block text-xs font-medium text-on-surface-variant mb-1">System Role <span class="text-error">*</span></label>
                                 <select id="updateRole" class="w-full h-11 px-4 border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition cursor-pointer">
                                     <option value="staff">Staff</option>
                                     <option value="admin">Admin</option>
@@ -458,11 +458,17 @@
                                     statusBadge.textContent = 'Active';
                                     icon.textContent = 'lock';
                                     btn.title = 'Lock Account';
+                                    btn.setAttribute('aria-label', 'Lock ' + role + ' account');
+                                    btn.classList.remove('btn-action-success');
+                                    btn.classList.add('btn-action-lock');
                                 } else {
                                     statusBadge.classList.replace('status-badge-active', 'status-badge-inactive');
                                     statusBadge.textContent = 'Locked';
                                     icon.textContent = 'lock_open';
                                     btn.title = 'Unlock Account';
+                                    btn.setAttribute('aria-label', 'Unlock ' + role + ' account');
+                                    btn.classList.remove('btn-action-lock');
+                                    btn.classList.add('btn-action-success');
                                 }
 
                                 row.dataset.status = newStatus;
@@ -636,6 +642,9 @@
                                 toggleBtn.dataset.currentStatus = newStatus;
                                 toggleBtn.querySelector('.material-symbols-outlined').textContent = newStatus === 'active' ? 'lock' : 'lock_open';
                                 toggleBtn.title = newStatus === 'active' ? 'Lock Account' : 'Unlock Account';
+                                toggleBtn.setAttribute('aria-label', (newStatus === 'active' ? 'Lock ' : 'Unlock ') + type + ' account');
+                                toggleBtn.classList.toggle('btn-action-lock', newStatus === 'active');
+                                toggleBtn.classList.toggle('btn-action-success', newStatus !== 'active');
                             }
 
                             const editBtn = row.querySelector('.edit-btn');

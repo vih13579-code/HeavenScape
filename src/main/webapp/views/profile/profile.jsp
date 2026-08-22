@@ -16,6 +16,19 @@
         border-color:#C92127;
         box-shadow:0 0 0 3px rgba(201,33,39,.12);
     }
+    .profile-card {
+        overflow:hidden;
+        border:1px solid #e5e7eb;
+        border-radius:14px;
+        background:#fff;
+        box-shadow:0 4px 18px rgba(0,0,0,.05);
+    }
+    #profile { width:100%; max-width:100%; }
+    #profileForm .grid > div { min-width:0; }
+    @media (max-width:640px) {
+        #profile { padding:20px; }
+        #profile h1 { font-size:24px; line-height:1.25; }
+    }
     .profile-form-button {
         min-height:46px;
         display:inline-flex;
@@ -56,13 +69,14 @@
                     <div class="grid md:grid-cols-2 gap-6">
                         <div>
                             <label class="block mb-2 font-medium">
-                                Full Name
+                                Full Name <span class="text-red-600 text-xs">*</span>
                             </label>
                             <input
                                 type="text"
                                 name="fullname"
                                 id="fullname"
-                                value="${customer.fullname}"
+                                value="${fn:escapeXml(customer.fullname)}"
+                                data-initial-value="${fn:escapeXml(customer.fullname)}"
                                 required
                                 class="input-style">
                             <p id="fullnameError" class="text-red-500 text-sm mt-1 hidden"></p>
@@ -74,7 +88,7 @@
                             <div class="flex flex-col sm:flex-row gap-2">
                                 <input
                                     type="email"
-                                    value="${customer.email}"
+                                    value="${fn:escapeXml(customer.email)}"
                                     disabled
                                     class="input-style bg-gray-100">
                                 <button
@@ -87,13 +101,15 @@
                         </div>
                         <div>
                             <label class="block mb-2 font-medium">
-                                Phone Number
+                                Phone Number <span class="text-red-600 text-xs">*</span>
                             </label>
                             <input
                                 type="text"
                                 name="phone"
                                 id="phone"
-                                value="${customer.phone}"
+                                value="${fn:escapeXml(customer.phone)}"
+                                data-initial-value="${fn:escapeXml(customer.phone)}"
+                                required
                                 class="input-style">
                             <p id="phoneError" class="text-red-500 text-sm mt-1 hidden"></p>
                         </div>
@@ -159,7 +175,7 @@
             We will send an OTP to the new email address for verification before updating it.
         </p>
         <form action="${pageContext.request.contextPath}/profile/change-email" method="post">
-            <label class="block mb-2 font-medium text-sm">New Email</label>
+            <label class="block mb-2 font-medium text-sm">New Email <span class="text-red-600 text-xs">*</span></label>
             <input
                 type="email"
                 name="newEmail"
@@ -202,13 +218,6 @@
 </script>
 
 <script>
-    const initialValues = {
-        fullname: "${customer.fullname}",
-        phone: "${customer.phone}",
-        gender: "${customer.gender}",
-        dob: "${customer.dob}"
-    };
-
     const form = document.getElementById('profileForm');
     const saveBtn = document.getElementById('saveBtn');
     const fullnameInput = document.getElementById('fullname');
@@ -218,6 +227,12 @@
     const genderSelect = document.getElementById('gender');
     const dobInput = document.getElementById('dob');
     const dobError = document.getElementById('dobError');
+    const initialValues = {
+        fullname: fullnameInput.dataset.initialValue || '',
+        phone: phoneInput.dataset.initialValue || '',
+        gender: genderSelect.value,
+        dob: dobInput.value
+    };
 
     function setFieldError(inputEl, errorEl, message) {
         if (message) {
