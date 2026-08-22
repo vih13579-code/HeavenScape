@@ -1,21 +1,17 @@
 package model;
 
-/**
- * Entity map bảng Address – dùng cho Address Management (Iteration 1).
- * 1 Customer có nhiều Address; checkout/order lưu addressID để biết giao đâu.
- */
 public class Address {
 
-    private int addressID;       // PK
-    private int customerID;      // FK → Customer, chủ sở hữu địa chỉ
-    private String street;       // số nhà + tên đường
-    private String district;     // phường/xã (UI gọi ward, DB cột district)
-    private String city;         // tỉnh/thành
-    private String country;      // mặc định "Vietnam"; '__DELETED__' = xóa mềm
-    private boolean isDefault;   // địa chỉ mặc định khi checkout
+    private int addressID;
+    private int customerID;
+    private String street;
+    private String district;
+    private String city;
+    private String country;
+    private boolean isDefault;
 
-    private String recipientName;  // copy từ Customer.fullname lúc tạo
-    private String recipientPhone; // copy từ Customer.phone lúc tạo
+    private String recipientName;
+    private String recipientPhone;
 
     public Address() {
     }
