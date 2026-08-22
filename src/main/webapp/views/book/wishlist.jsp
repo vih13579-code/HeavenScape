@@ -16,23 +16,72 @@
 </c:if>
 
 <style>
+    .wishlist-page {
+        background: #f3f4f6;
+        padding-bottom: 36px;
+    }
+    .wishlist-shell {
+        width: min(1180px, calc(100% - 40px));
+        margin: 0 auto;
+    }
+    .wishlist-hero {
+        padding: 28px 0;
+        background: linear-gradient(135deg, #c92127 0%, #a7191e 100%);
+    }
+    .wishlist-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        padding: 5px 12px;
+        margin-bottom: 9px;
+        border-radius: 999px;
+        background: #fff;
+        color: #c92127;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+    }
+    .wishlist-title {
+        margin: 0;
+        color: #fff;
+        font-size: 28px;
+        line-height: 1.25;
+        font-weight: 900;
+    }
+    .wishlist-count {
+        margin-top: 5px;
+        color: rgba(255, 255, 255, .82);
+        font-size: 14px;
+    }
+    .wishlist-main {
+        padding-top: 24px;
+    }
+    .wishlist-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+    }
     .wish-card {
         background:#fff;
-        border:1px solid #e5e7eb;
+        border:1px solid #e1e3e6;
         border-radius:14px;
         overflow:hidden;
         display:flex;
         align-items:stretch;
-        transition:box-shadow .2s;
+        min-width: 0;
+        min-height: 210px;
+        transition:box-shadow .2s, border-color .2s;
     }
     .wish-card:hover {
-        box-shadow:0 6px 20px rgba(23,71,157,.1);
+        border-color: #efb1b5;
+        box-shadow:0 8px 24px rgba(77, 17, 20, .10);
     }
     .wish-thumb {
-        width:100px;
-        min-height:120px;
+        width:145px;
+        min-height:210px;
         flex-shrink:0;
-        background:#f0f4ff;
+        padding: 12px;
+        background:#f7f7f8;
         display:flex;
         align-items:center;
         justify-content:center;
@@ -41,39 +90,172 @@
     .wish-thumb img {
         width:100%;
         height:100%;
-        object-fit:cover;
+        object-fit:contain;
+    }
+    .wish-card-body {
+        min-width: 0;
+        padding: 17px 18px;
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        justify-content: space-between;
     }
     .badge-stock-ok  {
-        background:#dcfce7;
-        color:#166534;
+        background:#edf8f1;
+        border: 1px solid #bfe7cb;
+        color:#17643a;
         font-size:11px;
         font-weight:700;
-        padding:2px 8px;
+        padding:3px 8px;
         border-radius:999px;
     }
     .badge-stock-out {
-        background:#fee2e2;
-        color:#991b1b;
+        background:#fff1f2;
+        border: 1px solid #f2c1c4;
+        color:#a7191e;
         font-size:11px;
         font-weight:700;
-        padding:2px 8px;
+        padding:3px 8px;
         border-radius:999px;
+    }
+    .wish-card-actions {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+        margin-top: 16px;
+    }
+    .wish-card-actions form {
+        min-width: 0;
+    }
+    .wish-action {
+        width: 100%;
+        min-height: 40px;
+        padding: 8px 10px;
+        border: 1px solid transparent;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        font-size: 12px;
+        line-height: 1.2;
+        font-weight: 700;
+        text-align: center;
+        transition: background-color .2s, border-color .2s, color .2s;
+    }
+    .wish-action-primary {
+        background: #c92127;
+        color: #fff;
+    }
+    .wish-action-primary:hover {
+        background: #a7191e;
+    }
+    .wish-action-secondary {
+        border-color: #c92127;
+        background: #fff;
+        color: #c92127;
+    }
+    .wish-action-secondary:hover {
+        background: #fff0f1;
+    }
+    .wish-action-delete {
+        border-color: #efb1b5;
+        background: #fff;
+        color: #a7191e;
+    }
+    .wish-action-delete:hover {
+        border-color: #c92127;
+        background: #fff0f1;
+    }
+    .wish-action-disabled {
+        border-color: #d5d7da;
+        background: #eceeef;
+        color: #71757a;
+        cursor: not-allowed;
+    }
+    .wishlist-footer-actions {
+        margin-top: 20px;
+        padding-top: 18px;
+        border-top: 1px solid #dedfe2;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 12px;
+    }
+    .wishlist-bottom-action {
+        min-height: 42px;
+        padding: 10px 18px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-size: 13px;
+        font-weight: 700;
+    }
+    .wishlist-continue {
+        border: 1px solid #c92127;
+        background: #fff;
+        color: #c92127;
+    }
+    .wishlist-continue:hover {
+        background: #fff0f1;
+    }
+    .wishlist-view-cart {
+        border: 1px solid #c92127;
+        background: #c92127;
+        color: #fff;
+    }
+    .wishlist-view-cart:hover {
+        background: #a7191e;
+        border-color: #a7191e;
+    }
+    @media (max-width: 900px) {
+        .wishlist-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    @media (max-width: 560px) {
+        .wishlist-shell {
+            width: min(1180px, calc(100% - 24px));
+        }
+        .wishlist-hero {
+            padding: 22px 0;
+        }
+        .wishlist-title {
+            font-size: 24px;
+        }
+        .wish-thumb {
+            width: 112px;
+            padding: 9px;
+        }
+        .wish-card-body {
+            padding: 14px 12px;
+        }
+        .wish-card-actions {
+            grid-template-columns: 1fr;
+        }
+        .wishlist-footer-actions {
+            align-items: stretch;
+            flex-direction: column;
+        }
     }
 </style>
 
-<section class="hero-gradient px-8 py-7 relative overflow-hidden">
-    <div class="relative z-10">
-        <div class="bg-secondary text-primary font-bold text-xs px-3 py-1 rounded-full inline-block mb-2 tracking-wide uppercase">Wishlist</div>
-        <h1 class="text-white text-[28px] font-black">My Wishlist</h1>
-        <p class="text-white/70 text-sm mt-1">${wishlistCount} books in this list</p>
-    </div>
-</section>
+<div class="wishlist-page">
+    <section class="wishlist-hero">
+        <div class="wishlist-shell">
+            <div class="wishlist-eyebrow">Wishlist</div>
+            <h1 class="wishlist-title">My Wishlist</h1>
+            <p class="wishlist-count">${wishlistCount} books in this list</p>
+        </div>
+    </section>
 
-<main class="max-w-[900px] mx-auto px-6 py-8">
+<main class="wishlist-shell wishlist-main">
 
     <c:choose>
         <c:when test="${not empty wishlistItems}">
-            <div class="space-y-4">
+            <div class="wishlist-grid">
                 <c:forEach var="item" items="${wishlistItems}">
                     <div class="wish-card">
                         <div class="wish-thumb">
@@ -86,7 +268,7 @@
                                 </c:otherwise>
                             </c:choose>
                         </div>
-                        <div class="flex-1 px-4 py-3 flex flex-col justify-between">
+                        <div class="wish-card-body">
                             <div>
                                 <a href="${pageContext.request.contextPath}/products?id=${item.bookID}"
                                    class="text-[15px] font-bold text-gray-800 hover:text-primary transition-colors line-clamp-2">${item.title}</a>
@@ -119,22 +301,29 @@
                                 </div>
                             </div>
 
-                            <div class="flex items-center gap-2 mt-3 flex-wrap">
+                            <div class="wish-card-actions">
                      
-                                <c:if test="${item.stockQuantity > 0 and item.status == 'available'}">
-                                    <form method="post" action="${pageContext.request.contextPath}/wishlist">
-                                        <input type="hidden" name="action"  value="moveToCart">
-                                        <input type="hidden" name="bookID"  value="${item.bookID}">
-                                        <button type="submit"
-                                                class="flex items-center gap-2 bg-primary text-white text-[13px] font-bold px-4 py-2 rounded-lg hover:bg-primary-dark transition-colors">
+                                <c:choose>
+                                    <c:when test="${item.stockQuantity > 0 and item.status == 'available'}">
+                                        <form method="post" action="${pageContext.request.contextPath}/wishlist">
+                                            <input type="hidden" name="action"  value="moveToCart">
+                                            <input type="hidden" name="bookID"  value="${item.bookID}">
+                                            <button type="submit" class="wish-action wish-action-primary">
+                                                <i data-lucide="shopping-cart" class="w-3.5 h-3.5"></i>
+                                                Move to Cart
+                                            </button>
+                                        </form>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <button type="button" class="wish-action wish-action-disabled" disabled>
                                             <i data-lucide="shopping-cart" class="w-3.5 h-3.5"></i>
                                             Move to Cart
                                         </button>
-                                    </form>
-                                </c:if>
+                                    </c:otherwise>
+                                </c:choose>
 
                                 <a href="${pageContext.request.contextPath}/products?id=${item.bookID}"
-                                   class="flex items-center gap-2 border border-primary text-primary text-[13px] font-bold px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors">
+                                   class="wish-action wish-action-secondary">
                                     <i data-lucide="eye" class="w-3.5 h-3.5"></i>
                                     View Details
                                 </a>
@@ -144,7 +333,7 @@
                                     <input type="hidden" name="action"  value="remove">
                                     <input type="hidden" name="bookID"  value="${item.bookID}">
                                     <button type="submit"
-                                            class="flex items-center gap-1.5 border border-gray-300 text-[13px] text-gray-400 hover:text-red-500 hover:border-red-300 transition-colors px-4 py-2 rounded-lg hover:bg-red-50"
+                                            class="wish-action wish-action-delete"
                                             title="Remove from Wishlist">
                                         <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                                         Delete
@@ -156,13 +345,13 @@
                 </c:forEach>
             </div>
 
-            <div class="mt-8 flex justify-between items-center">
+            <div class="wishlist-footer-actions">
                 <a href="${pageContext.request.contextPath}/products"
-                   class="flex items-center gap-2 text-primary font-medium hover:underline text-sm">
+                   class="wishlist-bottom-action wishlist-continue">
                     <i data-lucide="arrow-left" class="w-4 h-4"></i> Continue Shopping
                 </a>
                 <a href="${pageContext.request.contextPath}/cart"
-                   class="bg-secondary text-primary font-bold px-6 py-2.5 rounded-full text-sm hover:opacity-90 transition-opacity">
+                   class="wishlist-bottom-action wishlist-view-cart">
                     View Cart
                 </a>
             </div>
@@ -183,5 +372,6 @@
         </c:otherwise>
     </c:choose>
 </main>
+</div>
 
 <%@ include file="/views/layout/homepage/footer.jsp" %>

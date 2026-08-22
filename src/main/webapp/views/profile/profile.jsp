@@ -6,23 +6,31 @@
 <style>
     .input-style{
         width:100%;
+        min-height:46px;
         padding:12px 16px;
         border:1px solid #d1d5db;
-        border-radius:10px;
+        border-radius:8px;
     }
     .input-style:focus{
         outline:none;
-        border-color:#2563eb;
-        box-shadow:0 0 0 3px rgba(37,99,235,.15);
+        border-color:#C92127;
+        box-shadow:0 0 0 3px rgba(201,33,39,.12);
+    }
+    .profile-form-button {
+        min-height:46px;
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        border-radius:8px;
     }
 </style>
-<div class="max-w-7xl mx-auto py-10 px-4">
-    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+<div class="fhs-page-inner">
+    <div class="grid grid-cols-1 lg:grid-cols-[250px_minmax(0,1fr)] gap-4">
         <!-- SIDEBAR -->
         <c:set var="activeMenu" value="profile" scope="request"/>
         <%@ include file="/views/layout/profile/sidebar.jsp" %>
 
-        <div class="lg:col-span-3 space-y-6">
+        <div class="space-y-6 min-w-0">
             <c:if test="${not empty sessionScope.message}">
                 <div id="toastMessageData" class="hidden" data-message="${fn:escapeXml(sessionScope.message)}"></div>
                 <c:remove var="message" scope="session"/>
@@ -63,7 +71,7 @@
                             <label class="block mb-2 font-medium">
                                 Email
                             </label>
-                            <div class="flex gap-2">
+                            <div class="flex flex-col sm:flex-row gap-2">
                                 <input
                                     type="email"
                                     value="${customer.email}"
@@ -72,7 +80,7 @@
                                 <button
                                     type="button"
                                     id="openChangeEmailBtn"
-                                    class="shrink-0 px-4 py-3 rounded-xl border border-primary text-primary font-medium hover:bg-primary hover:text-white transition-all">
+                                    class="profile-form-button shrink-0 px-4 border border-primary text-primary font-medium hover:bg-primary hover:text-white transition-all">
                                     Change Email
                                 </button>
                             </div>
@@ -88,16 +96,6 @@
                                 value="${customer.phone}"
                                 class="input-style">
                             <p id="phoneError" class="text-red-500 text-sm mt-1 hidden"></p>
-                        </div>
-                        <div>
-                            <label class="block mb-2 font-medium">
-                                Status
-                            </label>
-                            <input
-                                type="text"
-                                value="${customer.status}"
-                                disabled
-                                class="input-style bg-gray-100">
                         </div>
                         <div>
                             <label class="block mb-2 font-medium">
@@ -140,7 +138,7 @@
                         <button
                             type="submit"
                             id="saveBtn"
-                            class="bg-primary hover:bg-primary-dark text-white px-8 py-3 rounded-xl shadow disabled:bg-gray-400 disabled:cursor-not-allowed disabled:opacity-60 transition-all"
+                            class="profile-form-button bg-primary hover:bg-primary-dark text-white px-8 shadow disabled:bg-gray-400 disabled:cursor-not-allowed disabled:opacity-60 transition-all"
                             disabled>
                             Save Changes
                         </button>

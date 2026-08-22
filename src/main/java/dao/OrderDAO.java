@@ -237,7 +237,11 @@ public class OrderDAO {
         List<OrderDetail> details = new ArrayList<>();
 
         String sql = "SELECT od.orderDetailID, od.orderID, od.bookID, od.quantity, od.unit_price, "
-                + "       b.title, b.thumbnail "
+                + "       b.title, b.thumbnail, "
+                + "       (SELECT STRING_AGG(a.fullname, ', ') "
+                + "        FROM BookAuthor ba "
+                + "        JOIN Author a ON a.authorID = ba.authorID "
+                + "        WHERE ba.bookID = b.bookID) AS authors "
                 + "FROM OrderDetail od "
                 + "JOIN Book b ON b.bookID = od.bookID "
                 + "WHERE od.orderID = ?";
@@ -256,6 +260,7 @@ public class OrderDAO {
                 d.setUnitPrice(rs.getBigDecimal("unit_price"));
                 d.setTitle(rs.getString("title"));
                 d.setThumbnail(rs.getString("thumbnail"));
+                d.setAuthorsDisplay(rs.getString("authors"));
                 details.add(d);
             }
 
@@ -281,6 +286,55 @@ public class OrderDAO {
             e.printStackTrace();
         }
 
+        return false;
+    }
+
+    public boolean requestCodRefund(int orderID, int customerID, String refundReason) {
+        String sql = "UPDATE [Order] "
+                + "SET status = 'cancelled', payment_status = 'pending_refund', cancel_reason = ? "
+                + "WHERE orderID = ? AND customerID = ? "
+                + "AND status = 'completed' AND payment_method = 'cod' AND payment_status = 'paid'";
+
+        Connection conn = null;
+        try {
+            conn = new DBContext().getConnection();
+            conn.setAutoCommit(false);
+
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setString(1, refundReason);
+                ps.setInt(2, orderID);
+                ps.setInt(3, customerID);
+
+                if (ps.executeUpdate() == 0) {
+                    conn.rollback();
+                    return false;
+                }
+            }
+
+            if (!restoreStock(conn, orderID)) {
+                conn.rollback();
+                return false;
+            }
+
+            conn.commit();
+            return true;
+        } catch (Exception e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (Exception ignored) {
+                }
+            }
+            e.printStackTrace();
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (Exception ignored) {
+                }
+            }
+        }
         return false;
     }
 
@@ -326,7 +380,7 @@ public class OrderDAO {
 
     public boolean confirmRefund(int orderID) {
         String sql = "UPDATE [Order] SET payment_status = 'refunded' "
-                + "WHERE orderID = ? AND payment_status = 'pending_refund'";
+                + "WHERE orderID = ? AND payment_method = 'cod' AND payment_status = 'pending_refund'";
         try (Connection conn = new DBContext().getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, orderID);
             return ps.executeUpdate() > 0;
@@ -348,9 +402,9 @@ public class OrderDAO {
                 int overdueOrderID = rsGet.getInt("orderID");
                 Order overdueOrder = getOrderByID(overdueOrderID);
                 if (overdueOrder != null) {
-                    boolean isVnpay = "vnpay".equalsIgnoreCase(overdueOrder.getPaymentMethod());
+                    boolean isCod = "cod".equalsIgnoreCase(overdueOrder.getPaymentMethod());
                     boolean isPaid = "paid".equalsIgnoreCase(overdueOrder.getPaymentStatus());
-                    if (isVnpay && isPaid) {
+                    if (isCod && isPaid) {
                         String autoCancelReason = "Order was not approved within two days";
                         String sqlAutoCancel = "UPDATE [Order] SET status = 'cancelled', cancel_reason = ? WHERE orderID = ?";
                         try (Connection connAC = new DBContext().getConnection(); PreparedStatement psAC = connAC.prepareStatement(sqlAutoCancel)) {
@@ -769,36 +823,67 @@ public class OrderDAO {
     }
 
     public boolean restoreStock(int orderID) {
-        String sqlRestore = "UPDATE Book "
-                + "SET Book.stock_quantity = Book.stock_quantity + OrderDetail.quantity "
-                + "FROM Book "
-                + "INNER JOIN OrderDetail ON Book.bookID = OrderDetail.bookID "
-                + "WHERE OrderDetail.orderID = ?";
+        Connection conn = null;
+        try {
+            conn = new DBContext().getConnection();
+            conn.setAutoCommit(false);
 
-        String sqlUpdateStatus = "UPDATE Book "
-                + "SET Book.status = 'available' "
-                + "FROM Book "
-                + "INNER JOIN OrderDetail ON Book.bookID = OrderDetail.bookID "
-                + "WHERE OrderDetail.orderID = ? "
-                + "AND Book.stock_quantity > 0 "
-                + "AND (Book.status IS NULL OR Book.status <> 'discontinued')";
+            if (!restoreStock(conn, orderID)) {
+                conn.rollback();
+                return false;
+            }
 
-        try (Connection conn = new DBContext().getConnection()) {
-            try (PreparedStatement ps1 = conn.prepareStatement(sqlRestore)) {
-                ps1.setInt(1, orderID);
-                int rows = ps1.executeUpdate();
-                if (rows > 0) {
-                    try (PreparedStatement ps2 = conn.prepareStatement(sqlUpdateStatus)) {
-                        ps2.setInt(1, orderID);
-                        ps2.executeUpdate();
-                    }
-                    return true;
+            conn.commit();
+            return true;
+        } catch (Exception e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (Exception ignored) {
                 }
             }
-        } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (Exception ignored) {
+                }
+            }
         }
         return false;
+    }
+
+    private boolean restoreStock(Connection conn, int orderID) throws SQLException {
+        String sqlRestore = "UPDATE b "
+                + "SET stock_quantity = COALESCE(b.stock_quantity, 0) + RestoredItem.quantity "
+                + "FROM Book AS b "
+                + "INNER JOIN ("
+                + "    SELECT bookID, SUM(quantity) AS quantity "
+                + "    FROM OrderDetail WHERE orderID = ? GROUP BY bookID"
+                + ") RestoredItem ON b.bookID = RestoredItem.bookID";
+
+        String sqlUpdateStatus = "UPDATE b "
+                + "SET status = 'available' "
+                + "FROM Book AS b "
+                + "INNER JOIN OrderDetail ON b.bookID = OrderDetail.bookID "
+                + "WHERE OrderDetail.orderID = ? "
+                + "AND b.stock_quantity > 0 "
+                + "AND (b.status IS NULL OR b.status <> 'discontinued')";
+
+        try (PreparedStatement ps1 = conn.prepareStatement(sqlRestore)) {
+            ps1.setInt(1, orderID);
+            if (ps1.executeUpdate() == 0) {
+                return false;
+            }
+        }
+
+        try (PreparedStatement ps2 = conn.prepareStatement(sqlUpdateStatus)) {
+            ps2.setInt(1, orderID);
+            ps2.executeUpdate();
+        }
+        return true;
     }
 
     public boolean updateOrderTotal(int orderID, java.math.BigDecimal newTotal) {

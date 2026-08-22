@@ -15,5 +15,6 @@ final class VoucherInput {
     String status;
     Double minOrderValue;
     Double maxDiscountValue;
+    String errorField;
     String errorMsg;
 }

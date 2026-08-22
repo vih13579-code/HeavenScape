@@ -6,11 +6,11 @@
 
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
-<footer class="bg-white border-t py-4 px-6 flex justify-between items-center mt-auto" style="border-color: #c2c6d4;">
-    <span class="text-xs" style="color: #424752;">© 2026 HeavenScape. All rights reserved.</span>
+<footer class="bg-white border-t py-4 px-6 flex justify-between items-center mt-auto" style="border-color: #D9D9DC;">
+    <span class="text-xs" style="color: #5C5C5F;">© 2026 HeavenScape. All rights reserved.</span>
     <div class="flex gap-5">
-        <a href="#" class="text-xs hover:underline" style="color: #424752;">Policies</a>
-        <a href="#" class="text-xs hover:underline" style="color: #424752;">Security</a>
-        <a href="#" class="text-xs hover:underline" style="color: #424752;">Contact</a>
+        <a href="#" class="text-xs hover:underline" style="color: #5C5C5F;">Policies</a>
+        <a href="#" class="text-xs hover:underline" style="color: #5C5C5F;">Security</a>
+        <a href="#" class="text-xs hover:underline" style="color: #5C5C5F;">Contact</a>
     </div>
 </footer>

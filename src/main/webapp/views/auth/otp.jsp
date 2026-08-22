@@ -7,6 +7,7 @@
         <meta charset="utf-8">
         <meta content="width=device-width, initial-scale=1.0" name="viewport">
         <title>OTP Verification | HeavenScape</title>
+        <link rel="icon" type="image/png" href="https://res.cloudinary.com/llfxqkny/image/upload/v1787226687/heavenscape/favicon/heavenscape_favicon.png">
         <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
@@ -17,21 +18,21 @@
                     extend: {
                         "colors": {
                             "error": "#D32F2F",
-                            "on-primary": "#ffffff",
-                            "outline": "#727783",
-                            "on-surface-variant": "#424752",
-                            "on-error-container": "#93000a",
+                            "on-primary": "#FFFFFF",
+                            "outline": "#8F8F92",
+                            "on-surface-variant": "#5C5C5F",
+                            "on-error-container": "#93000A",
                             "surface": "#FFFFFF",
-                            "primary-container": "#1565c0",
-                            "on-primary-container": "#dae5ff",
-                            "primary": "#004d99",
-                            "on-surface": "#071e27",
-                            "background": "#f3faff",
-                            "outline-variant": "#c2c6d4",
-                            "error-container": "#ffdad6",
+                            "primary-container": "#FDE8E9",
+                            "on-primary-container": "#7A0F13",
+                            "primary": "#C92127",
+                            "on-surface": "#1B1B1B",
+                            "background": "#F7F7F8",
+                            "outline-variant": "#D9D9DC",
+                            "error-container": "#FFDAD6",
                             "success": "#2E7D32",
-                            "success-container": "#E8F5E9",
-                            "on-success-container": "#1B5E20"
+                            "success-container": "#DDF4DE",
+                            "on-success-container": "#0B3D0E"
                         },
                         "spacing": {
                             "stack-sm": "12px",
@@ -72,7 +73,7 @@
         <style>
             body {
                 font-family: 'Inter', sans-serif;
-                background-color: #f3faff;
+                background-color: #F7F7F8;
             }
             .material-symbols-outlined {
                 font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
@@ -84,12 +85,12 @@
                 text-align: center;
                 font-size: 24px;
                 font-weight: 700;
-                border: 2px solid #c2c6d4;
+                border: 2px solid #D9D9DC;
                 border-radius: 12px;
                 outline: none;
                 transition: all 0.2s;
                 background: #fff;
-                color: #071e27;
+                color: #1B1B1B;
                 -moz-appearance: textfield;
             }
             .otp-input::-webkit-outer-spin-button,
@@ -98,12 +99,12 @@
                 margin: 0;
             }
             .otp-input:focus {
-                border-color: #004d99;
+                border-color: #C92127;
                 box-shadow: 0 0 0 3px rgba(0,77,153,0.15);
             }
             .otp-input.filled {
-                border-color: #004d99;
-                background: #f3faff;
+                border-color: #C92127;
+                background: #F7F7F8;
             }
             .otp-input.error  {
                 border-color: #D32F2F;

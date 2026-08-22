@@ -97,7 +97,8 @@ public class VNPayReturnController extends HttpServlet {
             cartItems = availableItems;
 
             if (cartItems.isEmpty()) {
-                session.setAttribute("errorMessage", "All cart items are out of stock. Please contact support for a refund.");
+                session.setAttribute("errorMessage",
+                        "All cart items are out of stock. Please contact support for a refund.");
                 session.removeAttribute("vnpay_txnRef");
                 session.removeAttribute("vnpay_addressID");
                 session.removeAttribute("vnpay_total");
@@ -115,7 +116,7 @@ public class VNPayReturnController extends HttpServlet {
                 // Out of Stock tại thời điểm VNPay return — tiền đã thu, cần hoàn
                 session.setAttribute("errorMessage",
                         "An item in your cart went out of stock during payment. "
-                        + "Please contact support for a refund!");
+                                + "Please contact support for a refund!");
                 session.removeAttribute("vnpay_txnRef");
                 session.removeAttribute("vnpay_addressID");
                 session.removeAttribute("vnpay_total");

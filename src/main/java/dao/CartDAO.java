@@ -62,7 +62,7 @@ public class CartDAO {
 
         for (CartItem item : cartItemList) {
             String authorSql = "SELECT Author.fullname "
-                    + "FROM BookAuthor"
+                    + "FROM BookAuthor "
                     + "JOIN Author ON Author.authorID = BookAuthor.authorID "
                     + "WHERE BookAuthor.bookID = ?";
 
@@ -87,7 +87,7 @@ public class CartDAO {
             if (authorNames.length() > 0) {
                 item.setAuthorsDisplay(authorNames.toString());
             } else {
-                item.setAuthorsDisplay("Updating");
+                item.setAuthorsDisplay("Author information unavailable");
             }
         }
 

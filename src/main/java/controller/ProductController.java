@@ -12,6 +12,9 @@ import model.Account;
 import model.Book;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import model.Review;
@@ -59,34 +62,38 @@ public class ProductController extends HttpServlet {
         int page      = parsePage(req.getParameter("page"));
         int pageSize  = parsePageSize(req.getParameter("size"));
         String sort    = req.getParameter("sort");
-        String keyword = req.getParameter("keyword");
+        String keyword = normalizeText(req.getParameter("keyword"));
         String order   = buildOrderClause(sort);
 
-  
-        Integer    genreID  = parseIntParam(req.getParameter("genre"));
+        List<Integer> selectedCategoryIDs = parsePositiveIntParams(req.getParameterValues("category"));
+        List<Integer> selectedAuthorIDs = parsePositiveIntParams(req.getParameterValues("author"));
+        List<String> availability = parseAvailability(req.getParameterValues("availability"));
+        Integer categoryID = selectedCategoryIDs.size() == 1 ? selectedCategoryIDs.get(0) : null;
         BigDecimal minPrice = parsePriceParam(req.getParameter("minPrice"));
         BigDecimal maxPrice = parsePriceParam(req.getParameter("maxPrice"));
+        String priceRangeError = null;
+        if (minPrice != null && maxPrice != null && minPrice.compareTo(maxPrice) > 0) {
+            priceRangeError = "Minimum price cannot be greater than maximum price.";
+            minPrice = null;
+            maxPrice = null;
+        }
 
-        int totalBooks = bookDAO.countBooksFiltered(keyword, genreID, minPrice, maxPrice);
+        int totalBooks = bookDAO.countBooksFiltered(keyword, selectedCategoryIDs,
+                selectedAuthorIDs, minPrice, maxPrice, availability);
         int totalPages = (int) Math.ceil((double) totalBooks / pageSize);
         if (totalPages == 0) totalPages = 1;
 
-
         if (page > totalPages) {
-            resp.sendRedirect(req.getContextPath() + "/products?page=" + totalPages
-                    + "&size=" + pageSize
-                    + (sort    != null ? "&sort="    + sort    : "")
-                    + (keyword != null ? "&keyword=" + keyword : "")
-                    + (genreID != null ? "&genre="   + genreID : ""));
-            return;
+            page = totalPages;
         }
 
         int offset = (page - 1) * pageSize;
         List<Book> books = bookDAO.getBooksFiltered(offset, pageSize, order,
-                                                     keyword, genreID, minPrice, maxPrice);
+                keyword, selectedCategoryIDs, selectedAuthorIDs, minPrice, maxPrice,
+                availability);
 
- 
-        Map<Integer, String> genreMap = bookDAO.getGenreMap();
+        Map<Integer, String> categoryMap = bookDAO.getCategoryMap();
+        Map<Integer, String> authorMap = bookDAO.getCatalogAuthorMap();
 
         HttpSession session = req.getSession(false);
         java.util.Set<String> wishlistBookIds = new java.util.HashSet<>();
@@ -107,10 +114,21 @@ public class ProductController extends HttpServlet {
         req.setAttribute("totalBooks",      totalBooks);
         req.setAttribute("sort",            sort);
         req.setAttribute("keyword",         keyword);
-        req.setAttribute("genreID",         genreID);
+        req.setAttribute("categoryID",         categoryID);
+        req.setAttribute("selectedCategoryIDs", selectedCategoryIDs);
+        req.setAttribute("selectedAuthorIDs", selectedAuthorIDs);
+        req.setAttribute("availability",    availability);
+        req.setAttribute("availabilityAvailable", availability.contains("available"));
+        req.setAttribute("availabilityOutOfStock", availability.contains("out_of_stock"));
         req.setAttribute("minPrice",        minPrice);
         req.setAttribute("maxPrice",        maxPrice);
-        req.setAttribute("genreMap",        genreMap);
+        req.setAttribute("priceRangeError", priceRangeError);
+        req.setAttribute("hasPriceFilter",  minPrice != null || maxPrice != null);
+        req.setAttribute("hasActiveFilters", !selectedCategoryIDs.isEmpty()
+                || !selectedAuthorIDs.isEmpty() || !availability.isEmpty()
+                || minPrice != null || maxPrice != null);
+        req.setAttribute("categoryMap",        categoryMap);
+        req.setAttribute("authorMap",       authorMap);
         req.setAttribute("wishlistBookIds", wishlistBookIds);
 
         req.getRequestDispatcher("/views/book/book-index.jsp").forward(req, resp);
@@ -126,7 +144,7 @@ public class ProductController extends HttpServlet {
         Book book = bookDAO.getBookByID(bookID);
         if (book == null) { show404(req, resp, "No book found with ID = " + bookID); return; }
 
-        List<Book> relatedBooks = bookDAO.getRelatedBooks(bookID, book.getGenreID(), 4);
+        List<Book> relatedBooks = bookDAO.getRelatedBooks(bookID, book.getCategoryID(), 4);
 
         ReviewDAO reviewDAO = new ReviewDAO();
         List<Review> reviews = reviewDAO.getReviewsByBook(bookID);
@@ -181,7 +199,8 @@ public class ProductController extends HttpServlet {
             throws ServletException, IOException {
 
         List<Book> featuredBooks = bookDAO.getFeaturedByOrders(10);
-        Map<Integer, String> genreMap = bookDAO.getGenreMap();
+        Map<Integer, String> categoryMap = bookDAO.getCategoryMap();
+        Map<Integer, String> authorMap = bookDAO.getCatalogAuthorMap();
 
         req.setAttribute("featuredBooks", featuredBooks);
         req.setAttribute("books",         featuredBooks);
@@ -190,7 +209,15 @@ public class ProductController extends HttpServlet {
         req.setAttribute("totalPages",    1);
         req.setAttribute("totalBooks",    featuredBooks.size());
         req.setAttribute("sort",          "popular");
-        req.setAttribute("genreMap",      genreMap);
+        req.setAttribute("categoryMap",      categoryMap);
+        req.setAttribute("authorMap",     authorMap);
+        req.setAttribute("selectedCategoryIDs", Collections.emptyList());
+        req.setAttribute("selectedAuthorIDs", Collections.emptyList());
+        req.setAttribute("availability",  Collections.emptyList());
+        req.setAttribute("availabilityAvailable", false);
+        req.setAttribute("availabilityOutOfStock", false);
+        req.setAttribute("hasPriceFilter", false);
+        req.setAttribute("hasActiveFilters", false);
 
         HttpSession session = req.getSession(false);
         java.util.Set<String> wishlistBookIds = new java.util.HashSet<>();
@@ -237,6 +264,37 @@ public class ProductController extends HttpServlet {
         if (param == null || param.trim().isEmpty()) return null;
         try { int v = Integer.parseInt(param.trim()); return v > 0 ? v : null; }
         catch (Exception e) { return null; }
+    }
+
+    private String normalizeText(String value) {
+        if (value == null) return null;
+        String normalized = value.trim();
+        return normalized.isEmpty() ? null : normalized;
+    }
+
+    private List<Integer> parsePositiveIntParams(String[] params) {
+        LinkedHashSet<Integer> values = new LinkedHashSet<>();
+        if (params != null) {
+            for (String param : params) {
+                Integer value = parseIntParam(param);
+                if (value != null) {
+                    values.add(value);
+                }
+            }
+        }
+        return new ArrayList<>(values);
+    }
+
+    private List<String> parseAvailability(String[] params) {
+        LinkedHashSet<String> values = new LinkedHashSet<>();
+        if (params != null) {
+            for (String param : params) {
+                if ("available".equals(param) || "out_of_stock".equals(param)) {
+                    values.add(param);
+                }
+            }
+        }
+        return new ArrayList<>(values);
     }
 
     private BigDecimal parsePriceParam(String param) {

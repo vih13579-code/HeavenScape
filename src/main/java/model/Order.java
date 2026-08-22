@@ -7,6 +7,8 @@ package model;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -32,6 +34,7 @@ public class Order {
     private String customerPhone;
     private String recipientName;
     private String recipientPhone;
+    private List<OrderDetail> orderDetails = new ArrayList<>();
 
     public String getStreet() {
         return street;
@@ -188,5 +191,13 @@ public class Order {
 
     public void setCancelReason(String cancelReason) {
         this.cancelReason = cancelReason;
+    }
+
+    public List<OrderDetail> getOrderDetails() {
+        return orderDetails;
+    }
+
+    public void setOrderDetails(List<OrderDetail> orderDetails) {
+        this.orderDetails = orderDetails != null ? orderDetails : new ArrayList<>();
     }
 }
