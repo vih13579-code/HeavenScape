@@ -810,7 +810,7 @@
                 <c:otherwise>
                     <div
                         class="bg-white border border-dashed border-gray-300 rounded-xl p-10 text-center">
-                        <div class="text-5xl mb-3">⭐</div>
+                        <div class="text-5xl mb-3">☆</div>
                         <div class="font-semibold text-gray-600">No Reviews Yet</div>
                         <div class="text-gray-400 mt-2">Be the first to read and review this book.</div>
                     </div>
