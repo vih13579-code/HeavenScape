@@ -441,4 +441,20 @@ public class ReviewDAO {
 
         return false;
     }
+
+    public boolean deleteReply(int reviewID) {
+        String sql = "UPDATE Review SET adminID = NULL, adminReply = NULL, "
+                + "adminReplyDate = NULL WHERE reviewID = ? "
+                + "AND adminReply IS NOT NULL";
+
+        try (Connection conn = db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, reviewID);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
 }

@@ -87,14 +87,17 @@ public class ReviewController extends HttpServlet {
                 case "edit":
                     handleEditReview(request, response);
                     break;
+                case "editReply":
+                    handleEditReply(request, response);
+                    break;
+                case "deleteReply":
+                    handleDeleteReply(request, response);
+                    break;
                 case "reply":
                     handleReplyReview(request, response);
                     break;
                 case "updateReply":
                     handleUpdateReply(request, response);
-                    break;
-                case "deleteReply":
-                    handleDeleteReply(request, response);
                     break;
                 case "hide":
                     handleHideReview(request, response);
@@ -240,7 +243,53 @@ public class ReviewController extends HttpServlet {
         }
     }
 
-    // admin/ staff phản hồi
+    private void handleEditReply(HttpServletRequest request,
+            HttpServletResponse response) throws IOException {
+        if (!isAdminOrStaff(request)) {
+            sendJson(response,
+                    "{\"success\":false,\"message\":\"You do not have permission to update this reply\"}");
+            return;
+        }
+
+        int reviewID = toInt(request.getParameter("reviewID"), 0);
+        String reply = request.getParameter("reply");
+        if (reviewID <= 0) {
+            sendJson(response, "{\"success\":false,\"message\":\"Invalid review\"}");
+            return;
+        }
+        if (reply == null || reply.trim().isEmpty()) {
+            sendJson(response, "{\"success\":false,\"message\":\"Please enter a reply\"}");
+            return;
+        }
+        reply = reply.trim();
+        if (reply.length() > 2000) {
+            sendJson(response,
+                    "{\"success\":false,\"message\":\"Reply must not exceed 2000 characters\"}");
+            return;
+        }
+
+        ReviewDAO dao = new ReviewDAO();
+        Review review = dao.getReviewByID(reviewID);
+        if (review == null) {
+            sendJson(response, "{\"success\":false,\"message\":\"Review does not exist\"}");
+            return;
+        }
+        if (review.getAdminReply() == null || review.getAdminReply().trim().isEmpty()) {
+            sendJson(response,
+                    "{\"success\":false,\"message\":\"This review does not have a staff/admin reply\"}");
+            return;
+        }
+
+        Account account = getAccount(request);
+        if (dao.replyReview(reviewID, account.getId(), reply)) {
+            sendJson(response,
+                    "{\"success\":true,\"message\":\"Reply updated successfully\"}");
+        } else {
+            sendJson(response,
+                    "{\"success\":false,\"message\":\"Could not update the reply\"}");
+        }
+    }
+
     private void handleReplyReview(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
 
@@ -264,6 +313,11 @@ public class ReviewController extends HttpServlet {
             return;
         }
         reply = reply.trim();
+        if (reply.length() > 2000) {
+            sendJson(response,
+                    "{\"success\":false,\"message\":\"Reply must not exceed 2000 characters\"}");
+            return;
+        }
         ReviewDAO dao = new ReviewDAO();
         Review review = dao.getReviewByID(reviewID);
         if (review == null) {

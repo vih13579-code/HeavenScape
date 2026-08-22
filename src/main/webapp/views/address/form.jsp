@@ -10,6 +10,7 @@ Address a = (Address) request.getAttribute("address");
 <head>
     <meta charset="UTF-8">
     <title>Address Form</title>
+    <link rel="icon" type="image/png" href="https://res.cloudinary.com/llfxqkny/image/upload/v1787226687/heavenscape/favicon/heavenscape_favicon.png">
 </head>
 <body>
 

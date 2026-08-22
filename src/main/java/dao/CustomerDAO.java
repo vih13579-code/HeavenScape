@@ -397,4 +397,50 @@ public class CustomerDAO {
         return 0;
     }
 
+    public boolean hasPin(int accountId) {
+        String sql = "SELECT pinHash FROM Customer WHERE customerID = ?";
+        try (Connection conn = new DBContext().getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)){
+            ps.setInt(1, accountId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                String pinHash = rs.getString("pinHash");
+                return pinHash != null && !pinHash.isEmpty();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    } 
+    public boolean setPin(int accountId, String rawPin){
+        String sql = "UPDATE Customer SET pinHash = ?, pinCreatedAt = GETDATE() WHERE customerID = ?";
+        try (Connection conn = new DBContext().getConnection();
+        PreparedStatement ps = conn.prepareStatement(sql)){
+            ps.setString(1, HashMD5.hash(rawPin));
+            ps.setInt(2, accountId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    public boolean verifyPin(int accountId, String rawPin ){
+        String sql = "SELECT pinHash FROM Customer WHERE customerID = ?"; 
+        try (Connection conn = new DBContext().getConnection();
+        PreparedStatement ps = conn.prepareStatement(sql)){
+            ps.setInt(1, accountId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()){
+                String storedPinHash = rs.getString("pinHash");
+                if (storedPinHash == null || storedPinHash.isEmpty()) {
+                    return false; // No PIN set
+                }
+                return storedPinHash.equals(HashMD5.hash(rawPin));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
 }

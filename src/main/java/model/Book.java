@@ -22,14 +22,16 @@ public class Book {
     private String status;
 
     // FK info
-    private int genreID;
-    private String genreName;
+    private int categoryID;
+    private String categoryName;
     private int contentID;
     private String contentName;
     private int seriesID;
     private String seriesName;
     private int originID;
     private String originName;
+    private int publisherID;
+    private String publisherName;
 
 
     private double avgRating;
@@ -122,20 +124,20 @@ public class Book {
         this.status = v;
     }
 
-    public int getGenreID() {
-        return genreID;
+    public int getCategoryID() {
+        return categoryID;
     }
 
-    public void setGenreID(int v) {
-        this.genreID = v;
+    public void setCategoryID(int v) {
+        this.categoryID = v;
     }
 
-    public String getGenreName() {
-        return genreName;
+    public String getCategoryName() {
+        return categoryName;
     }
 
-    public void setGenreName(String v) {
-        this.genreName = v;
+    public void setCategoryName(String v) {
+        this.categoryName = v;
     }
 
     public int getContentID() {
@@ -184,6 +186,22 @@ public class Book {
 
     public void setOriginName(String v) {
         this.originName = v;
+    }
+
+    public int getPublisherID() {
+        return publisherID;
+    }
+
+    public void setPublisherID(int v) {
+        this.publisherID = v;
+    }
+
+    public String getPublisherName() {
+        return publisherName;
+    }
+
+    public void setPublisherName(String v) {
+        this.publisherName = v;
     }
 
     public double getAvgRating() {

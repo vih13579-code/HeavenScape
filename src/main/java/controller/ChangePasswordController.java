@@ -68,13 +68,15 @@ public class ChangePasswordController extends HttpServlet {
         }
 
         String currentPassword = request.getParameter("currentPassword");
+        String securityPin = request.getParameter("securityPin");
         String newPassword = request.getParameter("newPassword");
         String confirmPassword = request.getParameter("confirmPassword");
-
+ 
         try (PrintWriter out = response.getWriter()) {
 
             String validationError = validatePasswordChange(
                     currentPassword,
+                    securityPin,
                     newPassword,
                     confirmPassword
             );
@@ -84,6 +86,19 @@ public class ChangePasswordController extends HttpServlet {
                         "{\"success\":false,\"message\":\""
                         + validationError
                         + "\"}"
+                );
+                return;
+            }
+
+            boolean isPinValid;
+            if ("customer".equalsIgnoreCase(acc.getRole())) {
+                isPinValid = customerDAO.verifyPin(acc.getId(), securityPin);
+            } else {
+                isPinValid = accountDAO.verifyPin(acc.getId(), securityPin);
+            }
+            if (!isPinValid) {
+                out.write(
+                        "{\"success\":false,\"message\":\"Security PIN is incorrect\"}"
                 );
                 return;
             }
@@ -135,9 +150,18 @@ public class ChangePasswordController extends HttpServlet {
 
     private String validatePasswordChange(
             String currentPassword,
+            String securityPin,
             String newPassword,
             String confirmPassword) {
+        
+        if (securityPin == null || securityPin.trim().isEmpty()) {
+            return "Please enter your security PIN";
+        }
 
+        if (!securityPin.matches("\\d{6}")) {
+            return "Security PIN must be exactly 6 digits";
+        }
+        
         if (currentPassword == null || currentPassword.trim().isEmpty()) {
             return "Please enter your current password";
         }
@@ -206,4 +230,25 @@ public class ChangePasswordController extends HttpServlet {
     public String getServletInfo() {
         return "Change Password Controller";
     }
+
+    public static String validateSecurityPin(String pin, String confirmPin) {
+        if (pin == null || pin.trim().isEmpty()) {
+            return "Please enter your security PIN";
+        }
+
+        if (!pin.matches("\\d{6}")) {
+            return "Security PIN must be exactly 6 digits";
+        }
+
+        if (confirmPin == null || confirmPin.trim().isEmpty()) {
+            return "Please confirm your security PIN";
+        }
+
+        if (!pin.equals(confirmPin)) {
+            return "Security PINs do not match";
+        }
+
+        return null;
+    }
+    
 }

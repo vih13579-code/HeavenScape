@@ -1,6 +1,7 @@
 package controller;
 
 import dao.OrderDAO;
+import dao.CartDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -63,6 +64,12 @@ public class OrderHistoryController extends HttpServlet {
             case "cancel":
                 handleCancel(request, response);
                 break;
+            case "requestRefund":
+                handleRefundRequest(request, response);
+                break;
+            case "buyAgain":
+                handleBuyAgain(request, response);
+                break;
             default:
                 response.sendRedirect(request.getContextPath() + "/profile/order-history");
                 break;
@@ -105,6 +112,9 @@ public class OrderHistoryController extends HttpServlet {
         int offset = (currentPage - 1) * pageSize;
 
         List<Order> orders = orderDAO.getOrdersByCustomerFiltered(account.getId(), status, offset, pageSize);
+        for (Order order : orders) {
+            order.setOrderDetails(orderDAO.getOrderDetails(order.getOrderID()));
+        }
 
         request.setAttribute("orders", orders);
         request.setAttribute("currentPage", currentPage);
@@ -133,7 +143,7 @@ public class OrderHistoryController extends HttpServlet {
         // The detail URL must be reloadable and browser-history safe. Access is
         // authorized by the order owner in the database, not by a one-time
         // session flag that disappears after the first request.
-        if (orderID <= 0 || order == null || order.getCustomerID() != account.getId()) {
+    if (orderID <= 0 || order == null || order.getCustomerID() != account.getId()) {
             request.getRequestDispatcher("/views/error/404.jsp").forward(request, response);
             return;
         }
@@ -174,7 +184,7 @@ public class OrderHistoryController extends HttpServlet {
         }
         if (cancelReason.length() < 10 || cancelReason.length() > 50) {
             HttpSession session = request.getSession();
-            session.setAttribute("errorMessage", "The cancellation reason must be 10–50 characters long.");
+            session.setAttribute("errorMessage", "The cancellation reason must be 10-50 characters long.");
             response.sendRedirect(redirectUrl);
             return;
         }
@@ -191,10 +201,10 @@ public class OrderHistoryController extends HttpServlet {
         HttpSession session = request.getSession();
         if (ok) {
             if (order != null) {
-                boolean isVnpayAndPaid = "vnpay".equalsIgnoreCase(order.getPaymentMethod())
+                boolean isCodAndPaid = "cod".equalsIgnoreCase(order.getPaymentMethod())
                         && "paid".equalsIgnoreCase(order.getPaymentStatus());
 
-                if (isVnpayAndPaid) {
+                if (isCodAndPaid) {
                     orderDAO.updatePaymentStatus(orderID, "pending_refund");
 
                     final Order finalOrder = order;
@@ -236,6 +246,115 @@ public class OrderHistoryController extends HttpServlet {
         }
 
         response.sendRedirect(redirectUrl);
+    }
+
+    private void handleRefundRequest(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+
+        Account account = getAccount(request);
+        int orderID = toInt(request.getParameter("orderID"), 0);
+        String refundReason = request.getParameter("refundReason");
+        refundReason = refundReason == null ? "" : refundReason.trim();
+
+        String redirectTarget = request.getParameter("redirect");
+        String redirectUrl = "list".equalsIgnoreCase(redirectTarget)
+                ? request.getContextPath() + "/profile/order-history"
+                : request.getContextPath() + "/profile/order-history?action=detail&orderID=" + orderID;
+
+        HttpSession session = request.getSession();
+        if (refundReason.isEmpty()) {
+            session.setAttribute("errorMessage", "Please enter a refund reason.");
+            response.sendRedirect(redirectUrl);
+            return;
+        }
+        if (refundReason.length() < 10 || refundReason.length() > 50) {
+            session.setAttribute("errorMessage", "The refund reason must be 10-50 characters long.");
+            response.sendRedirect(redirectUrl);
+            return;
+        }
+        if (!refundReason.matches(".*\\p{L}.*")) {
+            session.setAttribute("errorMessage", "The refund reason must contain at least one letter.");
+            response.sendRedirect(redirectUrl);
+            return;
+        }
+
+        Order order = orderDAO.getOrderByID(orderID);
+        boolean ok = orderDAO.requestCodRefund(orderID, account.getId(), refundReason);
+
+        if (ok) {
+            if (order != null && order.getCustomerEmail() != null) {
+                final Order finalOrder = order;
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            utils.EmailUtil.sendRefundPendingEmail(finalOrder.getCustomerEmail(), finalOrder);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
+            }
+            String orderCode = order != null ? order.getOrderCode() : String.valueOf(orderID);
+            session.setAttribute("successMessage",
+                    "Refund request for order #" + orderCode + " was submitted successfully!");
+        } else {
+            session.setAttribute("errorMessage",
+                    "This order is not eligible for a COD refund or has already been submitted.");
+        }
+
+        response.sendRedirect(redirectUrl);
+    }
+
+    private void handleBuyAgain(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+
+        Account account = getAccount(request);
+        int orderID = toInt(request.getParameter("orderID"), 0);
+        Order order = orderDAO.getOrderByID(orderID);
+        HttpSession session = request.getSession();
+
+        if (order == null || order.getCustomerID() != account.getId()
+                || !"completed".equalsIgnoreCase(order.getStatus())) {
+            session.setAttribute("errorMessage", "This order is not available for repurchase.");
+            response.sendRedirect(request.getContextPath() + "/profile/order-history");
+            return;
+        }
+
+        List<OrderDetail> details = orderDAO.getOrderDetails(orderID);
+        CartDAO cartDAO = new CartDAO();
+        int addedQuantity = 0;
+        boolean hasUnavailableItem = false;
+
+        for (OrderDetail detail : details) {
+            int stock = cartDAO.getStockByBookID(detail.getBookID());
+            int currentQuantity = cartDAO.getCurrentCartQty(account.getId(), detail.getBookID());
+            int availableQuantity = Math.max(0, stock - currentQuantity);
+            int quantityToAdd = Math.min(detail.getQuantity(), availableQuantity);
+
+            if (quantityToAdd > 0 && cartDAO.addToCart(account.getId(), detail.getBookID(), quantityToAdd)) {
+                addedQuantity += quantityToAdd;
+            }
+            if (quantityToAdd < detail.getQuantity()) {
+                hasUnavailableItem = true;
+            }
+        }
+
+        if (addedQuantity == 0) {
+            session.setAttribute("errorMessage", "The books in this order are currently out of stock.");
+            response.sendRedirect(request.getContextPath() + "/profile/order-history");
+            return;
+        }
+
+        int cartCount = 0;
+        for (model.CartItem item : cartDAO.getCartItems(account.getId())) {
+            cartCount += item.getQuantity();
+        }
+        session.setAttribute("cartCount", cartCount);
+        session.setAttribute("successMessage", hasUnavailableItem
+                ? "Available books were added to your cart. Some quantities were limited by stock."
+                : "Order items were added to your cart.");
+        response.sendRedirect(request.getContextPath() + "/cart");
     }
 
     private boolean isCustomer(HttpServletRequest request, HttpServletResponse response)

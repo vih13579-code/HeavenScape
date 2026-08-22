@@ -11,38 +11,6 @@ import java.util.List;
 
 public class AccountDAO {
 
-    /**
-     * Reloads the account represented by a session from its source table.
-     * Customer IDs and staff/admin IDs can overlap, so the role is required to
-     * select the correct table.
-     */
-    public Account getAccountById(int id, String role) {
-        boolean customer = "customer".equalsIgnoreCase(role);
-        String sql = customer
-                ? "SELECT customerID AS id, fullname, email, phone, role, status FROM Customer WHERE customerID = ?"
-                : "SELECT accountID AS id, fullname, email, phone, role, status FROM Account WHERE accountID = ?";
-
-        try (Connection conn = new DBContext().getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, id);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return new Account(
-                            rs.getInt("id"),
-                            rs.getString("fullname"),
-                            rs.getString("email"),
-                            rs.getString("phone"),
-                            customer ? "customer" : rs.getString("role"),
-                            rs.getString("status")
-                    );
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
     public Account checkLogin(String email, String password) {
         String hashedPassword = HashMD5.hash(password);
         DBContext db = new DBContext();
@@ -195,6 +163,51 @@ public class AccountDAO {
                 );
             }
 
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public Account getAccountById(int id, String role) {
+        String normalizedRole = role == null ? "" : role.trim().toLowerCase();
+
+        if ("customer".equals(normalizedRole)) {
+            String sql = "SELECT customerID, fullname, email, phone, role, status FROM Customer WHERE customerID = ?";
+            try (Connection conn = new DBContext().getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setInt(1, id);
+                ResultSet rs = ps.executeQuery();
+                if (rs.next()) {
+                    return new Account(
+                            rs.getInt("customerID"),
+                            rs.getString("fullname"),
+                            rs.getString("email"),
+                            rs.getString("phone") != null ? rs.getString("phone") : "",
+                            "customer",
+                            rs.getString("status")
+                    );
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        String sql = "SELECT accountID, fullname, email, phone, role, status FROM Account WHERE accountID = ?";
+        try (Connection conn = new DBContext().getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return new Account(
+                        rs.getInt("accountID"),
+                        rs.getString("fullname"),
+                        rs.getString("email"),
+                        rs.getString("phone") != null ? rs.getString("phone") : "",
+                        rs.getString("role"),
+                        rs.getString("status")
+                );
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -502,4 +515,50 @@ public class AccountDAO {
         }
         return null;
     }
+    public boolean hasPin(int accountId) {
+        String sql = "SELECT pinHash FROM Account WHERE accountID = ?";
+        try (Connection conn = new DBContext().getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)){
+            ps.setInt(1, accountId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                String pinHash = rs.getString("pinHash");
+                return pinHash != null && !pinHash.isEmpty();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    } 
+    public boolean setPin(int accountId, String rawPin){
+        String sql = "UPDATE Account SET pinHash = ?, pinCreatedAt = GETDATE() WHERE accountID = ?";
+        try (Connection conn = new DBContext().getConnection();
+        PreparedStatement ps = conn.prepareStatement(sql)){
+            ps.setString(1, HashMD5.hash(rawPin));
+            ps.setInt(2, accountId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    public boolean verifyPin(int accountId, String rawPin ){
+        String sql = "SELECT pinHash FROM Account WHERE accountID = ?"; 
+        try (Connection conn = new DBContext().getConnection();
+        PreparedStatement ps = conn.prepareStatement(sql)){
+            ps.setInt(1, accountId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()){
+                String storedPinHash = rs.getString("pinHash");
+                if (storedPinHash == null || storedPinHash.isEmpty()) {
+                    return false; // No PIN set
+                }
+                return storedPinHash.equals(HashMD5.hash(rawPin));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    
 }

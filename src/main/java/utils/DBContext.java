@@ -16,8 +16,8 @@ public class DBContext {
         try {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
             String dbURL = "jdbc:sqlserver://localhost:1433;"
-                    + "databaseName=HeavenScapeDB;" // Tên db cho đồng bộ
-                    + "user=sa;"
+                    + "databaseName=HeavenScapeDB;"
+                    + "user=vinhlee;"
                     + "password=123456;"
                     + "encrypt=true;trustServerCertificate=true;";
             return DriverManager.getConnection(dbURL);

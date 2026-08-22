@@ -21,58 +21,72 @@ public class VoucherController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        if (!hasAccess(request, response)) return;
+        if (!hasAccess(request, response))
+            return;
         voucherDAO.autoExpireVouchers();
 
         String keyword = trimOrNull(request.getParameter("keyword"));
-        String status  = trimOrNull(request.getParameter("status"));
+        String status = trimOrNull(request.getParameter("status"));
 
-        int pageSize    = 10;
+        int pageSize = 10;
         int currentPage = parseIntSafe(request.getParameter("page"), 1);
-        if (currentPage < 1) currentPage = 1;
+        if (currentPage < 1)
+            currentPage = 1;
 
         int totalRecords = voucherDAO.countFiltered(keyword, status);
-        int totalPages   = Math.max(1, (int) Math.ceil((double) totalRecords / pageSize));
-        if (currentPage > totalPages) currentPage = totalPages;
+        int totalPages = Math.max(1, (int) Math.ceil((double) totalRecords / pageSize));
+        if (currentPage > totalPages)
+            currentPage = totalPages;
 
         int offset = (currentPage - 1) * pageSize;
 
-        request.setAttribute("voucherList",    voucherDAO.getAllVouchers(keyword, status, offset, pageSize));
-        request.setAttribute("currentPage",    currentPage);
-        request.setAttribute("totalPages",     totalPages);
+        request.setAttribute("voucherList", voucherDAO.getAllVouchers(keyword, status, offset, pageSize));
+        request.setAttribute("currentPage", currentPage);
+        request.setAttribute("totalPages", totalPages);
 
         String encodedKeyword = keyword != null
-                ? URLEncoder.encode(keyword, StandardCharsets.UTF_8.name()) : "";
-        String encodedStatus  = status  != null
-                ? URLEncoder.encode(status,  StandardCharsets.UTF_8.name()) : "";
+                ? URLEncoder.encode(keyword, StandardCharsets.UTF_8.name())
+                : "";
+        String encodedStatus = status != null
+                ? URLEncoder.encode(status, StandardCharsets.UTF_8.name())
+                : "";
 
         String baseUrl = request.getContextPath()
                 + "/dashboard/voucher-management?keyword=" + encodedKeyword
                 + "&status=" + encodedStatus;
         request.setAttribute("baseUrl", baseUrl);
 
-        request.setAttribute("totalVouchers",   voucherDAO.countTotal());
-        request.setAttribute("activeVouchers",  voucherDAO.countActive());
+        request.setAttribute("totalVouchers", voucherDAO.countTotal());
+        request.setAttribute("activeVouchers", voucherDAO.countActive());
         request.setAttribute("expiredVouchers", voucherDAO.countExpired());
-        request.setAttribute("totalUsed",       voucherDAO.countTotalUsed());
+        request.setAttribute("totalUsed", voucherDAO.countTotalUsed());
 
         request.getRequestDispatcher("/views/admin/voucher/voucher-management.jsp")
-               .forward(request, response);
+                .forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        if (!hasAccess(request, response)) return;
+        if (!hasAccess(request, response))
+            return;
         request.setCharacterEncoding("UTF-8");
 
         String action = request.getParameter("action");
         try {
             switch (action == null ? "" : action) {
-                case "add":    handleAdd(request, response);    break;
-                case "edit":   handleEdit(request, response);   break;
-                case "delete": handleDelete(request, response); break;
-                case "toggle": handleToggle(request, response); break;
+                case "add":
+                    handleAdd(request, response);
+                    break;
+                case "edit":
+                    handleEdit(request, response);
+                    break;
+                case "delete":
+                    handleDelete(request, response);
+                    break;
+                case "toggle":
+                    handleToggle(request, response);
+                    break;
                 default:
                     response.sendRedirect(request.getContextPath() + "/dashboard/voucher-management");
             }
@@ -96,7 +110,7 @@ public class VoucherController extends HttpServlet {
         boolean ok = voucherDAO.addVoucher(
                 input.code, input.discount, input.quantity,
                 input.startDate, input.endDate,
-                "active",                          // luôn active khi tạo mới
+                "active", // luôn active khi tạo mới
                 input.minOrderValue, input.maxDiscountValue);
 
         setFlash(request, ok,
@@ -145,9 +159,15 @@ public class VoucherController extends HttpServlet {
 
         int result = voucherDAO.deleteVoucher(voucherID);
         switch (result) {
-            case  1: setFlash(request, true,  "Voucher deleted successfully!", null); break;
-            case -1: setFlash(request, false, null, "A voucher that has already been used cannot be deleted."); break;
-            default: setFlash(request, false, null, "Could not delete the voucher."); break;
+            case 1:
+                setFlash(request, true, "Voucher deleted successfully!", null);
+                break;
+            case -1:
+                setFlash(request, false, null, "A voucher that has already been used cannot be deleted.");
+                break;
+            default:
+                setFlash(request, false, null, "Could not delete the voucher.");
+                break;
         }
         response.sendRedirect(request.getContextPath() + "/dashboard/voucher-management");
     }
@@ -155,7 +175,7 @@ public class VoucherController extends HttpServlet {
     private void handleToggle(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
 
-        int    voucherID = parseIntSafe(request.getParameter("voucherID"), 0);
+        int voucherID = parseIntSafe(request.getParameter("voucherID"), 0);
         String newStatus = request.getParameter("newStatus");
 
         if (voucherID <= 0 || newStatus == null
@@ -165,8 +185,8 @@ public class VoucherController extends HttpServlet {
             return;
         }
 
-        boolean ok  = voucherDAO.toggleStatus(voucherID, newStatus);
-        String  msg = "active".equals(newStatus) ? "Voucher activated." : "Voucher disabled.";
+        boolean ok = voucherDAO.toggleStatus(voucherID, newStatus);
+        String msg = "active".equals(newStatus) ? "Voucher activated." : "Voucher disabled.";
         setFlash(request, ok, msg, "Action failed. The voucher may have expired.");
         response.sendRedirect(request.getContextPath() + "/dashboard/voucher-management");
     }
@@ -238,7 +258,7 @@ public class VoucherController extends HttpServlet {
         }
 
         v.startDate = parseDate(request.getParameter("startDate"));
-        v.endDate   = parseDate(request.getParameter("endDate"));
+        v.endDate = parseDate(request.getParameter("endDate"));
 
         if (isCreate && v.startDate != null) {
             Timestamp today = Timestamp.valueOf(LocalDate.now().atStartOfDay());
@@ -277,7 +297,8 @@ public class VoucherController extends HttpServlet {
     }
 
     private Timestamp parseDate(String dateStr) {
-        if (dateStr == null || dateStr.trim().isEmpty()) return null;
+        if (dateStr == null || dateStr.trim().isEmpty())
+            return null;
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             sdf.setLenient(false);
@@ -288,21 +309,28 @@ public class VoucherController extends HttpServlet {
     }
 
     private int parseIntSafe(String s, int defaultVal) {
-        try { return Integer.parseInt(s); } catch (Exception e) { return defaultVal; }
+        try {
+            return Integer.parseInt(s);
+        } catch (Exception e) {
+            return defaultVal;
+        }
     }
 
     private String trimOrNull(String s) {
-        if (s == null || s.trim().isEmpty()) return null;
+        if (s == null || s.trim().isEmpty())
+            return null;
         return s.trim();
     }
 
     private void setFlash(HttpServletRequest request, boolean ok,
-                          String successMsg, String errorMsg) {
+            String successMsg, String errorMsg) {
         HttpSession session = request.getSession();
         if (ok) {
-            if (successMsg != null) session.setAttribute("successMessage", successMsg);
+            if (successMsg != null)
+                session.setAttribute("successMessage", successMsg);
         } else {
-            if (errorMsg   != null) session.setAttribute("errorMessage",   errorMsg);
+            if (errorMsg != null)
+                session.setAttribute("errorMessage", errorMsg);
         }
     }
 }

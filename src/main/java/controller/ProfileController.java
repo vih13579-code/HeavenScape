@@ -12,6 +12,8 @@ import java.time.LocalDate;
 import java.time.Period;
 import model.Account;
 import model.Customer;
+import utils.HashMD5;
+
 
 public class ProfileController extends HttpServlet {
 
@@ -60,12 +62,17 @@ public class ProfileController extends HttpServlet {
         if ("customer".equalsIgnoreCase(loginUser.getRole())) {
             CustomerDAO customerDao = new CustomerDAO();
             Customer customer = customerDao.getCustomerById(id);
+
+            boolean hasPin = customerDao.hasPin(id);
+            request.setAttribute("hasPin", hasPin);
             request.setAttribute("customer", customer);
             request.getRequestDispatcher("/views/profile/profile.jsp").forward(request, response);
             return;
         }
         AccountDAO accountDao = new AccountDAO();
         Account account = accountDao.getStaffById(id);
+        boolean hasPin = accountDao.hasPin(id);
+        request.setAttribute("hasPin", hasPin);
         request.setAttribute("account", account);
         request.getRequestDispatcher("/views/profile/profile-admin.jsp").forward(request, response);
     }
@@ -90,6 +97,38 @@ public class ProfileController extends HttpServlet {
         String phone = safeTrim(request.getParameter("phone"));
         String gender = request.getParameter("gender");
         String dob = request.getParameter("dob");
+        String action = request.getParameter("action");
+
+
+
+
+            if ("save-pin".equals(action) || "update-pin".equals(action)) {
+            String pin = request.getParameter("securityPin");
+            String confirmPin = request.getParameter("securityPinConfirm");
+
+            String pinError = ChangePasswordController.validateSecurityPin(pin, confirmPin);
+            if (pinError != null) {
+                session.setAttribute("error", pinError);
+                response.sendRedirect(request.getContextPath() + "/profile?id=" + acc.getId());
+                return;
+            }
+            boolean success;
+            if ("customer".equalsIgnoreCase(acc.getRole())) {
+                success = new CustomerDAO().setPin(acc.getId(), pin);
+            } else {
+                success = new AccountDAO().setPin(acc.getId(), pin);
+            }
+            if (success) {
+                
+                session.setAttribute("message", "Security PIN updated successfully!");
+            } else {
+                
+                session.setAttribute("error", "Failed to update Security PIN!");
+            }
+            response.sendRedirect(request.getContextPath() + "/profile?id=" + acc.getId());
+            return;
+        }
+
         if (fullname.isEmpty()) {
             session.setAttribute("error", "Full name is required");
             response.sendRedirect(request.getContextPath() + "/profile?id=" + acc.getId());
@@ -194,9 +233,13 @@ public class ProfileController extends HttpServlet {
             session.setAttribute("error", "Update failed!");
         }
         response.sendRedirect(request.getContextPath() + "/profile?id=" + acc.getId());
+
+
+
     }
 
     private String safeTrim(String s) {
         return s == null ? "" : s.trim();
     }
+    
 }

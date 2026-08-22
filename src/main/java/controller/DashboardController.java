@@ -3,7 +3,7 @@ package controller;
 import dao.AccountDAO;
 import dao.BookDAO;
 import dao.DashboardDAO;
-import dao.GenreDAO;
+import dao.CategoryDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,7 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import model.Account;
 import model.Book;
-import model.Genre;
+import model.Category;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -25,7 +25,7 @@ import java.util.Map;
 public class DashboardController extends HttpServlet {
 
     private final DashboardDAO dashboardDAO = new DashboardDAO();
-    private final GenreDAO genreDAO = new GenreDAO();
+    private final CategoryDAO categoryDAO = new CategoryDAO();
     private final BookDAO bookDAO = new BookDAO();
     private final AccountDAO accountDAO = new AccountDAO();
 
@@ -39,7 +39,7 @@ public class DashboardController extends HttpServlet {
 
         String fromDate = trimToNull(request.getParameter("fromDate"));
         String toDate = trimToNull(request.getParameter("toDate"));
-        Integer genreID = parseGenreID(request.getParameter("genreID"));
+        Integer categoryID = parseCategoryID(request.getParameter("categoryID"));
 
         boolean showAll = "true".equalsIgnoreCase(request.getParameter("showAll"));
         boolean filterRequested = "filter".equalsIgnoreCase(request.getParameter("action"));
@@ -59,31 +59,31 @@ public class DashboardController extends HttpServlet {
             filterRequested = false;
         }
 
-        // Code mới: số liệu bán hàng, lọc ngày và lọc genre.
-        BigDecimal totalRevenue = dashboardDAO.getTotalRevenue(fromDate, toDate, genreID);
-        int totalOrders = dashboardDAO.getTotalOrders(fromDate, toDate, genreID);
-        int totalCustomers = dashboardDAO.getTotalCustomers(fromDate, toDate, genreID);
-        int totalBooks = dashboardDAO.getTotalBooks(genreID);
-        int totalSoldBooks = dashboardDAO.getTotalSoldBooks(fromDate, toDate, genreID);
+        // Code mới: số liệu bán hàng, lọc ngày và lọc category.
+        BigDecimal totalRevenue = dashboardDAO.getTotalRevenue(fromDate, toDate, categoryID);
+        int totalOrders = dashboardDAO.getTotalOrders(fromDate, toDate, categoryID);
+        int totalCustomers = dashboardDAO.getTotalCustomers(fromDate, toDate, categoryID);
+        int totalBooks = dashboardDAO.getTotalBooks(categoryID);
+        int totalSoldBooks = dashboardDAO.getTotalSoldBooks(fromDate, toDate, categoryID);
         Map<String, Integer> statusSummary = dashboardDAO.getOrderStatusSummary(
-                fromDate, toDate, genreID);
+                fromDate, toDate, categoryID);
         List<Map<String, Object>> revenueByCategory = dashboardDAO.getRevenueByCategory(
-                fromDate, toDate, genreID);
+                fromDate, toDate, categoryID);
         addRevenuePercentages(revenueByCategory);
         List<Map<String, Object>> topSellingBooks = dashboardDAO.getTopSellingBooks(
-                fromDate, toDate, genreID);
+                fromDate, toDate, categoryID);
         List<Map<String, Object>> allOrders;
         if (showAll) {
-            // Nút "View All Orders": không áp dụng bộ lọc ngày/genre.
+            // Nút "View All Orders": không áp dụng bộ lọc ngày/category.
             allOrders = dashboardDAO.getAllOrders(null, null, null);
         } else if (filterRequested && dateError == null) {
             // Chỉ hiển thị danh sách đơn khi users dùng thật sự bấm nút Filter.
-            allOrders = dashboardDAO.getAllOrders(fromDate, toDate, genreID);
+            allOrders = dashboardDAO.getAllOrders(fromDate, toDate, categoryID);
         } else {
             // Lần đầu mở dashboard hoặc bấm Delete: để trống khu vực đơn hàng.
             allOrders = Collections.emptyList();
         }
-        List<Genre> genres = genreDAO.getAllGenres();
+        List<Category> categories = categoryDAO.getAllCategories();
 
         // Giữ code cũ: thống kê kho sách và nhân viên.
         int allBooks = bookDAO.countAllBooks();
@@ -102,10 +102,10 @@ public class DashboardController extends HttpServlet {
         request.setAttribute("revenueByCategory", revenueByCategory);
         request.setAttribute("topSellingBooks", topSellingBooks);
         request.setAttribute("allOrders", allOrders);
-        request.setAttribute("genres", genres);
+        request.setAttribute("categories", categories);
         request.setAttribute("fromDate", fromDate);
         request.setAttribute("toDate", toDate);
-        request.setAttribute("selectedGenreID", genreID);
+        request.setAttribute("selectedCategoryID", categoryID);
         request.setAttribute("showAll", showAll);
         request.setAttribute("filterRequested", filterRequested);
         request.setAttribute("currentDate", LocalDate.now().toString());
@@ -194,7 +194,7 @@ public class DashboardController extends HttpServlet {
         return true;
     }
 
-    private Integer parseGenreID(String raw) {
+    private Integer parseCategoryID(String raw) {
         try {
             if (raw == null || raw.trim().isEmpty() || "0".equals(raw.trim())) {
                 return null;

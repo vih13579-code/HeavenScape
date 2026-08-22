@@ -9,6 +9,7 @@
         <meta charset="utf-8"/>
         <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
         <title>HeavenScape - Review Management</title>
+        <link rel="icon" type="image/png" href="https://res.cloudinary.com/llfxqkny/image/upload/v1787226687/heavenscape/favicon/heavenscape_favicon.png">
         <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
@@ -18,56 +19,56 @@
                 theme: {
                     extend: {
                         "colors": {
-                            "inverse-primary": "#a9c7ff",
-                            "surface-bright": "#f3faff",
-                            "on-error": "#ffffff",
-                            "tertiary-fixed": "#d9e2ff",
-                            "on-tertiary-fixed": "#001945",
-                            "tertiary": "#134aa4",
+                            "inverse-primary": "#FFB3B0",
+                            "surface-bright": "#FFFFFF",
+                            "on-error": "#FFFFFF",
+                            "tertiary-fixed": "#FFE8A3",
+                            "on-tertiary-fixed": "#241A00",
+                            "tertiary": "#F5A623",
                             "error": "#D32F2F",
-                            "secondary": "#705d00",
-                            "surface-container-highest": "#cfe6f2",
-                            "inverse-on-surface": "#dff4ff",
-                            "secondary-fixed": "#ffe16e",
+                            "secondary": "#F97316",
+                            "surface-container-highest": "#E3E3E6",
+                            "inverse-on-surface": "#F5F5F5",
+                            "secondary-fixed": "#FFDCC0",
                             "surface": "#FFFFFF",
-                            "on-tertiary-container": "#dde5ff",
-                            "background": "#f3faff",
-                            "secondary-fixed-dim": "#e8c41d",
-                            "primary-container": "#1565c0",
-                            "on-secondary": "#ffffff",
-                            "on-secondary-fixed": "#221b00",
-                            "tertiary-fixed-dim": "#b0c6ff",
-                            "primary-fixed": "#d6e3ff",
-                            "on-background": "#071e27",
-                            "surface-container-low": "#e6f6ff",
-                            "primary": "#004d99",
-                            "inverse-surface": "#1e333c",
-                            "surface-container-high": "#d5ecf8",
-                            "secondary-container": "#fdd835",
-                            "tertiary-container": "#3563be",
-                            "on-surface-variant": "#424752",
-                            "surface-variant": "#cfe6f2",
-                            "warning": "#FFA000",
-                            "on-tertiary-fixed-variant": "#00429c",
-                            "on-error-container": "#93000a",
-                            "on-tertiary": "#ffffff",
-                            "primary-fixed-dim": "#a9c7ff",
-                            "surface-dim": "#c7dde9",
-                            "outline": "#727783",
-                            "on-primary": "#ffffff",
-                            "surface-container-lowest": "#ffffff",
-                            "surface-container": "#dbf1fe",
-                            "surface-tint": "#005db7",
-                            "on-primary-fixed-variant": "#00468c",
+                            "on-tertiary-container": "#402D00",
+                            "background": "#F7F7F8",
+                            "secondary-fixed-dim": "#FFB876",
+                            "primary-container": "#FDE8E9",
+                            "on-secondary": "#FFFFFF",
+                            "on-secondary-fixed": "#2B1700",
+                            "tertiary-fixed-dim": "#F0C34D",
+                            "primary-fixed": "#FFDAD9",
+                            "on-background": "#1B1B1B",
+                            "surface-container-low": "#F7F7F8",
+                            "primary": "#C92127",
+                            "inverse-surface": "#303030",
+                            "surface-container-high": "#EBEBED",
+                            "secondary-container": "#FFE3C2",
+                            "tertiary-container": "#FFF3D6",
+                            "on-surface-variant": "#5C5C5F",
+                            "surface-variant": "#EFE0DF",
+                            "warning": "#F9A825",
+                            "on-tertiary-fixed-variant": "#5C4200",
+                            "on-error-container": "#93000A",
+                            "on-tertiary": "#402D00",
+                            "primary-fixed-dim": "#FFB3B0",
+                            "surface-dim": "#E9E9EB",
+                            "outline": "#8F8F92",
+                            "on-primary": "#FFFFFF",
+                            "surface-container-lowest": "#FFFFFF",
+                            "surface-container": "#F1F1F3",
+                            "surface-tint": "#C92127",
+                            "on-primary-fixed-variant": "#93000A",
                             "success": "#2E7D32",
-                            "on-secondary-container": "#705e00",
-                            "outline-variant": "#c2c6d4",
-                            "on-surface": "#071e27",
-                            "error-container": "#ffdad6",
-                            "on-primary-container": "#dae5ff",
-                            "on-secondary-fixed-variant": "#544600",
-                            "background-alt": "#F5F7F9",
-                            "on-primary-fixed": "#001b3d"
+                            "on-secondary-container": "#7A3A00",
+                            "outline-variant": "#D9D9DC",
+                            "on-surface": "#1B1B1B",
+                            "error-container": "#FFDAD6",
+                            "on-primary-container": "#7A0F13",
+                            "on-secondary-fixed-variant": "#7A3A00",
+                            "background-alt": "#FFFFFF",
+                            "on-primary-fixed": "#410006"
                         },
                         "borderRadius": {
                             "DEFAULT": "0.25rem",
@@ -116,7 +117,7 @@
         <style>
             body {
                 font-family: 'Inter', sans-serif;
-                background-color: #f3faff;
+                background-color: #F7F7F8;
             }
             .material-symbols-outlined {
                 font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
@@ -131,7 +132,7 @@
                 background: transparent;
             }
             .custom-scrollbar::-webkit-scrollbar-thumb {
-                background: #cfe6f2;
+                background: #FDE8E9;
                 border-radius: 10px;
             }
             .shadow-tonal {
@@ -141,13 +142,14 @@
     </head>
     <body class="text-on-surface">
         <%@ include file="/views/layout/dashboard/sidebar.jsp" %>
-        <header class="bg-white border-b h-14 sticky top-0 z-30 flex items-center px-6 md:ml-64">
-            <h2 class="font-semibold text-base">
-                Review Management
-            </h2>
-        </header>
         <main class="ml-64 flex-1 flex flex-col min-h-screen">
             <div class="p-6 flex-1 space-y-6 max-w-screen-xl mx-auto w-full">
+                <div class="hs-admin-page-heading">
+                    <div>
+                        <h1 class="hs-admin-page-title">Review Management</h1>
+                        <p class="hs-admin-page-subtitle">Review and moderate customer feedback.</p>
+                    </div>
+                </div>
                 <section class="bg-surface p-stack-sm rounded-xl shadow-sm border border-outline-variant/50 mb-stack-md flex flex-wrap gap-4 items-center">
                     <div class="flex flex-1 gap-2 min-w-[300px]">
                         <div class="relative flex-1">
@@ -189,6 +191,7 @@
                                     <th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Book</th>
                                     <th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Review</th>
                                     <th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Content</th>
+                                    <th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Reply</th>
                                     <th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Date</th>
                                     <th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Status</th>
                                     <th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-right">Actions</th>
@@ -201,7 +204,7 @@
                                             <tr class="hover:bg-surface-container-lowest transition-colors group ${review.isHidden ? 'opacity-50 bg-gray-100' : ''}">
                                                 <td class="px-6 py-5">
                                                     <div class="flex items-center gap-3">
-                                                        <span class="font-label-md text-label-md text-on-surface"><c:out value="${review.customerName}"/></span>
+                                                        <span class="font-label-md text-label-md text-on-surface">${review.customerName}</span>
                                                         <c:if test="${review.isHidden}">
                                                             <span class="text-xs px-2 py-1 bg-gray-400 text-white rounded">Hidden</span>
                                                         </c:if>
@@ -210,7 +213,7 @@
                                                 <td class="px-6 py-5">
                                                     <div class="flex items-center gap-3">
                                                        
-                                                        <span class="font-body-sm text-body-sm text-on-surface max-w-[120px] line-clamp-2"><c:out value="${review.bookTitle}"/></span>
+                                                        <span class="font-body-sm text-body-sm text-on-surface max-w-[120px] line-clamp-2">${review.bookTitle}</span>
                                                     </div>
                                                 </td>
                                                 <td class="px-6 py-5">
@@ -221,7 +224,49 @@
                                                     </div>
                                                 </td>
                                                 <td class="px-6 py-5">
-                                                    <p class="font-body-sm text-body-sm text-on-surface-variant max-w-[200px] line-clamp-2"><c:out value="${review.comment}"/></p>
+                                                    <p class="font-body-sm text-body-sm text-on-surface-variant max-w-[200px] line-clamp-2">${review.comment}</p>
+                                                </td>
+                                                <td class="px-6 py-5">
+                                                    <c:choose>
+                                                        <c:when test="${not empty review.adminReply}">
+                                                            <div class="max-w-[260px] rounded-lg border border-primary/20 bg-primary-container/40 px-3 py-2">
+                                                                <div class="mb-1 flex items-center justify-between gap-2 text-primary">
+                                                                    <div class="flex items-center gap-1.5">
+                                                                        <span class="material-symbols-outlined text-[16px]" data-icon="reply">reply</span>
+                                                                        <span class="font-label-sm text-label-sm">Staff/Admin reply</span>
+                                                                    </div>
+                                                                    <div class="flex items-center gap-1">
+                                                                        <button type="button" data-edit-reply-btn
+                                                                                data-review-id="${review.reviewID}"
+                                                                                data-customer-name="${fn:escapeXml(review.customerName)}"
+                                                                                data-book-title="${fn:escapeXml(review.bookTitle)}"
+                                                                                data-rating="${review.rating}"
+                                                                                data-comment="${fn:escapeXml(review.comment)}"
+                                                                                data-reply="${fn:escapeXml(review.adminReply)}"
+                                                                                class="rounded p-1 hover:bg-primary/10"
+                                                                                title="Update Staff/Admin Reply">
+                                                                            <span class="material-symbols-outlined text-[16px]">edit</span>
+                                                                        </button>
+                                                                        <button type="button" data-delete-reply-btn
+                                                                                data-review-id="${review.reviewID}"
+                                                                                class="rounded p-1 text-error hover:bg-error/10"
+                                                                                title="Delete Staff/Admin Reply">
+                                                                            <span class="material-symbols-outlined text-[16px]">delete</span>
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                                <p class="whitespace-pre-line break-words font-body-sm text-body-sm text-on-surface"><c:out value="${review.adminReply}"/></p>
+                                                                <c:if test="${review.adminReplyDate != null}">
+                                                                    <span class="mt-1.5 block text-[11px] text-on-surface-variant">
+                                                                        <fmt:formatDate value="${review.adminReplyDate}" pattern="dd/MM/yyyy HH:mm"/>
+                                                                    </span>
+                                                                </c:if>
+                                                            </div>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span class="font-body-sm text-body-sm italic text-on-surface-variant">Not replied yet</span>
+                                                        </c:otherwise>
+                                                    </c:choose>
                                                 </td>
                                                 <td class="px-6 py-5">
                                                     <span class="font-body-sm text-body-sm text-on-surface-variant">
@@ -243,10 +288,10 @@
                                                         <c:if test="${review.status != 'Approved' && !review.isHidden && review.customerStatus == 'active'}">
                                                             <button data-reply-btn 
                                                                     data-review-id="${review.reviewID}"
-                                                                    data-customer-name="${fn:escapeXml(review.customerName)}"
-                                                                    data-book-title="${fn:escapeXml(review.bookTitle)}"
+                                                                    data-customer-name="${review.customerName}"
+                                                                    data-book-title="${review.bookTitle}"
                                                                     data-rating="${review.rating}"
-                                                                    data-comment="${fn:escapeXml(review.comment)}"
+                                                                    data-comment="${review.comment}"
                                                                     class="p-2 hover:bg-surface-container-low rounded-lg text-primary transition-all border border-transparent hover:border-primary/20" 
                                                                     title="Reply">
                                                                 <span class="material-symbols-outlined text-[20px]" data-icon="reply">reply</span>
@@ -271,52 +316,11 @@
                                                     </div>
                                                 </td>
                                             </tr>
-                                            <c:if test="${not empty review.adminReply}">
-                                                <tr class="${review.isHidden ? 'opacity-50 bg-gray-100' : 'bg-blue-50/40'}">
-                                                    <td colspan="7" class="px-6 pb-5 pt-0">
-                                                        <div class="ml-6 mt-1 p-4 bg-blue-50 rounded-xl border-l-4 border-primary flex items-start justify-between gap-4">
-                                                            <div class="min-w-0">
-                                                                <div class="flex flex-wrap items-center gap-2 mb-2">
-                                                                    <span class="material-symbols-outlined text-primary text-[19px]">forum</span>
-                                                                    <span class="font-label-md text-primary">Reply Feedback</span>
-                                                                    <c:if test="${review.adminReplyDate != null}">
-                                                                        <span class="text-xs text-on-surface-variant">
-                                                                            <fmt:formatDate value="${review.adminReplyDate}" pattern="dd/MM/yyyy HH:mm"/>
-                                                                        </span>
-                                                                    </c:if>
-                                                                </div>
-                                                                <p class="font-body-sm text-body-sm text-on-surface whitespace-pre-wrap break-words"><c:out value="${review.adminReply}"/></p>
-                                                            </div>
-                                                            <div class="flex shrink-0 gap-2">
-                                                                <button type="button"
-                                                                        data-edit-reply-btn
-                                                                        data-review-id="${review.reviewID}"
-                                                                        data-customer-name="${fn:escapeXml(review.customerName)}"
-                                                                        data-book-title="${fn:escapeXml(review.bookTitle)}"
-                                                                        data-rating="${review.rating}"
-                                                                        data-comment="${fn:escapeXml(review.comment)}"
-                                                                        data-reply="${fn:escapeXml(review.adminReply)}"
-                                                                        class="p-2 bg-white hover:bg-primary/10 rounded-lg text-primary border border-primary/20 transition-all"
-                                                                        title="Edit Reply Feedback">
-                                                                    <span class="material-symbols-outlined text-[19px]">edit</span>
-                                                                </button>
-                                                                <button type="button"
-                                                                        data-delete-reply-btn
-                                                                        data-review-id="${review.reviewID}"
-                                                                        class="p-2 bg-white hover:bg-error/10 rounded-lg text-error border border-error/20 transition-all"
-                                                                        title="Delete Reply Feedback">
-                                                                    <span class="material-symbols-outlined text-[19px]">delete</span>
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            </c:if>
                                         </c:forEach>
                                     </c:when>
                                     <c:otherwise>
                                         <tr>
-                                            <td colspan="7" class="px-6 py-8 text-center">
+                                            <td colspan="8" class="px-6 py-8 text-center">
                                                 <p class="font-body-md text-on-surface-variant">No reviews found</p>
                                             </td>
                                         </tr>
@@ -441,6 +445,7 @@
                                         name="reply" 
                                         id="replyContent"
                                         rows="6"
+                                        maxlength="2000"
                                         required
                                         placeholder="Enter your reply..."
                                         class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-primary focus:outline-none">
@@ -451,8 +456,8 @@
                                     <button type="button" onclick="closeModal()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100">
                                         Cancel
                                     </button>
-                                    <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg hover:opacity-90">
-                                        <span id="replySubmitText">Send Reply</span>
+                                    <button type="submit" id="replySubmitButton" class="px-4 py-2 bg-primary text-white rounded-lg hover:opacity-90">
+                                        Send Reply
                                     </button>
                                 </div>
                             </form>
@@ -465,16 +470,21 @@
 
             function openReplyModal(reviewID, customerName, bookTitle, rating, comment, existingReply, editMode) {
                 currentReviewID = reviewID;
+                const editing = editMode === true;
 
                 document.getElementById('previewCustomerName').textContent = customerName;
                 document.getElementById('previewBookTitle').textContent = bookTitle;
                 document.getElementById('previewRating').textContent = '⭐'.repeat(rating);
                 document.getElementById('previewComment').textContent = comment;
                 document.getElementById('replyReviewID').value = reviewID;
-                document.getElementById('replyContent').value = existingReply || '';
-                document.getElementById('replyAction').value = editMode ? 'updateReply' : 'reply';
-                document.getElementById('replyModalTitle').textContent = editMode ? 'Edit Reply Feedback' : 'Reply to Review';
-                document.getElementById('replySubmitText').textContent = editMode ? 'Save Changes' : 'Send Reply';
+                document.getElementById('replyAction').value = editing ? 'editReply' : 'reply';
+                document.getElementById('replyContent').value = editing ? (existingReply || '') : '';
+                document.getElementById('replyModalTitle').textContent = editing
+                        ? 'Update Staff/Admin Reply'
+                        : 'Reply to Review';
+                document.getElementById('replySubmitButton').textContent = editing
+                        ? 'Save Changes'
+                        : 'Send Reply';
 
                 replyModal.classList.remove('hidden');
                 replyModal.classList.add('flex');
@@ -528,7 +538,7 @@
                         })
                         .then(data => {
                             if (data.success) {
-                                showToast(data.message || 'Reply saved successfully');
+                                showToast(data.message || 'Reply sent successfully');
                                 closeModal();
 
                                 // Reload trang sau 1 giây
@@ -552,25 +562,21 @@
 
                 fetch(REVIEW_API_URL, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
+                    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
                     body: formData.toString()
                 })
                         .then(res => res.json())
                         .then(data => {
-                            if (data.success) {
-                                showToast(data.message || 'Reply deleted successfully');
-                                setTimeout(() => {
-                                    location.reload();
-                                }, 1000);
-                            } else {
+                            if (!data.success) {
                                 showToast(data.message || 'Could not delete the reply', true);
+                                return;
                             }
+                            showToast(data.message || 'Reply deleted successfully');
+                            setTimeout(() => location.reload(), 700);
                         })
                         .catch(err => {
                             console.error('Error:', err);
-                            showToast('An error occurred', true);
+                            showToast('Could not connect to the server', true);
                         });
             }
 
@@ -676,16 +682,15 @@
                         const rating = this.dataset.rating;
                         const comment = this.dataset.comment;
 
-                        openReplyModal(reviewID, customerName, bookTitle, rating, comment, '', false);
+                        openReplyModal(reviewID, customerName, bookTitle, rating, comment);
                     });
                 });
             }
 
             function initEditReplyButtons() {
                 document.querySelectorAll('[data-edit-reply-btn]').forEach(btn => {
-                    btn.addEventListener('click', function (e) {
-                        e.preventDefault();
-
+                    btn.addEventListener('click', function (event) {
+                        event.preventDefault();
                         openReplyModal(
                                 this.dataset.reviewId,
                                 this.dataset.customerName,
@@ -701,13 +706,12 @@
 
             function initDeleteReplyButtons() {
                 document.querySelectorAll('[data-delete-reply-btn]').forEach(btn => {
-                    btn.addEventListener('click', function (e) {
-                        e.preventDefault();
+                    btn.addEventListener('click', function (event) {
+                        event.preventDefault();
                         const reviewID = this.dataset.reviewId;
-
                         openConfirmModal(
-                                'Delete Reply Feedback',
-                                'Are you sure you want to delete this reply? The customer review will remain unchanged.',
+                                'Delete Staff/Admin Reply',
+                                'Are you sure you want to delete this staff/admin reply? The customer review will remain unchanged.',
                                 () => deleteReply(reviewID)
                         );
                     });

@@ -1,51 +1,43 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <style>
-    body {
-        background: #f3faff;
+    body { background:#f2f4f5; }
+    .profile-card { background:#fff; border-radius:8px; border:0; box-shadow:0 2px 8px rgba(0,0,0,.07); }
+    .menu-item { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:5px; transition:.18s; text-decoration:none; color:#555; font-size:13px; }
+    .menu-item:hover { background:#f7f7f7; color:#c92127; }
+    .menu-active { background:#fff0f1; color:#c92127; font-weight:700; }
+    .profile-sidebar { min-width:0; }
+    .profile-default-avatar {
+        width:80px;
+        height:80px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        border-radius:999px;
+        background:#fff0f1;
+        color:#c92127;
+        border:2px solid #ffe1e3;
     }
-    .profile-card {
-        background: #fff;
-        border-radius: 16px;
-        border: 1px solid #dbeafe;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, .05);
-    }
-    .menu-item {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 12px 16px;
-        border-radius: 12px;
-        transition: .2s;
-        text-decoration: none;
-    }
-    .menu-item:hover {
-        background: #eff6ff;
-    }
-    .menu-active {
-        background: #dbeafe;
-        color: #2563eb;
-        font-weight: 600;
+    .profile-default-avatar .material-symbols-outlined {
+        font-size:52px;
+        line-height:1;
     }
 </style>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
-<div class="lg:col-span-1">
-    <div class="profile-card p-6">
+<div class="profile-sidebar">
+    <div class="profile-card p-5">
         <div class="flex flex-col items-center">
-            <div class="relative">
-                <img
-                    src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
-                    class="w-24 h-24 rounded-full border-4 border-blue-200 shadow"
-                    alt="Avatar">
+            <div class="profile-default-avatar" aria-hidden="true">
+                <span class="material-symbols-outlined">account_circle</span>
             </div>
-            <h2 class="mt-4 text-xl font-bold text-center">
+            <h2 class="mt-3 text-base font-bold text-center">
                 ${sessionScope.account.fullname}
             </h2>
-            <div class="mt-2 px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 text-sm">
+            <div class="mt-2 px-3 py-1 rounded-full bg-[#fff5df] text-[#9a5c00] text-xs">
                 ${sessionScope.account.role}
             </div>
         </div>
-        <hr class="my-6">
+        <hr class="my-4">
         <nav class="space-y-2">
             <a href="${pageContext.request.contextPath}/profile?id=${sessionScope.account.id}"
                class="menu-item ${activeMenu == 'profile' ? 'menu-active' : ''}">
