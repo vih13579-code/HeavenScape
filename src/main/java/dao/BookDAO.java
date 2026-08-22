@@ -152,7 +152,7 @@ public class BookDAO {
                 + "          JOIN [Order] ord ON ord.orderID = od.orderID "
                 + "          WHERE od.bookID = b.bookID "
                 + "            AND LOWER(LTRIM(RTRIM(ord.status))) = 'completed') DESC, "
-                + "avg_rating DESC "
+                + "avg_rating DESC, b.bookID ASC "
                 + "OFFSET 0 ROWS FETCH NEXT ? ROWS ONLY";
 
         List<Book> books = new ArrayList<>();

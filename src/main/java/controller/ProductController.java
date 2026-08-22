@@ -303,14 +303,29 @@ public class ProductController extends HttpServlet {
     }
 
     private String buildOrderClause(String sortBy) {
-        if (sortBy == null || sortBy.trim().isEmpty()) return " ORDER BY b.created_at DESC ";
+        if (sortBy == null || sortBy.trim().isEmpty()) {
+            return " ORDER BY b.created_at DESC, b.bookID DESC ";
+        }
         switch (sortBy.trim()) {
-            case "name":       return " ORDER BY b.title ASC ";
-            case "price_asc":  return " ORDER BY b.price ASC ";
-            case "price_desc": return " ORDER BY b.price DESC ";
-            case "newest":     return " ORDER BY b.created_at DESC ";
-            case "popular":    return " ORDER BY review_count DESC ";
-            default:           return " ORDER BY b.created_at DESC ";
+            case "name":
+                return " ORDER BY b.title ASC, b.bookID ASC ";
+            case "price_asc":
+                return " ORDER BY b.price ASC, b.bookID ASC ";
+            case "price_desc":
+                return " ORDER BY b.price DESC, b.bookID ASC ";
+            case "newest":
+                return " ORDER BY b.created_at DESC, b.bookID DESC ";
+            case "popular":
+                // Keep the catalog's Popular order consistent with Shopping Trends:
+                // completed-order sales first, then rating as the tie-breaker.
+                return " ORDER BY (SELECT ISNULL(SUM(od.quantity), 0) "
+                        + "FROM OrderDetail od "
+                        + "JOIN [Order] ord ON ord.orderID = od.orderID "
+                        + "WHERE od.bookID = b.bookID "
+                        + "AND LOWER(LTRIM(RTRIM(ord.status))) = 'completed') DESC, "
+                        + "avg_rating DESC, b.bookID ASC ";
+            default:
+                return " ORDER BY b.created_at DESC, b.bookID DESC ";
         }
     }
 }
