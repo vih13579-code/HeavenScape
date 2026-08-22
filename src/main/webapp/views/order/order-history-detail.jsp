@@ -6,7 +6,7 @@
 <%@ include file="/views/layout/common/toast.jsp" %>
 
 <style>
-    .od-page { width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 34px 0 42px; color: #27272a; }
+    .od-page { min-width: 0; padding-bottom: 28px; color: #27272a; }
     .od-title { margin: 0 0 18px; font-size: 22px; line-height: 1.3; font-weight: 800; text-transform: uppercase; }
     .od-section-title { margin: 22px 0 10px; font-size: 14px; line-height: 1.3; font-weight: 800; text-transform: uppercase; }
     .od-card { border: 1px solid #dedfe2; border-radius: 7px; background: #fff; overflow: hidden; }
@@ -90,7 +90,6 @@
     }
 
     @media (max-width: 620px) {
-        .od-page { width: min(100% - 20px, 1180px); padding-top: 24px; }
         .od-overview, .od-shipping { grid-template-columns: 1fr; }
         .od-overview-cell:nth-child(2) { grid-column: auto; grid-row: auto; }
         .od-overview-cell + .od-overview-cell, .od-overview-cell:nth-child(3), .od-info-cell + .od-info-cell { border-top: 1px solid #e5e5e7; border-left: 0; }
@@ -116,7 +115,12 @@
     <c:set var="totalQuantity" value="${totalQuantity + detail.quantity}" />
 </c:forEach>
 
-<main class="od-page">
+<div class="fhs-page-inner">
+    <div class="grid grid-cols-1 lg:grid-cols-[250px_minmax(0,1fr)] gap-4">
+        <c:set var="activeMenu" value="orders" scope="request" />
+        <%@ include file="/views/layout/profile/sidebar.jsp" %>
+
+        <main class="od-page">
     <h1 class="od-title">Order Details</h1>
 
     <section class="od-card od-overview">
@@ -297,7 +301,9 @@
             </div>
         </div>
     </section>
-</main>
+        </main>
+    </div>
+</div>
 
 <c:if test="${order.status == 'pending' or (order.status == 'completed' and order.paymentMethod == 'cod' and order.paymentStatus == 'paid')}">
     <div id="customerCancelModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-[200] p-4">
