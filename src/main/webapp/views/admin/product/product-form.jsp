@@ -390,16 +390,21 @@
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label class="field-label" for="categoryID">Category</label>
+                                <label class="field-label" for="genreID">Genres <span class="text-error">*</span></label>
                                 <div class="lookup-row">
-                                    <select id="categoryID" name="categoryID" class="field-input">
-                                        <option value="">-- Select Category --</option>
-                                        <c:forEach var="entry" items="${categoryMap}">
-                                            <option value="${entry.key}" <c:if test="${book.categoryID == entry.key}">selected</c:if>>${entry.value}</option>
+                                    <select id="genreID" name="genreID" class="field-input" multiple required size="5">
+                                        <c:forEach var="entry" items="${genreMap}">
+                                            <c:set var="genreSelected" value="false" />
+                                            <c:forEach var="selectedGenreID" items="${selectedGenreIDs}">
+                                                <c:if test="${selectedGenreID == entry.key}"><c:set var="genreSelected" value="true" /></c:if>
+                                            </c:forEach>
+                                            <option value="${entry.key}" <c:if test="${genreSelected}">selected</c:if>>${entry.value}</option>
                                         </c:forEach>
                                     </select>
-                                    <button type="button" class="lookup-add-btn" data-lookup-type="category" data-target-select="categoryID" title="Add Category">+</button>
+                                    <button type="button" class="lookup-add-btn" data-lookup-type="genre" data-target-select="genreID" title="Add Genre">+</button>
                                 </div>
+                                <p class="text-xs text-on-surface-variant mt-1">Select one or more genres. Hold Ctrl (Windows) or Command (macOS) to select multiple.</p>
+                                <p class="err-msg" id="genreIDErr">Please select at least one genre</p>
                             </div>
                             <div>
                                 <label class="field-label" for="contentID">Format</label>
@@ -667,6 +672,17 @@
                     statusErr.classList.remove('show');
                 }
 
+                const genreSelect = document.getElementById('genreID');
+                const genreErr = document.getElementById('genreIDErr');
+                if (genreSelect.selectedOptions.length === 0) {
+                    genreSelect.classList.add('error');
+                    genreErr.classList.add('show');
+                    valid = false;
+                } else {
+                    genreSelect.classList.remove('error');
+                    genreErr.classList.remove('show');
+                }
+
                 if (!valid) {
                     e.preventDefault();
                     document.querySelector('.field-input.error')?.scrollIntoView({behavior: 'smooth', block: 'center'});
@@ -718,7 +734,7 @@
             });
 
 
-            const lookupLabels = {category: 'category', content: 'format', origin: 'origin', series: 'series', publisher: 'publisher'};
+            const lookupLabels = {genre: 'genre', content: 'format', origin: 'origin', series: 'series', publisher: 'publisher'};
             let activeLookupType = '';
             let activeLookupSelectId = '';
 
@@ -744,14 +760,21 @@
                     return;
                 const existing = Array.from(select.options).find(opt => String(opt.value) === String(id));
                 if (existing) {
-                    select.value = String(id);
+                    if (select.multiple) {
+                        existing.selected = true;
+                    } else {
+                        select.value = String(id);
+                    }
                     return;
                 }
                 const option = document.createElement('option');
                 option.value = String(id);
                 option.textContent = name;
+                option.selected = true;
                 select.appendChild(option);
-                select.value = String(id);
+                if (!select.multiple) {
+                    select.value = String(id);
+                }
             }
 
             async function saveLookupItem() {

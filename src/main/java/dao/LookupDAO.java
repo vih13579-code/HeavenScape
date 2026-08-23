@@ -10,7 +10,7 @@ import java.sql.Statement;
 public class LookupDAO {
 
     public void ensureDefaultLookups() {
-        seedIfEmpty("Category", "category_name",
+        seedIfEmpty("Genre", "genre_name",
                 new String[]{"Fiction", "Personal Development", "Business", "Children's Books", "Science"});
         seedIfEmpty("Content", "content_name",
                 new String[]{"Paperback", "Hardcover", "Glossy Cover", "Audiobook"});
@@ -113,8 +113,8 @@ public class LookupDAO {
             return null;
         }
         String key = type.toLowerCase();
-        if ("category".equals(key)) {
-            return new LookupMeta("Category", "categoryID", "category_name");
+        if ("genre".equals(key)) {
+            return new LookupMeta("Genre", "genreID", "genre_name");
         }
         if ("content".equals(key)) {
             return new LookupMeta("Content", "contentID", "content_name");

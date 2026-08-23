@@ -116,8 +116,8 @@
         <servlet-class>controller.ReviewManagementController</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>CategoryManagementController</servlet-name>
-        <servlet-class>controller.CategoryManagementController</servlet-class>
+        <servlet-name>GenreManagementController</servlet-name>
+        <servlet-class>controller.GenreManagementController</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>AddressManagementController</servlet-name>
@@ -255,8 +255,8 @@
         <url-pattern>/vnpay-return</url-pattern>
     </servlet-mapping>
 <servlet-mapping>
-    <servlet-name>CategoryManagementController</servlet-name>
-    <url-pattern>/dashboard/category-management</url-pattern>
+    <servlet-name>GenreManagementController</servlet-name>
+    <url-pattern>/dashboard/genre-management</url-pattern>
 </servlet-mapping>
     <servlet-mapping>
         <servlet-name>AddressManagementController</servlet-name>

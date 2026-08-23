@@ -1,6 +1,6 @@
 package controller;
 
-import dao.CategoryDAO;
+import dao.GenreDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -9,11 +9,11 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 import model.Account;
-import model.Category;
+import model.Genre;
 
-public class CategoryManagementController extends HttpServlet {
+public class GenreManagementController extends HttpServlet {
 
-    private final CategoryDAO categoryDAO = new CategoryDAO();
+    private final GenreDAO genreDAO = new GenreDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -23,76 +23,76 @@ public class CategoryManagementController extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
 
         String action = request.getParameter("action");
-        boolean canManageCategory = canManageCategory(request);
-        request.setAttribute("canManageCategory", canManageCategory);
+        boolean canManageGenre = canManageGenre(request);
+        request.setAttribute("canManageGenre", canManageGenre);
 
         if ("create".equals(action)) {
-            if (!canManageCategory) {
-                setFlash(request, "error", "You do not have permission to add categories.");
+            if (!canManageGenre) {
+                setFlash(request, "error", "You do not have permission to add genres.");
                 response.sendRedirect(request.getContextPath()
-                        + "/dashboard/category-management");
+                        + "/dashboard/genre-management");
                 return;
             }
 
-            request.setAttribute("pageTitle", "Add Category");
+            request.setAttribute("pageTitle", "Add Genre");
             request.setAttribute("formAction", "create");
-            request.getRequestDispatcher("/views/category/form.jsp")
+            request.getRequestDispatcher("/views/genre/form.jsp")
                     .forward(request, response);
             return;
         }
 
         if ("edit".equals(action)) {
-            if (!canManageCategory) {
-                setFlash(request, "error", "You do not have permission to update categories.");
+            if (!canManageGenre) {
+                setFlash(request, "error", "You do not have permission to update genres.");
                 response.sendRedirect(request.getContextPath()
-                        + "/dashboard/category-management");
+                        + "/dashboard/genre-management");
                 return;
             }
 
             int id = parseInt(request.getParameter("id"));
-            Category category = categoryDAO.getCategoryById(id);
+            Genre genre = genreDAO.getGenreById(id);
 
-            if (category == null) {
-                setFlash(request, "error", "Category not found.");
+            if (genre == null) {
+                setFlash(request, "error", "Genre not found.");
                 response.sendRedirect(request.getContextPath()
-                        + "/dashboard/category-management");
+                        + "/dashboard/genre-management");
                 return;
             }
 
-            request.setAttribute("category", category);
-            request.setAttribute("pageTitle", "Update Category");
+            request.setAttribute("genre", genre);
+            request.setAttribute("pageTitle", "Update Genre");
             request.setAttribute("formAction", "update");
-            request.getRequestDispatcher("/views/category/form.jsp")
+            request.getRequestDispatcher("/views/genre/form.jsp")
                     .forward(request, response);
             return;
         }
 
         if ("detail".equals(action)) {
             int id = parseInt(request.getParameter("id"));
-            Category category = categoryDAO.getCategoryById(id);
+            Genre genre = genreDAO.getGenreById(id);
 
-            if (category == null) {
-                setFlash(request, "error", "Category not found.");
+            if (genre == null) {
+                setFlash(request, "error", "Genre not found.");
                 response.sendRedirect(request.getContextPath()
-                        + "/dashboard/category-management");
+                        + "/dashboard/genre-management");
                 return;
             }
 
-            request.setAttribute("category", category);
-            request.getRequestDispatcher("/views/category/detail.jsp")
+            request.setAttribute("genre", genre);
+            request.getRequestDispatcher("/views/genre/detail.jsp")
                     .forward(request, response);
             return;
         }
 
         String keyword = clean(request.getParameter("keyword"));
-        List<Category> categories = keyword.isEmpty()
-                ? categoryDAO.getAllCategories()
-                : categoryDAO.searchCategories(keyword);
+        List<Genre> genres = keyword.isEmpty()
+                ? genreDAO.getAllGenres()
+                : genreDAO.searchGenres(keyword);
 
-        request.setAttribute("categories", categories);
+        request.setAttribute("genres", genres);
         request.setAttribute("keyword", keyword);
-        request.setAttribute("totalCategories", categories.size());
-        request.getRequestDispatcher("/views/category/list.jsp")
+        request.setAttribute("totalGenres", genres.size());
+        request.getRequestDispatcher("/views/genre/list.jsp")
                 .forward(request, response);
     }
 
@@ -105,67 +105,67 @@ public class CategoryManagementController extends HttpServlet {
 
         String action = request.getParameter("action");
         String redirectUrl = request.getContextPath()
-                + "/dashboard/category-management";
+                + "/dashboard/genre-management";
 
-        if (!canManageCategory(request)) {
+        if (!canManageGenre(request)) {
             setFlash(request, "error", "You do not have permission to perform this action.");
             response.sendRedirect(redirectUrl);
             return;
         }
 
         if ("create".equals(action)) {
-            String name = clean(request.getParameter("category_name"));
+            String name = clean(request.getParameter("genre_name"));
 
-            String validationError = validateCategoryName(name);
+            String validationError = validateGenreName(name);
             if (validationError != null) {
                 setFlash(request, "error", validationError);
                 response.sendRedirect(redirectUrl + "?action=create");
                 return;
             }
 
-            if (categoryDAO.isCategoryNameExists(name)) {
-                setFlash(request, "error", "Category name already exists.");
+            if (genreDAO.isGenreNameExists(name)) {
+                setFlash(request, "error", "Genre name already exists.");
                 response.sendRedirect(redirectUrl + "?action=create");
                 return;
             }
 
-            boolean success = categoryDAO.insertCategory(name);
+            boolean success = genreDAO.insertGenre(name);
             setFlash(request, success ? "success" : "error",
-                    success ? "Category added successfully." : "Could not add the category.");
+                    success ? "Genre added successfully." : "Could not add the genre.");
             response.sendRedirect(redirectUrl + (success ? "" : "?action=create"));
             return;
         }
 
         if ("update".equals(action)) {
             int id = parseInt(request.getParameter("id"));
-            String name = clean(request.getParameter("category_name"));
+            String name = clean(request.getParameter("genre_name"));
 
             if (id <= 0) {
-                setFlash(request, "error", "Category Invalid ID.");
+                setFlash(request, "error", "Genre Invalid ID.");
                 response.sendRedirect(redirectUrl);
                 return;
             }
 
-            String validationError = validateCategoryName(name);
+            String validationError = validateGenreName(name);
             if (validationError != null) {
                 setFlash(request, "error", validationError);
                 response.sendRedirect(redirectUrl + "?action=detail&id=" + id);
                 return;
             }
 
-            if (categoryDAO.isCategoryNameExists(name, id)) {
-                setFlash(request, "error", "Category name already exists.");
+            if (genreDAO.isGenreNameExists(name, id)) {
+                setFlash(request, "error", "Genre name already exists.");
                 response.sendRedirect(redirectUrl + "?action=detail&id=" + id);
                 return;
             }
 
-            boolean success = categoryDAO.updateCategory(id, name);
+            boolean success = genreDAO.updateGenre(id, name);
 
             if (success) {
-                setFlash(request, "success", "Category updated successfully.");
+                setFlash(request, "success", "Genre updated successfully.");
                 response.sendRedirect(redirectUrl + "?action=detail&id=" + id);
             } else {
-                setFlash(request, "error", "Could not update the category.");
+                setFlash(request, "error", "Could not update the genre.");
                 response.sendRedirect(redirectUrl + "?action=detail&id=" + id);
             }
             return;
@@ -175,22 +175,22 @@ public class CategoryManagementController extends HttpServlet {
             int id = parseInt(request.getParameter("id"));
 
             if (id <= 0) {
-                setFlash(request, "error", "Category Invalid ID.");
+                setFlash(request, "error", "Genre Invalid ID.");
                 response.sendRedirect(redirectUrl);
                 return;
             }
 
-            int bookCount = categoryDAO.countBooksByCategory(id);
+            int bookCount = genreDAO.countBooksByGenre(id);
             if (bookCount > 0) {
                 request.getSession().setAttribute(
-                        "errorMessage", "A category containing books cannot be deleted.");
+                        "errorMessage", "A genre containing books cannot be deleted.");
                 response.sendRedirect(redirectUrl);
                 return;
             }
 
-            boolean success = categoryDAO.deleteCategory(id);
+            boolean success = genreDAO.deleteGenre(id);
             setFlash(request, success ? "success" : "error",
-                    success ? "Category deleted successfully." : "Could not delete the category.");
+                    success ? "Genre deleted successfully." : "Could not delete the genre.");
             response.sendRedirect(redirectUrl);
             return;
         }
@@ -198,7 +198,7 @@ public class CategoryManagementController extends HttpServlet {
         response.sendRedirect(redirectUrl);
     }
 
-    private boolean canManageCategory(HttpServletRequest request) {
+    private boolean canManageGenre(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
 
         if (session == null) {
@@ -215,17 +215,17 @@ public class CategoryManagementController extends HttpServlet {
         return "staff".equals(role) || "admin".equals(role);
     }
 
-    private String validateCategoryName(String name) {
+    private String validateGenreName(String name) {
         if (name == null || name.isEmpty()) {
-            return "Category name is required.";
+            return "Genre name is required.";
         }
 
         if (name.length() > 100) {
-            return "Category name cannot exceed 100 characters.";
+            return "Genre name cannot exceed 100 characters.";
         }
 
         if (!name.matches("^[\\p{L}\\s]+$")) {
-            return "Category name may contain only letters and spaces, not numbers or special characters.";
+            return "Genre name may contain only letters and spaces, not numbers or special characters.";
         }
 
         return null;

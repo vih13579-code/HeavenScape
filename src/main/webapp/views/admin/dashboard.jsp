@@ -287,7 +287,7 @@
                             <thead>
                                 <tr class="bg-background-alt border-b border-outline-variant/30">
                                     <th class="px-5 py-3 font-semibold text-on-surface-variant">Book</th>
-                                    <th class="px-5 py-3 font-semibold text-on-surface-variant">Category</th>
+                                    <th class="px-5 py-3 font-semibold text-on-surface-variant">Genres</th>
                                     <th class="px-5 py-3 font-semibold text-on-surface-variant text-right">Price</th>
                                     <th class="px-5 py-3 font-semibold text-on-surface-variant text-center">Stock</th>
                                     <th class="px-5 py-3 font-semibold text-on-surface-variant text-center">Status</th>
@@ -323,9 +323,11 @@
                                             </div>
                                         </td>
                                         <td class="px-5 py-3">
-                                            <c:if test="${not empty book.categoryName}">
-                                                <span style="background:#FDE8E9; color:#C92127; font-size:11px; font-weight:700; padding:3px 9px; border-radius:20px;">${book.categoryName}</span>
-                                            </c:if>
+                                            <div class="flex flex-wrap gap-1">
+                                                <c:forEach var="genre" items="${book.genres}">
+                                                    <span style="background:#FDE8E9; color:#C92127; font-size:11px; font-weight:700; padding:3px 9px; border-radius:20px;">${genre.genreName}</span>
+                                                </c:forEach>
+                                            </div>
                                         </td>
                                         <td class="px-5 py-3 text-right font-semibold text-primary">
                                             <fmt:formatNumber value="${book.price}" type="number" groupingUsed="true"/> VND

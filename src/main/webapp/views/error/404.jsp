@@ -28,9 +28,9 @@
             <p class="text-[11px] text-gray-400 uppercase tracking-widest font-semibold mb-3">Suggested Searches</p>
             <div class="flex flex-wrap gap-2 justify-center">
                 <a href="${pageContext.request.contextPath}/products" class="bg-gray-100 hover:bg-primary hover:text-white text-gray-600 text-[13px] px-4 py-1.5 rounded-full transition-colors">All Books</a>
-                <a href="${pageContext.request.contextPath}/products?category=1" class="bg-gray-100 hover:bg-primary hover:text-white text-gray-600 text-[13px] px-4 py-1.5 rounded-full transition-colors">Fiction</a>
-                <a href="${pageContext.request.contextPath}/products?category=2" class="bg-gray-100 hover:bg-primary hover:text-white text-gray-600 text-[13px] px-4 py-1.5 rounded-full transition-colors">Business</a>
-                <a href="${pageContext.request.contextPath}/products?category=3" class="bg-gray-100 hover:bg-primary hover:text-white text-gray-600 text-[13px] px-4 py-1.5 rounded-full transition-colors">Personal Development</a>
+                <a href="${pageContext.request.contextPath}/products?genre=1" class="bg-gray-100 hover:bg-primary hover:text-white text-gray-600 text-[13px] px-4 py-1.5 rounded-full transition-colors">Fiction</a>
+                <a href="${pageContext.request.contextPath}/products?genre=2" class="bg-gray-100 hover:bg-primary hover:text-white text-gray-600 text-[13px] px-4 py-1.5 rounded-full transition-colors">Business</a>
+                <a href="${pageContext.request.contextPath}/products?genre=3" class="bg-gray-100 hover:bg-primary hover:text-white text-gray-600 text-[13px] px-4 py-1.5 rounded-full transition-colors">Personal Development</a>
             </div>
         </div>
     </div>

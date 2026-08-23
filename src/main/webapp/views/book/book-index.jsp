@@ -18,8 +18,8 @@
             <span aria-current="page">
                 <c:choose>
                     <c:when test="${not empty keyword}">Search results</c:when>
-                    <c:when test="${not empty categoryID}"><c:out value="${categoryMap[categoryID]}" /></c:when>
-                    <c:when test="${not empty selectedCategoryIDs}">Selected categories</c:when>
+                    <c:when test="${not empty genreID}"><c:out value="${genreMap[genreID]}" /></c:when>
+                    <c:when test="${not empty selectedGenreIDs}">Selected genres</c:when>
                     <c:otherwise>All Books</c:otherwise>
                 </c:choose>
             </span>
@@ -27,8 +27,8 @@
         <h1 class="hs-catalog-title">
             <c:choose>
                 <c:when test="${not empty keyword}">Results for “<em><c:out value="${keyword}" /></em>”</c:when>
-                <c:when test="${not empty categoryID}"><c:out value="${categoryMap[categoryID]}" /></c:when>
-                <c:when test="${not empty selectedCategoryIDs}">Selected Categories</c:when>
+                <c:when test="${not empty genreID}"><c:out value="${genreMap[genreID]}" /></c:when>
+                <c:when test="${not empty selectedGenreIDs}">Selected Genres</c:when>
                 <c:otherwise>All Books</c:otherwise>
             </c:choose>
             <span class="hs-catalog-count">(${totalBooks} books)</span>
@@ -76,16 +76,16 @@
             </div>
 
             <div class="filter-card">
-                <h3 class="catalog-filter-title">Category</h3>
+                <h3 class="catalog-filter-title">Genre</h3>
                 <div class="catalog-filter-options">
-                    <c:forEach var="entry" items="${categoryMap}">
-                        <c:set var="categoryChecked" value="false" />
-                        <c:forEach var="selectedCategory" items="${selectedCategoryIDs}">
-                            <c:if test="${selectedCategory == entry.key}"><c:set var="categoryChecked" value="true" /></c:if>
+                    <c:forEach var="entry" items="${genreMap}">
+                        <c:set var="genreChecked" value="false" />
+                        <c:forEach var="selectedGenre" items="${selectedGenreIDs}">
+                            <c:if test="${selectedGenre == entry.key}"><c:set var="genreChecked" value="true" /></c:if>
                         </c:forEach>
                         <label class="catalog-filter-option">
-                            <input type="checkbox" name="category" value="${entry.key}"
-                                   <c:if test="${categoryChecked}">checked</c:if>
+                            <input type="checkbox" name="genre" value="${entry.key}"
+                                   <c:if test="${genreChecked}">checked</c:if>
                                    onchange="this.form.requestSubmit()">
                             <span><c:out value="${entry.value}" /></span>
                         </label>
@@ -139,8 +139,8 @@
                 <c:if test="${not empty keyword}"><input type="hidden" name="keyword" value="<c:out value='${keyword}' />"></c:if>
                 <c:if test="${not empty minPrice}"><input type="hidden" name="minPrice" value="${minPrice}"></c:if>
                 <c:if test="${not empty maxPrice}"><input type="hidden" name="maxPrice" value="${maxPrice}"></c:if>
-                <c:forEach var="selectedCategory" items="${selectedCategoryIDs}">
-                    <input type="hidden" name="category" value="${selectedCategory}">
+                <c:forEach var="selectedGenre" items="${selectedGenreIDs}">
+                    <input type="hidden" name="genre" value="${selectedGenre}">
                 </c:forEach>
                 <c:forEach var="selectedAuthor" items="${selectedAuthorIDs}">
                     <input type="hidden" name="author" value="${selectedAuthor}">
@@ -193,7 +193,9 @@
                         </div>
                         <div class="p-3 flex flex-col flex-1">
                             <div class="text-[12px] text-gray-400 mb-1 truncate">
-                                <c:if test="${not empty book.categoryName}"><span class="text-primary font-medium">${book.categoryName}</span></c:if>
+                                <c:forEach var="genre" items="${book.genres}" varStatus="genreStatus">
+                                    <span class="text-primary font-medium">${genre.genreName}</span><c:if test="${!genreStatus.last}">, </c:if>
+                                </c:forEach>
                             </div>
                             <div class="text-[13px] font-semibold text-gray-800 mb-1 line-clamp-2 min-h-[36px]">
                                 <a href="${pageContext.request.contextPath}/products?id=${book.bookID}" class="hover:text-primary transition-colors">${book.title}</a>
@@ -231,7 +233,7 @@
                             <c:if test="${not empty keyword}"><c:param name="keyword" value="${keyword}" /></c:if>
                             <c:if test="${not empty minPrice}"><c:param name="minPrice" value="${minPrice}" /></c:if>
                             <c:if test="${not empty maxPrice}"><c:param name="maxPrice" value="${maxPrice}" /></c:if>
-                            <c:forEach var="selectedCategory" items="${selectedCategoryIDs}"><c:param name="category" value="${selectedCategory}" /></c:forEach>
+                            <c:forEach var="selectedGenre" items="${selectedGenreIDs}"><c:param name="genre" value="${selectedGenre}" /></c:forEach>
                             <c:forEach var="selectedAuthor" items="${selectedAuthorIDs}"><c:param name="author" value="${selectedAuthor}" /></c:forEach>
                             <c:forEach var="availabilityValue" items="${availability}"><c:param name="availability" value="${availabilityValue}" /></c:forEach>
                         </c:url>
@@ -253,7 +255,7 @@
                                     <c:if test="${not empty keyword}"><c:param name="keyword" value="${keyword}" /></c:if>
                                     <c:if test="${not empty minPrice}"><c:param name="minPrice" value="${minPrice}" /></c:if>
                                     <c:if test="${not empty maxPrice}"><c:param name="maxPrice" value="${maxPrice}" /></c:if>
-                                    <c:forEach var="selectedCategory" items="${selectedCategoryIDs}"><c:param name="category" value="${selectedCategory}" /></c:forEach>
+                                    <c:forEach var="selectedGenre" items="${selectedGenreIDs}"><c:param name="genre" value="${selectedGenre}" /></c:forEach>
                                     <c:forEach var="selectedAuthor" items="${selectedAuthorIDs}"><c:param name="author" value="${selectedAuthor}" /></c:forEach>
                                     <c:forEach var="availabilityValue" items="${availability}"><c:param name="availability" value="${availabilityValue}" /></c:forEach>
                                 </c:url>
@@ -273,7 +275,7 @@
                             <c:if test="${not empty keyword}"><c:param name="keyword" value="${keyword}" /></c:if>
                             <c:if test="${not empty minPrice}"><c:param name="minPrice" value="${minPrice}" /></c:if>
                             <c:if test="${not empty maxPrice}"><c:param name="maxPrice" value="${maxPrice}" /></c:if>
-                            <c:forEach var="selectedCategory" items="${selectedCategoryIDs}"><c:param name="category" value="${selectedCategory}" /></c:forEach>
+                            <c:forEach var="selectedGenre" items="${selectedGenreIDs}"><c:param name="genre" value="${selectedGenre}" /></c:forEach>
                             <c:forEach var="selectedAuthor" items="${selectedAuthorIDs}"><c:param name="author" value="${selectedAuthor}" /></c:forEach>
                             <c:forEach var="availabilityValue" items="${availability}"><c:param name="availability" value="${availabilityValue}" /></c:forEach>
                         </c:url>
