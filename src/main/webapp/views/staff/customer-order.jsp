@@ -117,7 +117,7 @@
                                         class="px-6 py-3.5 text-xs text-gray-500 uppercase tracking-wider font-semibold">
                                         Payment</th>
                                     <th
-                                        class="px-6 py-3.5 text-xs text-gray-500 uppercase tracking-wider font-semibold">
+                                        class="px-6 py-3.5 text-xs text-gray-500 uppercase tracking-wider font-semibold whitespace-nowrap min-w-[150px]">
                                         Total Amount</th>
                                     <th
                                         class="px-6 py-3.5 text-xs text-gray-500 uppercase tracking-wider font-semibold">
@@ -167,7 +167,7 @@
                                                 </c:otherwise>
                                             </c:choose>
                                         </td>
-                                        <td class="px-6 py-3.5 text-sm font-semibold text-gray-900">
+                                        <td class="px-6 py-3.5 text-sm font-semibold text-[#C92127] whitespace-nowrap min-w-[150px]">
                                             <fmt:formatNumber value="${order.totalPrice}"
                                                               pattern="#,###" />
                                             VND

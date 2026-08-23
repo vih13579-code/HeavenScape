@@ -288,7 +288,7 @@
                                 <tr class="bg-background-alt border-b border-outline-variant/30">
                                     <th class="px-5 py-3 font-semibold text-on-surface-variant">Book</th>
                                     <th class="px-5 py-3 font-semibold text-on-surface-variant">Genres</th>
-                                    <th class="px-5 py-3 font-semibold text-on-surface-variant text-right">Price</th>
+                                    <th class="px-5 py-3 font-semibold text-on-surface-variant text-right whitespace-nowrap min-w-[130px]">Price</th>
                                     <th class="px-5 py-3 font-semibold text-on-surface-variant text-center">Stock</th>
                                     <th class="px-5 py-3 font-semibold text-on-surface-variant text-center">Status</th>
                                     <th class="px-5 py-3 font-semibold text-on-surface-variant text-center">Date Added</th>
@@ -329,7 +329,7 @@
                                                 </c:forEach>
                                             </div>
                                         </td>
-                                        <td class="px-5 py-3 text-right font-semibold text-primary">
+                                        <td class="px-5 py-3 text-right font-semibold text-primary whitespace-nowrap min-w-[130px]">
                                             <fmt:formatNumber value="${book.price}" type="number" groupingUsed="true"/> VND
                                         </td>
                                         <td class="px-5 py-3 text-center">
