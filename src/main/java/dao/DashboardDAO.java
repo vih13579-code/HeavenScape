@@ -14,19 +14,14 @@ import utils.DBContext;
 public class DashboardDAO {
 
     private Connection getConnection() throws Exception {
-        // TODO: implement
-        return null;
+        Connection conn = new DBContext().getConnection();
+        if (conn == null) {
+            throw new Exception("Cannot connect to database");
+        }
+        return conn;
     }
 
     public BigDecimal getTotalRevenue(String fromDate, String toDate, Integer genreID) {
-<<<<<<< Updated upstream
-        // TODO: implement
-        return null;
-    }
-
-    public int getTotalOrders(String fromDate, String toDate, Integer genreID) {
-        // TODO: implement
-=======
         String sql;
         if (genreID == null) {
             sql = "SELECT ISNULL(SUM(o.total_price), 0) AS totalRevenue "
@@ -72,14 +67,10 @@ public class DashboardDAO {
         } catch (Exception e) {
             e.printStackTrace();
         }
->>>>>>> Stashed changes
         return 0;
     }
 
     public int getTotalCustomers(String fromDate, String toDate, Integer genreID) {
-<<<<<<< Updated upstream
-        // TODO: implement
-=======
         String sql = "SELECT COUNT(DISTINCT o.customerID) AS totalCustomers "
                 + "FROM [Order] o "
                 + buildOrderDetailJoin(genreID)
@@ -96,14 +87,10 @@ public class DashboardDAO {
         } catch (Exception e) {
             e.printStackTrace();
         }
->>>>>>> Stashed changes
         return 0;
     }
 
     public int getTotalBooks(Integer genreID) {
-<<<<<<< Updated upstream
-        // TODO: implement
-=======
         String sql = "SELECT COUNT(*) AS totalBooks FROM Book b WHERE 1 = 1 "
             + (genreID != null ? "AND EXISTS (SELECT 1 FROM BookGenre bg "
             + "WHERE bg.bookID = b.bookID AND bg.genreID = ?) " : "");
@@ -119,14 +106,10 @@ public class DashboardDAO {
         } catch (Exception e) {
             e.printStackTrace();
         }
->>>>>>> Stashed changes
         return 0;
     }
 
     public int getTotalSoldBooks(String fromDate, String toDate, Integer genreID) {
-<<<<<<< Updated upstream
-        // TODO: implement
-=======
         String sql = "SELECT ISNULL(SUM(od.quantity), 0) AS totalSold "
                 + "FROM [Order] o "
                 + "JOIN OrderDetail od ON od.orderID = o.orderID "
@@ -144,7 +127,6 @@ public class DashboardDAO {
         } catch (Exception e) {
             e.printStackTrace();
         }
->>>>>>> Stashed changes
         return 0;
     }
 
@@ -154,20 +136,6 @@ public class DashboardDAO {
      */
     public Map<String, Integer> getOrderStatusSummary(
             String fromDate, String toDate, Integer genreID) {
-<<<<<<< Updated upstream
-        // TODO: implement
-        return new HashMap<>();
-    }
-
-    public List<Map<String, Object>> getRevenueByCategory(String fromDate, String toDate, Integer genreID) {
-        // TODO: implement
-        return new ArrayList<Map<String, Object>>();
-    }
-
-    public List<Map<String, Object>> getTopSellingBooks(String fromDate, String toDate, Integer genreID) {
-        // TODO: implement
-        return new ArrayList<Map<String, Object>>();
-=======
 
         Map<String, Integer> result = new LinkedHashMap<>();
 
@@ -289,7 +257,6 @@ public class DashboardDAO {
             e.printStackTrace();
         }
         return list;
->>>>>>> Stashed changes
     }
 
     /**
@@ -297,10 +264,6 @@ public class DashboardDAO {
      * Unlimited TOP 5 vÃƒÆ’Ã‚Â  khÃƒÆ’Ã‚Â´ng loÃƒÂ¡Ã‚ÂºÃ‚Â¡i bÃƒÂ¡Ã‚Â»Ã‚Â trÃƒÂ¡Ã‚ÂºÃ‚Â¡ng thÃƒÆ’Ã‚Â¡i completed/cancelled.
      */
     public List<Map<String, Object>> getAllOrders(String fromDate, String toDate, Integer genreID) {
-<<<<<<< Updated upstream
-        // TODO: implement
-        return new ArrayList<Map<String, Object>>();
-=======
         List<Map<String, Object>> list = new ArrayList<>();
 
         String sql = "SELECT DISTINCT o.orderID, o.created_at, o.total_price, o.status, c.fullname "
@@ -336,22 +299,12 @@ public class DashboardDAO {
         }
 
         return list;
->>>>>>> Stashed changes
     }
 
     /**
      * GiÃƒÂ¡Ã‚Â»Ã‚Â¯ lÃƒÂ¡Ã‚ÂºÃ‚Â¡i Ãƒâ€žÃ¢â‚¬ËœÃƒÂ¡Ã‚Â»Ã†â€™ nhÃƒÂ¡Ã‚Â»Ã‚Â¯ng chÃƒÂ¡Ã‚Â»Ã¢â‚¬â€ code cÃƒâ€¦Ã‚Â© Ãƒâ€žÃ¢â‚¬Ëœang gÃƒÂ¡Ã‚Â»Ã‚Âi khÃƒÆ’Ã‚Â´ng bÃƒÂ¡Ã‚Â»Ã¢â‚¬Â¹ lÃƒÂ¡Ã‚Â»Ã¢â‚¬â€i biÃƒÆ’Ã‚Âªn dÃƒÂ¡Ã‚Â»Ã¢â‚¬Â¹ch.
      */
     public List<Map<String, Object>> getRecentOrders(String fromDate, String toDate, Integer genreID) {
-<<<<<<< Updated upstream
-        // TODO: implement
-        return new ArrayList<Map<String, Object>>();
-    }
-
-    private String buildOrderDetailJoin(Integer genreID) {
-        // TODO: implement
-        return null;
-=======
         return getAllOrders(fromDate, toDate, genreID);
     }
 
@@ -360,23 +313,14 @@ public class DashboardDAO {
             return "";
         }
         return "JOIN OrderDetail od ON od.orderID = o.orderID JOIN Book b ON b.bookID = od.bookID ";
->>>>>>> Stashed changes
     }
 
     private String buildDateFilter() {
-        // TODO: implement
-        return null;
+        return "AND (? IS NULL OR CAST(o.created_at AS DATE) >= ?) "
+                + "AND (? IS NULL OR CAST(o.created_at AS DATE) <= ?) ";
     }
 
     private String buildGenreFilter(Integer genreID) {
-<<<<<<< Updated upstream
-        // TODO: implement
-        return null;
-    }
-
-    private void setCommonParams(PreparedStatement ps, String fromDate, String toDate, Integer genreID) throws Exception {
-        // TODO: implement
-=======
         return genreID != null ? "AND EXISTS (SELECT 1 FROM BookGenre bg "
             + "WHERE bg.bookID = b.bookID AND bg.genreID = ?) " : "";
     }
@@ -392,11 +336,12 @@ public class DashboardDAO {
         if (genreID != null) {
             ps.setInt(index, genreID);
         }
->>>>>>> Stashed changes
     }
 
     private Date parseDate(String value) {
-        // TODO: implement
-        return null;
+        if (value == null || value.trim().isEmpty()) {
+            return null;
+        }
+        return Date.valueOf(value.trim());
     }
 }

@@ -26,20 +26,65 @@ public class AdminProductController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        // TODO: implement
+
+        Account account = requireStaff(req, resp);
+        if (account == null) {
+            return;
+        }
+
+        String action = req.getParameter("action");
+        if (action == null) {
+            action = "";
+        }
+
+        switch (action) {
+            case "create":
+                showForm(req, resp, null);
+                break;
+            case "edit":
+                showEditForm(req, resp);
+                break;
+            default:
+                showList(req, resp);
+                break;
+        }
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        // TODO: implement
+
+        req.setCharacterEncoding("UTF-8");
+        Account account = requireStaff(req, resp);
+        if (account == null) {
+            return;
+        }
+
+        String action = req.getParameter("action");
+        if (action == null) {
+            action = "";
+        }
+
+        switch (action) {
+            case "create":
+                handleCreate(req, resp, account);
+                break;
+            case "update":
+                handleUpdate(req, resp, account);
+                break;
+            case "delete":
+                handleDelete(req, resp, account);
+                break;
+            case "restore":
+                handleRestore(req, resp, account);
+                break;
+            default:
+                resp.sendRedirect(req.getContextPath() + "/dashboard/product-management");
+        }
     }
 
     private void showList(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-<<<<<<< Updated upstream
-        // TODO: implement
-=======
 
         req.setAttribute("activeMenu", "product-management");
 
@@ -67,15 +112,11 @@ public class AdminProductController extends HttpServlet {
         req.setAttribute("genreMap", genreMap);
 
         req.getRequestDispatcher("/views/admin/product/product-management.jsp").forward(req, resp);
->>>>>>> Stashed changes
     }
 
 
     private void showForm(HttpServletRequest req, HttpServletResponse resp, Book book)
             throws ServletException, IOException {
-<<<<<<< Updated upstream
-        // TODO: implement
-=======
         req.setAttribute("activeMenu", "product-management");
         lookupDAO.ensureDefaultLookups();
         req.setAttribute("book", book);
@@ -86,15 +127,11 @@ public class AdminProductController extends HttpServlet {
         req.setAttribute("publisherMap", bookDAO.getPublisherMap());
         req.setAttribute("formAction", "create");
         req.getRequestDispatcher("/views/admin/product/product-form.jsp").forward(req, resp);
->>>>>>> Stashed changes
     }
 
  
     private void showEditForm(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-<<<<<<< Updated upstream
-        // TODO: implement
-=======
         req.setAttribute("activeMenu", "product-management");
         int bookID = parseID(req.getParameter("id"));
         if (bookID <= 0) {
@@ -128,14 +165,10 @@ public class AdminProductController extends HttpServlet {
         req.setAttribute("publisherMap", bookDAO.getPublisherMap());
         req.setAttribute("formAction", "update");
         req.getRequestDispatcher("/views/admin/product/product-form.jsp").forward(req, resp);
->>>>>>> Stashed changes
     }
 
     private void handleCreate(HttpServletRequest req, HttpServletResponse resp, Account account)
             throws IOException {
-<<<<<<< Updated upstream
-        // TODO: implement
-=======
         HttpSession session = req.getSession();
         String stockError = validateStockQuantity(req.getParameter("stockQuantity"));
         if (stockError != null) {
@@ -164,14 +197,10 @@ public class AdminProductController extends HttpServlet {
             session.setAttribute("errorMessage", "Could not add the book. Please try again!");
         }
         resp.sendRedirect(req.getContextPath() + "/dashboard/product-management");
->>>>>>> Stashed changes
     }
 
     private void handleUpdate(HttpServletRequest req, HttpServletResponse resp, Account account)
             throws IOException {
-<<<<<<< Updated upstream
-        // TODO: implement
-=======
         int bookID = parseID(req.getParameter("bookID"));
         if (bookID <= 0) {
             resp.sendRedirect(req.getContextPath() + "/dashboard/product-management");
@@ -206,35 +235,74 @@ public class AdminProductController extends HttpServlet {
             session.setAttribute("errorMessage", "Update failed. Please try again!");
         }
         resp.sendRedirect(req.getContextPath() + "/dashboard/product-management");
->>>>>>> Stashed changes
     }
 
     private void handleDelete(HttpServletRequest req, HttpServletResponse resp, Account account)
             throws IOException {
-        // TODO: implement
+        int bookID = parseID(req.getParameter("bookID"));
+        HttpSession session = req.getSession();
+        if (bookID > 0) {
+            boolean ok = bookDAO.deleteBook(bookID, account.getId());
+            if (ok) {
+                session.setAttribute("successMessage", "Book discontinued!");
+            } else {
+                session.setAttribute("errorMessage", "Could not discontinue the book. Please try again!");
+            }
+        }
+        resp.sendRedirect(req.getContextPath() + "/dashboard/product-management");
     }
     private void handleRestore(HttpServletRequest req, HttpServletResponse resp, Account account)
         throws IOException {
-        // TODO: implement
+    int bookID = parseID(req.getParameter("bookID"));
+    HttpSession session = req.getSession();
+    if (bookID > 0) {
+        boolean ok = bookDAO.restoreBook(bookID, account.getId());
+        if (ok) {
+            session.setAttribute("successMessage", "Book relisted!");
+        } else {
+            session.setAttribute("errorMessage", "Could not relist the book. Please try again!");
+        }
+    }
+    resp.sendRedirect(req.getContextPath() + "/dashboard/product-management");
 }
 
 
     private String validateStockQuantity(String raw) {
-        // TODO: implement
+        if (raw == null || raw.trim().isEmpty()) {
+            return "Please enter the stock quantity!";
+        }
+ 
+        if (!raw.trim().matches("\\d+")) {
+            return "Stock quantity must be a non-negative integer; fractions such as 1.5 are invalid!";
+        }
+        try {
+            Integer.parseInt(raw.trim());
+        } catch (NumberFormatException e) {
+            return "Invalid stock quantity!";
+        }
         return null;
     }
 
 
     private String validateStatusVsStock(String stockRaw, String statusRaw) {
-        // TODO: implement
+        int stockQuantity = Integer.parseInt(stockRaw.trim());
+        String status = (statusRaw == null || statusRaw.trim().isEmpty()) ? "available" : statusRaw.trim();
+        if (stockQuantity <= 0 && "available".equals(status)) {
+            return "A book with zero stock cannot be marked as available. "
+                    + "Select Out of Stock or Discontinued, or enter a stock quantity greater than 0.";
+        }
+        return null;
+    }
+
+    private String validatePublisher(String rawPublisherID) {
+        Integer publisherID = parseIntParam(rawPublisherID);
+        if (publisherID == null || !bookDAO.getPublisherMap().containsKey(publisherID)) {
+            return "Please select a valid publisher!";
+        }
         return null;
     }
 
     private Book buildBookFromRequest(HttpServletRequest req) {
-<<<<<<< Updated upstream
-        // TODO: implement
-        return null;
-=======
         Book b = new Book();
         b.setTitle(req.getParameter("title"));
         b.setDescription(req.getParameter("description"));
@@ -310,39 +378,53 @@ public class AdminProductController extends HttpServlet {
             b.setPublisherID(pid);
         }
         return b;
->>>>>>> Stashed changes
     }
 
     private String clean(String s) {
-        // TODO: implement
-        return null;
+        return (s == null) ? "" : s.trim();
     }
 
 
     private Account requireStaff(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
-        // TODO: implement
-        return null;
+        return RoleGuard.requireStaff(req, resp);
     }
 
 
     private int parsePage(String param) {
-        // TODO: implement
-        return 0;
+        if (param == null) {
+            return 1;
+        }
+        try {
+            int p = Integer.parseInt(param.trim());
+            return p < 1 ? 1 : p;
+        } catch (Exception e) {
+            return 1;
+        }
     }
 
     private int parseID(String param) {
-        // TODO: implement
-        return 0;
+        if (param == null) {
+            return -1;
+        }
+        try {
+            return Integer.parseInt(param.trim());
+        } catch (Exception e) {
+            return -1;
+        }
     }
 
     private Integer parseIntParam(String param) {
-        // TODO: implement
-        return null;
+        if (param == null || param.trim().isEmpty()) {
+            return null;
+        }
+        try {
+            int v = Integer.parseInt(param.trim());
+            return v > 0 ? v : null;
+        } catch (Exception e) {
+            return null;
+        }
     }
-<<<<<<< Updated upstream
-}
-=======
 
     private List<Integer> parsePositiveIntParams(String[] params) {
         List<Integer> values = new java.util.ArrayList<>();
@@ -358,4 +440,3 @@ public class AdminProductController extends HttpServlet {
         return values;
     }
 }
->>>>>>> Stashed changes

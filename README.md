@@ -1,7 +1,3 @@
-<<<<<<< Updated upstream
-# HeavenScape-skeleton
-file trong đã dựng mô hình chỉ để code đúng mô hình dự án hiện tại
-=======
 # HeavenScape
 
 Online Bookstore System
@@ -87,4 +83,3 @@ HeavenScape/
 │   └── WEB-INF/          web.xml and beans.xml
 ├── pom.xml
 └── README.md
->>>>>>> Stashed changes
