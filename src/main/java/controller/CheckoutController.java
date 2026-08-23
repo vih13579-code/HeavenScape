@@ -3,7 +3,6 @@ package controller;
 import dao.CartDAO;
 import dao.OrderDAO;
 import dao.AddressDAO;
-import dao.BookDAO;
 import dao.VoucherDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -13,6 +12,9 @@ import jakarta.servlet.http.HttpSession;
 import model.Account;
 import model.CartItem;
 import model.Address;
+import model.CheckoutIssue;
+import model.CheckoutResult;
+import model.CheckoutSnapshot;
 import model.Voucher;
 
 import java.io.IOException;
@@ -20,6 +22,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 public class CheckoutController extends HttpServlet {
@@ -70,33 +73,28 @@ public class CheckoutController extends HttpServlet {
 
         CartDAO cartDAO = new CartDAO();
         AddressDAO addressDAO = new AddressDAO();
-        List<CartItem> cartItems = cartDAO.getCartItems(account.getId());
+        List<CartItem> cartItems = cartDAO.getCartItemsForCheckout(account.getId());
 
         if (cartItems.isEmpty()) {
             response.sendRedirect(request.getContextPath() + "/cart");
             return;
         }
 
-        cartItems.removeIf(item -> item.getStockQuantity() == 0);
-
-        if (cartItems.isEmpty()) {
-            request.getSession().setAttribute("errorMessage", "All items in your cart are out of stock!");
-            response.sendRedirect(request.getContextPath() + "/cart");
-            return;
-        }
-
-        boolean hasAdjusted = false;
         for (CartItem item : cartItems) {
-            if (item.getQuantity() > item.getStockQuantity()) {
-                cartDAO.updateQuantity(item.getCartItemID(), account.getId(), item.getStockQuantity());
-                item.setQuantity(item.getStockQuantity());
-                hasAdjusted = true;
+            if (!"available".equalsIgnoreCase(item.getStatus())) {
+                request.getSession().setAttribute("errorMessage",
+                        "'" + item.getTitle() + "' is no longer available for sale. Please review your cart.");
+                response.sendRedirect(request.getContextPath() + "/cart");
+                return;
             }
-        }
-
-        if (hasAdjusted) {
-            request.getSession().setAttribute("warningMessage",
-                    "Some item quantities were adjusted to match the remaining stock.");
+            if (item.getQuantity() < 1 || item.getStockQuantity() < item.getQuantity()) {
+                request.getSession().setAttribute("errorMessage",
+                        "'" + item.getTitle() + "' only has " + item.getStockQuantity()
+                                + " item(s) left, which is not enough for your requested quantity ("
+                                + item.getQuantity() + "). Please update your cart.");
+                response.sendRedirect(request.getContextPath() + "/cart");
+                return;
+            }
         }
 
         BigDecimal total = cartDAO.calcSubtotal(cartItems);
@@ -115,6 +113,8 @@ public class CheckoutController extends HttpServlet {
         // Nếu đang có voucher áp dụng trong session, kiểm tra lại còn hợp lệ không
         // (ví dụ giỏ hàng thay đổi khiến không còn đạt giá trị đơn tối thiểu)
         HttpSession session = request.getSession();
+        Voucher appliedVoucher = null;
+        BigDecimal appliedDiscount = BigDecimal.ZERO;
         Object voucherIdObj = session.getAttribute(SESSION_VOUCHER_ID);
         if (voucherIdObj != null) {
             String code = (String) session.getAttribute(SESSION_VOUCHER_CODE);
@@ -125,6 +125,8 @@ public class CheckoutController extends HttpServlet {
                 session.setAttribute(SESSION_VOUCHER_DISCOUNT, recheck.discountAmount);
                 request.setAttribute("appliedVoucherCode", recheck.voucher.getCode());
                 request.setAttribute("appliedDiscount", recheck.discountAmount);
+                appliedVoucher = recheck.voucher;
+                appliedDiscount = BigDecimal.valueOf(recheck.discountAmount);
             } else {
                 session.removeAttribute(SESSION_VOUCHER_ID);
                 session.removeAttribute(SESSION_VOUCHER_CODE);
@@ -134,6 +136,9 @@ public class CheckoutController extends HttpServlet {
                         "Voucher \"" + code + "\" can no longer be applied: " + recheck.message);
             }
         }
+
+        session.setAttribute(SESSION_CHECKOUT_SNAPSHOT,
+                createSnapshot(cartItems, appliedVoucher, total, appliedDiscount));
 
         request.getRequestDispatcher("/views/cart/checkout.jsp").forward(request, response);
     }
@@ -195,63 +200,7 @@ public class CheckoutController extends HttpServlet {
             return;
         }
 
-        CartDAO cartDAO = new CartDAO();
-        OrderDAO orderDAO = new OrderDAO();
-
-        List<CartItem> cartItems = cartDAO.getCartItems(account.getId());
-
-        if (cartItems.isEmpty()) {
-            response.sendRedirect(request.getContextPath() + "/cart");
-            return;
-        }
-
-        cartItems.removeIf(item -> item.getStockQuantity() == 0);
-
-        if (cartItems.isEmpty()) {
-            request.getSession().setAttribute("errorMessage", "All items in your cart are out of stock!");
-            response.sendRedirect(request.getContextPath() + "/cart");
-            return;
-        }
-
-        BigDecimal total = cartDAO.calcSubtotal(cartItems);
-
-        BookDAO bookDAO = new BookDAO();
-        for (CartItem item : cartItems) {
-            String stockError = bookDAO.validatePurchaseQuantity(item.getBookID(), item.getQuantity());
-            if (stockError != null) {
-                request.getSession().setAttribute("errorMessage",
-                        item.getTitle() + ": " + stockError);
-                response.sendRedirect(request.getContextPath() + "/cart");
-                return;
-            }
-        }
-
-        // --- Áp lại voucher (nếu có) và xác thực lần cuối trước khi trừ tiền ---
         HttpSession session = request.getSession();
-        Integer appliedVoucherID = (Integer) session.getAttribute(SESSION_VOUCHER_ID);
-        BigDecimal finalTotal = total;
-
-        if (appliedVoucherID != null) {
-            VoucherDAO voucherDAO = new VoucherDAO();
-            String appliedCode = (String) session.getAttribute(SESSION_VOUCHER_CODE);
-            VoucherController.VoucherValidationResult recheck = validateVoucher(appliedCode, account.getId(), total, voucherDAO);
-
-            if (recheck.success) {
-                finalTotal = total.subtract(BigDecimal.valueOf(recheck.discountAmount));
-                if (finalTotal.compareTo(BigDecimal.ZERO) < 0) {
-                    finalTotal = BigDecimal.ZERO;
-                }
-            } else {
-                // Voucher không còn hợp lệ tại thời điểm đặt hàng (hết lượt, hết hạn...)
-                appliedVoucherID = null;
-                session.removeAttribute(SESSION_VOUCHER_ID);
-                session.removeAttribute(SESSION_VOUCHER_CODE);
-                session.removeAttribute(SESSION_VOUCHER_DISCOUNT);
-                request.getSession().setAttribute("errorMessage",
-                        "The voucher is no longer valid and was removed from the order. Please review your total.");
-            }
-        }
-
         String addressIDRaw = request.getParameter("addressID");
 
         if (isEmpty(addressIDRaw)) {
@@ -269,52 +218,48 @@ public class CheckoutController extends HttpServlet {
             return;
         }
 
-        // Kiểm tra bảo mật: địa chỉ phải thuộc sở hữu của khách hàng đang đăng nhập
-        AddressDAO addressDAO = new AddressDAO();
-        List<Address> addresses = addressDAO.getAddressesByCustomerId(account.getId());
-        boolean isOwnedByCustomer = false;
-        for (Address addr : addresses) {
-            if (addr.getAddressID() == addressID) {
-                isOwnedByCustomer = true;
-                break;
-            }
-        }
-
-        if (!isOwnedByCustomer) {
-            request.getSession().setAttribute("errorMessage", "Invalid shipping address!");
+        CheckoutSnapshot expected = (CheckoutSnapshot) session.getAttribute(SESSION_CHECKOUT_SNAPSHOT);
+        if (expected == null) {
+            session.setAttribute("warningMessage",
+                    "Your checkout information has expired. Please review your order before continuing.");
             response.sendRedirect(request.getContextPath() + "/checkout");
             return;
         }
 
-        int orderID = orderDAO.createOrderWithStockCheck(
-                account.getId(), addressID, paymentMethod, finalTotal, cartItems, appliedVoucherID);
+        OrderDAO orderDAO = new OrderDAO();
+        CheckoutResult result = orderDAO.createCodOrderWithRevalidation(
+                account.getId(), addressID, expected);
 
-        if (orderID == -2) {
-            request.getSession().setAttribute("errorMessage", "An item in your cart went out of stock because another customer purchased it first. Please review your cart!");
-            response.sendRedirect(request.getContextPath() + "/cart");
-            return;
-        } else if (orderID == -3) {
-            request.getSession().setAttribute("errorMessage", "The selected shipping address no longer exists or is invalid. Please choose another address.");
-            response.sendRedirect(request.getContextPath() + "/checkout");
-            return;
-        } else if (orderID == -4) {
-            session.removeAttribute(SESSION_VOUCHER_ID);
-            session.removeAttribute(SESSION_VOUCHER_CODE);
-            session.removeAttribute(SESSION_VOUCHER_DISCOUNT);
-            request.getSession().setAttribute("errorMessage", "The selected voucher is no longer valid. Please review your order and try again.");
-            response.sendRedirect(request.getContextPath() + "/checkout");
-            return;
-        } else if (orderID == -1) {
-            request.getSession().setAttribute("errorMessage", "Could not create the order. Please try again!");
+        if (result.getStatus() == CheckoutResult.Status.REVIEW_REQUIRED) {
+            syncVoucherSession(session, result.getSnapshot());
+            session.setAttribute(SESSION_CHECKOUT_SNAPSHOT, result.getSnapshot());
+            session.setAttribute(SESSION_CHECKOUT_ISSUES, issueMessages(result));
             response.sendRedirect(request.getContextPath() + "/checkout");
             return;
         }
+
+        if (result.getStatus() == CheckoutResult.Status.BLOCKED) {
+            session.setAttribute(SESSION_CHECKOUT_ISSUES, issueMessages(result));
+            response.sendRedirect(request.getContextPath()
+                    + (hasBookIssue(result) ? "/cart" : "/checkout"));
+            return;
+        }
+
+        if (result.getStatus() != CheckoutResult.Status.VALID) {
+            session.setAttribute("errorMessage", "Could not create the order. Please try again!");
+            response.sendRedirect(request.getContextPath() + "/checkout");
+            return;
+        }
+
+        int orderID = result.getOrderID();
 
         orderDAO.clearCart(account.getId());
 
         session.removeAttribute(SESSION_VOUCHER_ID);
         session.removeAttribute(SESSION_VOUCHER_CODE);
         session.removeAttribute(SESSION_VOUCHER_DISCOUNT);
+        session.removeAttribute(SESSION_CHECKOUT_SNAPSHOT);
+        session.removeAttribute(SESSION_CHECKOUT_ISSUES);
 
         request.getSession().setAttribute("cartCount", 0);
         request.getSession().setAttribute("just_placed_order_id", orderID);
@@ -369,6 +314,86 @@ public class CheckoutController extends HttpServlet {
     private static final String SESSION_VOUCHER_ID = "appliedVoucherID";
     private static final String SESSION_VOUCHER_CODE = "appliedVoucherCode";
     private static final String SESSION_VOUCHER_DISCOUNT = "appliedVoucherDiscount";
+    private static final String SESSION_CHECKOUT_SNAPSHOT = "codCheckoutSnapshot";
+    private static final String SESSION_CHECKOUT_ISSUES = "checkoutIssueMessages";
+
+    private CheckoutSnapshot createSnapshot(List<CartItem> cartItems, Voucher voucher,
+            BigDecimal subtotal, BigDecimal discount) {
+        List<CheckoutSnapshot.Item> items = new ArrayList<>();
+        for (CartItem item : cartItems) {
+            items.add(new CheckoutSnapshot.Item(
+                    item.getBookID(), item.getTitle(), item.getQuantity(), item.getPrice()));
+        }
+
+        BigDecimal safeDiscount = discount == null ? BigDecimal.ZERO : discount;
+        BigDecimal total = subtotal.subtract(safeDiscount).max(BigDecimal.ZERO);
+        return new CheckoutSnapshot(
+                items,
+                voucher == null ? null : voucher.getVoucherID(),
+                voucher == null ? null : voucher.getCode(),
+                voucher == null ? null : BigDecimal.valueOf(voucher.getDiscountPercent()),
+                voucher == null ? null : voucher.getQuantity(),
+                voucher == null ? null : voucher.getStartDate(),
+                voucher == null ? null : voucher.getEndDate(),
+                voucher == null || voucher.getMinOrderValue() == null
+                        ? null : BigDecimal.valueOf(voucher.getMinOrderValue()),
+                voucher == null || voucher.getMaxDiscountValue() == null
+                        ? null : BigDecimal.valueOf(voucher.getMaxDiscountValue()),
+                subtotal, safeDiscount, total);
+    }
+
+    private CheckoutSnapshot createSnapshotAfterVoucherApply(HttpSession session,
+            List<CartItem> currentItems, Voucher voucher, BigDecimal currentSubtotal,
+            BigDecimal discount, BigDecimal displayedTotal) {
+        CheckoutSnapshot displayed = (CheckoutSnapshot) session.getAttribute(SESSION_CHECKOUT_SNAPSHOT);
+        if (displayed == null) {
+            return createSnapshot(currentItems, voucher, currentSubtotal, discount);
+        }
+
+        return new CheckoutSnapshot(
+                displayed.getItems(),
+                voucher.getVoucherID(),
+                voucher.getCode(),
+                BigDecimal.valueOf(voucher.getDiscountPercent()),
+                voucher.getQuantity(),
+                voucher.getStartDate(),
+                voucher.getEndDate(),
+                voucher.getMinOrderValue() == null
+                        ? null : BigDecimal.valueOf(voucher.getMinOrderValue()),
+                voucher.getMaxDiscountValue() == null
+                        ? null : BigDecimal.valueOf(voucher.getMaxDiscountValue()),
+                displayed.getSubtotal(), discount, displayedTotal);
+    }
+
+    private void syncVoucherSession(HttpSession session, CheckoutSnapshot snapshot) {
+        if (snapshot == null || snapshot.getVoucherID() == null) {
+            session.removeAttribute(SESSION_VOUCHER_ID);
+            session.removeAttribute(SESSION_VOUCHER_CODE);
+            session.removeAttribute(SESSION_VOUCHER_DISCOUNT);
+            return;
+        }
+        session.setAttribute(SESSION_VOUCHER_ID, snapshot.getVoucherID());
+        session.setAttribute(SESSION_VOUCHER_CODE, snapshot.getVoucherCode());
+        session.setAttribute(SESSION_VOUCHER_DISCOUNT, snapshot.getDiscount().doubleValue());
+    }
+
+    private List<String> issueMessages(CheckoutResult result) {
+        List<String> messages = new ArrayList<>();
+        for (CheckoutIssue issue : result.getIssues()) {
+            messages.add(issue.getMessage());
+        }
+        return messages;
+    }
+
+    private boolean hasBookIssue(CheckoutResult result) {
+        for (CheckoutIssue issue : result.getIssues()) {
+            if (issue.getCode().startsWith("BOOK_")
+                    || "INSUFFICIENT_STOCK".equals(issue.getCode())) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     private VoucherController.VoucherValidationResult validateVoucher(String code, int customerID, BigDecimal orderTotal,
             VoucherDAO voucherDAO) {
@@ -448,12 +473,27 @@ public class CheckoutController extends HttpServlet {
         String code = request.getParameter("code");
 
         CartDAO cartDAO = new CartDAO();
-        List<CartItem> cartItems = cartDAO.getCartItems(account.getId());
-        cartItems.removeIf(item -> item.getStockQuantity() == 0);
+        List<CartItem> cartItems = cartDAO.getCartItemsForCheckout(account.getId());
 
         if (cartItems.isEmpty()) {
             response.getWriter().write("{\"success\":false,\"message\":\"The cart is empty or all items are out of stock.\"}");
             return;
+        }
+        for (CartItem item : cartItems) {
+            if (!"available".equalsIgnoreCase(item.getStatus())) {
+                response.getWriter().write("{\"success\":false,\"message\":\""
+                        + escapeJson("'" + item.getTitle()
+                                + "' is no longer available for sale. Please review your cart.")
+                        + "\"}");
+                return;
+            }
+            if (item.getQuantity() < 1 || item.getStockQuantity() < item.getQuantity()) {
+                response.getWriter().write("{\"success\":false,\"message\":\""
+                        + escapeJson("'" + item.getTitle() + "' only has "
+                                + item.getStockQuantity() + " item(s) left. Please update your cart.")
+                        + "\"}");
+                return;
+            }
         }
 
         BigDecimal total = cartDAO.calcSubtotal(cartItems);
@@ -475,6 +515,10 @@ public class CheckoutController extends HttpServlet {
         if (newTotal.compareTo(BigDecimal.ZERO) < 0) {
             newTotal = BigDecimal.ZERO;
         }
+        session.setAttribute(SESSION_CHECKOUT_SNAPSHOT,
+                createSnapshotAfterVoucherApply(
+                        session, cartItems, result.voucher, total,
+                        BigDecimal.valueOf(result.discountAmount), newTotal));
 
         String json = "{\"success\":true,\"message\":\"" + escapeJson(result.message) + "\","
                 + "\"discountAmount\":" + result.discountAmount + ","
@@ -490,6 +534,14 @@ public class CheckoutController extends HttpServlet {
             session.removeAttribute(SESSION_VOUCHER_ID);
             session.removeAttribute(SESSION_VOUCHER_CODE);
             session.removeAttribute(SESSION_VOUCHER_DISCOUNT);
+            CheckoutSnapshot old = (CheckoutSnapshot) session.getAttribute(SESSION_CHECKOUT_SNAPSHOT);
+            if (old != null) {
+                session.setAttribute(SESSION_CHECKOUT_SNAPSHOT,
+                        new CheckoutSnapshot(
+                                old.getItems(), null, null, null, null,
+                                null, null, null, null,
+                                old.getSubtotal(), BigDecimal.ZERO, old.getSubtotal()));
+            }
         }
 
         response.getWriter().write("{\"success\":true}");
@@ -502,7 +554,7 @@ public class CheckoutController extends HttpServlet {
         VoucherDAO voucherDAO = new VoucherDAO();
         Account account = getAccount(request);
         List<Voucher> vouchers = voucherDAO.getActiveVouchers(account.getId());
-        List<CartItem> cartItems = new CartDAO().getCartItems(account.getId());
+        List<CartItem> cartItems = new CartDAO().getCartItemsForCheckout(account.getId());
         cartItems.removeIf(item -> item.getQuantity() <= 0
                 || item.getStockQuantity() <= 0
                 || !"available".equalsIgnoreCase(item.getStatus()));
