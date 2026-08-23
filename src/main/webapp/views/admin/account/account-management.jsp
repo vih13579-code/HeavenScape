@@ -8,6 +8,7 @@
         <meta charset="UTF-8">
         <meta content="width=device-width, initial-scale=1.0" name="viewport">
         <title>Account Management - HeavenScape</title>
+        <link rel="icon" type="image/png" href="https://res.cloudinary.com/llfxqkny/image/upload/v1787226687/heavenscape/favicon/heavenscape_favicon.png">
         <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
@@ -18,24 +19,24 @@
                 theme: {
                     extend: {
                         "colors": {
-                            "primary": "#004d99",
-                            "secondary": "#705d00",
+                            "primary": "#C92127",
+                            "secondary": "#F97316",
                             "success": "#2E7D32",
                             "error": "#D32F2F",
-                            "warning": "#FFA000",
-                            "background": "#f3faff",
-                            "background-alt": "#F5F7F9",
+                            "warning": "#F9A825",
+                            "background": "#F7F7F8",
+                            "background-alt": "#FFFFFF",
                             "surface": "#FFFFFF",
-                            "on-surface": "#071e27",
-                            "on-surface-variant": "#424752",
-                            "outline": "#727783",
-                            "outline-variant": "#c2c6d4",
-                            "surface-container-low": "#e6f6ff",
-                            "surface-container": "#dbf1fe",
-                            "surface-container-high": "#d5ecf8",
-                            "primary-fixed": "#d6e3ff",
-                            "secondary-container": "#fdd835",
-                            "error-container": "#ffdad6"
+                            "on-surface": "#1B1B1B",
+                            "on-surface-variant": "#5C5C5F",
+                            "outline": "#8F8F92",
+                            "outline-variant": "#D9D9DC",
+                            "surface-container-low": "#F7F7F8",
+                            "surface-container": "#F1F1F3",
+                            "surface-container-high": "#EBEBED",
+                            "primary-fixed": "#FFDAD9",
+                            "secondary-container": "#FFE3C2",
+                            "error-container": "#FFDAD6"
                         }
                     }
                 }
@@ -73,8 +74,8 @@
                 color: #D32F2F;
             }
             .role-badge-staff    {
-                background: #E3F2FD;
-                color: #004d99;
+                background: #FDE8E9;
+                color: #C92127;
             }
             .role-badge-customer {
                 background: #FFF3E0;
@@ -96,14 +97,12 @@
         <%@ include file="/views/layout/dashboard/sidebar.jsp" %>
 
         <main class="flex-1 md:ml-64 min-h-screen flex flex-col">
-            <header class="bg-white border-b h-14 sticky top-0 z-30 flex items-center px-6"
-                    style="border-color:#c2c6d4;">
-                <h2 class="font-semibold text-base">
-                    Account Management
-                </h2>
-            </header>
             <div class="p-6 md:p-8 ">
-                <div class="flex flex-col md:flex-row justify-end items-end gap-4 mb-6">
+                <div class="hs-admin-page-heading mb-6">
+                    <div>
+                        <h1 class="hs-admin-page-title">Account Management</h1>
+                        <p class="hs-admin-page-subtitle">Manage customer, staff, and administrator accounts.</p>
+                    </div>
                     <c:if test="${sessionScope.account.role == 'admin'}">
                         <a href="${pageContext.request.contextPath}/dashboard/add-staff"
                            class="bg-primary text-white px-6 py-3 rounded-xl inline-flex items-center gap-2 hover:opacity-90 transition">
@@ -174,18 +173,18 @@
                                             </span>
                                         </td>
                                         <td class="px-6 py-4 text-right">
-                                            <div class="flex justify-end gap-2">
-                                                <button type="button" class="edit-btn text-primary hover:text-primary/80 p-2 rounded hover:bg-surface-container transition"
+                                            <div class="action-group">
+                                                <button type="button" class="edit-btn btn-action btn-action-edit"
                                                         data-id="${c.customerID}" data-type="customer"
                                                         data-fullname="${c.fullname}" data-phone="${c.phone}"
                                                         data-status="${c.status}" data-email="${c.email}"
-                                                        title="Update Information">
-                                                    <span class="material-symbols-outlined text-sm">edit</span>
+                                                        title="Update Information" aria-label="Update customer information">
+                                                    <span class="material-symbols-outlined" aria-hidden="true">edit</span>
                                                 </button>
-                                                <button class="toggle-status-btn text-warning hover:text-warning/80 p-2 rounded hover:bg-surface-container transition"
+                                                <button type="button" class="toggle-status-btn btn-action ${c.status == 'active' ? 'btn-action-lock' : 'btn-action-success'}"
                                                         data-account-id="${c.customerID}" data-role="customer" data-current-status="${c.status}"
-                                                        title="${c.status == 'active' ? 'Lock Account' : 'Unlock Account'}">
-                                                    <span class="material-symbols-outlined text-sm">${c.status == 'active' ? 'lock' : 'lock_open'}</span>
+                                                        title="${c.status == 'active' ? 'Lock Account' : 'Unlock Account'}" aria-label="${c.status == 'active' ? 'Lock customer account' : 'Unlock customer account'}">
+                                                    <span class="material-symbols-outlined" aria-hidden="true">${c.status == 'active' ? 'lock' : 'lock_open'}</span>
                                                 </button>
                                             </div>
                                         </td>
@@ -219,19 +218,19 @@
                                                 </span>
                                             </td>
                                             <td class="px-6 py-4 text-right">
-                                                <div class="flex justify-end gap-2">
-                                                    <button type="button" class="edit-btn text-primary hover:text-primary/80 p-2 rounded hover:bg-surface-container transition"
+                                                <div class="action-group">
+                                                    <button type="button" class="edit-btn btn-action btn-action-edit"
                                                             data-id="${s.id}" data-type="staff"
                                                             data-fullname="${s.fullname}" data-phone="${s.phone}"
                                                             data-status="${s.status}" data-role-value="${s.role}" data-email="${s.email}"
-                                                            title="Update Information">
-                                                        <span class="material-symbols-outlined text-sm">edit</span>
+                                                            title="Update Information" aria-label="Update staff information">
+                                                        <span class="material-symbols-outlined" aria-hidden="true">edit</span>
                                                     </button>
                                                     <c:if test="${s.role ne 'admin'}">
-                                                        <button class="toggle-status-btn text-warning hover:text-warning/80 p-2 rounded hover:bg-surface-container transition"
+                                                        <button type="button" class="toggle-status-btn btn-action ${s.status == 'active' ? 'btn-action-lock' : 'btn-action-success'}"
                                                                 data-account-id="${s.id}" data-role="staff" data-current-status="${s.status}"
-                                                                title="${s.status == 'active' ? 'Lock Account' : 'Unlock Account'}">
-                                                            <span class="material-symbols-outlined text-sm">${s.status == 'active' ? 'lock' : 'lock_open'}</span>
+                                                                title="${s.status == 'active' ? 'Lock Account' : 'Unlock Account'}" aria-label="${s.status == 'active' ? 'Lock staff account' : 'Unlock staff account'}">
+                                                            <span class="material-symbols-outlined" aria-hidden="true">${s.status == 'active' ? 'lock' : 'lock_open'}</span>
                                                         </button>
                                                     </c:if>
                                                 </div>
@@ -297,13 +296,13 @@
                         </div>
                         <div class="space-y-3">
                             <div>
-                                <label class="block text-xs font-medium text-on-surface-variant mb-1">Full Name</label>
+                                <label class="block text-xs font-medium text-on-surface-variant mb-1">Full Name <span class="text-error">*</span></label>
                                 <input type="text" id="updateFullname"
                                        class="w-full h-11 px-4 border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition">
                             </div>
                             <div class="grid grid-cols-2 gap-3">
                                 <div>
-                                    <label class="block text-xs font-medium text-on-surface-variant mb-1">Phone Number</label>
+                                    <label class="block text-xs font-medium text-on-surface-variant mb-1">Phone Number <span class="text-error">*</span></label>
                                     <input type="text" id="updatePhone"
                                            class="w-full h-11 px-4 border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition">
                                 </div>
@@ -340,7 +339,7 @@
                         </div>
                         <div class="space-y-3">
                             <div id="updateRoleWrapper" class="hidden">
-                                <label class="block text-xs font-medium text-on-surface-variant mb-1">System Role</label>
+                                <label class="block text-xs font-medium text-on-surface-variant mb-1">System Role <span class="text-error">*</span></label>
                                 <select id="updateRole" class="w-full h-11 px-4 border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition cursor-pointer">
                                     <option value="staff">Staff</option>
                                     <option value="admin">Admin</option>
@@ -459,11 +458,17 @@
                                     statusBadge.textContent = 'Active';
                                     icon.textContent = 'lock';
                                     btn.title = 'Lock Account';
+                                    btn.setAttribute('aria-label', 'Lock ' + role + ' account');
+                                    btn.classList.remove('btn-action-success');
+                                    btn.classList.add('btn-action-lock');
                                 } else {
                                     statusBadge.classList.replace('status-badge-active', 'status-badge-inactive');
                                     statusBadge.textContent = 'Locked';
                                     icon.textContent = 'lock_open';
                                     btn.title = 'Unlock Account';
+                                    btn.setAttribute('aria-label', 'Unlock ' + role + ' account');
+                                    btn.classList.remove('btn-action-lock');
+                                    btn.classList.add('btn-action-success');
                                 }
 
                                 row.dataset.status = newStatus;
@@ -637,6 +642,9 @@
                                 toggleBtn.dataset.currentStatus = newStatus;
                                 toggleBtn.querySelector('.material-symbols-outlined').textContent = newStatus === 'active' ? 'lock' : 'lock_open';
                                 toggleBtn.title = newStatus === 'active' ? 'Lock Account' : 'Unlock Account';
+                                toggleBtn.setAttribute('aria-label', (newStatus === 'active' ? 'Lock ' : 'Unlock ') + type + ' account');
+                                toggleBtn.classList.toggle('btn-action-lock', newStatus === 'active');
+                                toggleBtn.classList.toggle('btn-action-success', newStatus !== 'active');
                             }
 
                             const editBtn = row.querySelector('.edit-btn');

@@ -29,12 +29,12 @@
         <servlet-name>OtpController</servlet-name>
         <servlet-class>controller.OtpController</servlet-class>
     </servlet>
-    <!-- BÃƒÂ¡Ã‚Â»Ã¢â‚¬Â SUNG: trÃƒâ€ Ã‚Â°ÃƒÂ¡Ã‚Â»Ã¢â‚¬Âºc Ãƒâ€žÃ¢â‚¬ËœÃƒÆ’Ã‚Â¢y thiÃƒÂ¡Ã‚ÂºÃ‚Â¿u, gÃƒÆ’Ã‚Â¢y lÃƒÂ¡Ã‚Â»Ã¢â‚¬â€i 404 khi truy cÃƒÂ¡Ã‚ÂºÃ‚Â­p /forgot-password -->
+    <!-- BỔ SUNG: trước đây thiếu, gây lỗi 404 khi truy cập /forgot-password -->
     <servlet>
         <servlet-name>ForgotPasswordController</servlet-name>
         <servlet-class>controller.ForgotPasswordController</servlet-class>
     </servlet>
-    <!-- BÃƒÂ¡Ã‚Â»Ã¢â‚¬Â SUNG: trÃƒâ€ Ã‚Â°ÃƒÂ¡Ã‚Â»Ã¢â‚¬Âºc Ãƒâ€žÃ¢â‚¬ËœÃƒÆ’Ã‚Â¢y thiÃƒÂ¡Ã‚ÂºÃ‚Â¿u, sÃƒÂ¡Ã‚ÂºÃ‚Â½ gÃƒÆ’Ã‚Â¢y lÃƒÂ¡Ã‚Â»Ã¢â‚¬â€i 404 khi truy cÃƒÂ¡Ã‚ÂºÃ‚Â­p /reset-password -->
+    <!-- BỔ SUNG: trước đây thiếu, sẽ gây lỗi 404 khi truy cập /reset-password -->
     <servlet>
         <servlet-name>ResetPasswordController</servlet-name>
         <servlet-class>controller.ResetPasswordController</servlet-class>
@@ -179,6 +179,10 @@
         <url-pattern>/profile</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
+        <servlet-name>ProfileController</servlet-name>
+        <url-pattern>/dashboard/profile</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
         <servlet-name>ProductController</servlet-name>
         <url-pattern>/products</url-pattern>
     </servlet-mapping>
@@ -205,6 +209,10 @@
     <servlet-mapping>
         <servlet-name>ChangePasswordController</servlet-name>
         <url-pattern>/profile/change-password</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ChangePasswordController</servlet-name>
+        <url-pattern>/dashboard/profile/change-password</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>AccountManagementController</servlet-name>

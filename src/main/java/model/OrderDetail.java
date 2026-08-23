@@ -15,6 +15,7 @@ public class OrderDetail {
     private BigDecimal unitPrice;
     private String title;
     private String thumbnail;
+    private String authorsDisplay;
    
 
     public OrderDetail() {
@@ -74,6 +75,14 @@ public class OrderDetail {
 
     public void setThumbnail(String thumbnail) {
         this.thumbnail = thumbnail;
+    }
+
+    public String getAuthorsDisplay() {
+        return authorsDisplay;
+    }
+
+    public void setAuthorsDisplay(String authorsDisplay) {
+        this.authorsDisplay = authorsDisplay;
     }
 
     public BigDecimal getSubtotal() {

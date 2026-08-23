@@ -21,6 +21,48 @@ public class HomeController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        // TODO: implement
+
+        // Featured Books: top 5 theo số lượng đặt hàng (OrderDetail)
+        List<Book> featuredBooks = bookDAO.getFeaturedByOrders(5);
+        req.setAttribute("featuredBooks", featuredBooks);
+
+        // New Releases nhất: top 5 theo created_at DESC
+        List<Book> newBooks = bookDAO.getNewBooks(5);
+        req.setAttribute("newBooks", newBooks);
+
+        // Wishlist badge cho header (nếu đã đăng nhập) & load list sách yêu thích
+        HttpSession session = req.getSession(false);
+        Set<String> wishlistBookIds = new HashSet<>();
+        if (session != null) {
+            Account account = (Account) session.getAttribute("account");
+            if (account != null && "customer".equals(account.getRole())) {
+                WishListDAO wDAO = new WishListDAO();
+                wDAO.getWishlistItems(account.getId()).forEach(wi -> wishlistBookIds.add(String.valueOf(wi.getBookID())));
+                session.setAttribute("wishlistCount", wDAO.countWishlistItems(account.getId()));
+            }
+        }
+        req.setAttribute("wishlistBookIds", wishlistBookIds);
+
+        // Toast messages từ redirect parameters
+        String addResult = req.getParameter("addResult");
+        if ("success".equals(addResult)) {
+            req.setAttribute("successMessage", "Added to cart!");
+        } else if ("error".equals(addResult)) {
+            req.setAttribute("errorMessage", "Could not add to cart.");
+        }
+        String wishResult = req.getParameter("wishResult");
+        if ("added".equals(wishResult)) {
+            req.setAttribute("successMessage", "Added to wishlist!");
+        } else if ("removed".equals(wishResult)) {
+            req.setAttribute("successMessage", "Removed from wishlist!");
+        } else if ("wishError".equals(wishResult)) {
+            String wishMessage = req.getParameter("wishMessage");
+            req.setAttribute("errorMessage",
+                    wishMessage != null && !wishMessage.isBlank()
+                            ? wishMessage
+                            : "An error occurred. Please try again.");
+        }
+
+        req.getRequestDispatcher("/views/book/index.jsp").forward(req, resp);
     }
 }

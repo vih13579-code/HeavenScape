@@ -12,7 +12,7 @@
     }
     .input-style:focus {
         outline: none;
-        border-color: #2563eb;
+        border-color: #C92127;
         box-shadow: 0 0 0 3px rgba(37, 99, 235, .15);
     }
     .password-strength {
@@ -46,7 +46,7 @@
         background: #10b981;
     }
     .btn-submit {
-        background: #2563eb;
+        background: #C92127;
         color: white;
         padding: 12px 24px;
         border-radius: 10px;
@@ -108,7 +108,7 @@
         justify-content: center;
     }
     .visibility-toggle:hover {
-        color: #2563eb;
+        color: #C92127;
     }
     .password-input-wrapper {
         position: relative;
@@ -155,12 +155,12 @@
     }
 </style>
 
-<div class="max-w-7xl mx-auto py-10 px-4">
-    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+<div class="fhs-page-inner">
+    <div class="grid grid-cols-1 lg:grid-cols-[250px_minmax(0,1fr)] gap-4">
         <!-- Sidebar -->
         <c:set var="activeMenu" value="password" scope="request"/>
         <%@ include file="/views/layout/profile/sidebar.jsp" %>
-        <div class="lg:col-span-3">
+        <div class="min-w-0">
             <div class="profile-card p-8">
                 <div class="mb-8">
                     <h1 class="text-3xl font-bold">Change Password</h1>

@@ -10,6 +10,7 @@ Address a = (Address) request.getAttribute("address");
 <head>
     <meta charset="UTF-8">
     <title>Address Form</title>
+    <link rel="icon" type="image/png" href="https://res.cloudinary.com/llfxqkny/image/upload/v1787226687/heavenscape/favicon/heavenscape_favicon.png">
 </head>
 <body>
 
@@ -20,12 +21,12 @@ Address a = (Address) request.getAttribute("address");
     <input type="hidden" name="id"
            value="<%=a != null ? a.getAddressID() : ""%>">
 
-    Customer ID:
+    <label>Customer ID: <span style="color:#d32f2f;font-size:12px">*</span></label>
     <input type="number" name="customerID" required
            value="<%=a != null ? a.getCustomerID() : 2%>">
     <br><br>
 
-    Street:
+    <label>Street: <span style="color:#d32f2f;font-size:12px">*</span></label>
     <input type="text" name="street" required
            value="<%=a != null ? a.getStreet() : ""%>">
     <br><br>

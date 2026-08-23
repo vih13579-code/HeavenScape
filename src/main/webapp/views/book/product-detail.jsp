@@ -7,6 +7,20 @@
 <%@ include file="/views/layout/common/toast.jsp" %>
 <%@ include file="/views/layout/common/wishlist-heart.js.jsp" %>
 <style>
+    :root {
+        --hs-primary: #C92127;
+        --hs-surface-low: #F7F7F8;
+        --hs-outline-variant: #D9D9DC;
+        --hs-tertiary: #F5A623;
+        --hs-tertiary-container: #FFF3D6;
+    }
+    .hs-detail-title { font-size: 24px; font-weight: 700; color: #1B1B1B; line-height: 1.3; }
+    .hs-primary-button { background:#C92127; color:#fff; border-radius:6px; transition: background .15s, transform .15s; }
+    .hs-primary-button:hover { background:#8E171B; }
+    .hs-secondary-button { background:#fff; color:#C92127; border:2px solid #C92127; border-radius:6px; transition: background .15s; }
+    .hs-secondary-button:hover { background:#FDE8E9; }
+    .hs-purchase-panel { background:#fff; border:1px solid #E3E3E6; border-radius:12px; }
+
     .no-spinner::-webkit-outer-spin-button,
     .no-spinner::-webkit-inner-spin-button {
         -webkit-appearance: none;
@@ -77,7 +91,7 @@
         }
     }
 
-    /* ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ Tabs ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ */
+    /* ── Tabs ── */
     .tab-nav {
         border-bottom: 1px solid var(--hs-outline-variant);
         display: flex;
@@ -115,7 +129,7 @@
         display: block;
     }
 
-    /* ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ Review cards ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ */
+    /* ── Review cards ── */
     .badge-purchased {
         display: inline-flex;
         align-items: center;
@@ -147,7 +161,7 @@
         margin-top: 14px;
     }
 
-    /* ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ Write review form ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ */
+    /* ── Write review form ── */
     .btn-write-review {
         display: inline-flex;
         align-items: center;
@@ -211,7 +225,7 @@
         width: 40px;
         height: 40px;
         border-radius: 50%;
-        background: #4f46e5;
+        background: #C92127;
         color: white;
         display: flex;
         align-items: center;
@@ -226,20 +240,20 @@
     }
 </style>
 
-<main class="flex-grow max-w-[1280px] w-full mx-auto px-5 md:px-16 py-10 md:py-16 flex flex-col gap-10">
+<main class="fhs-page-inner flex flex-col gap-4">
 
     <nav class="flex flex-wrap items-center gap-2 text-sm text-on-surface-variant" aria-label="Breadcrumb">
         <a href="${pageContext.request.contextPath}/home" class="hover:text-primary">Home</a>
         <i data-lucide="chevron-right" class="w-4 h-4"></i>
-        <c:if test="${not empty book.genreName}">
-            <a href="${pageContext.request.contextPath}/products?genre=${book.genreID}" class="hover:text-primary">${book.genreName}</a>
-            <i data-lucide="chevron-right" class="w-4 h-4"></i>
-        </c:if>
+        <c:forEach var="genre" items="${book.genres}" varStatus="genreStatus">
+            <a href="${pageContext.request.contextPath}/products?genre=${genre.genreID}" class="hover:text-primary">${genre.genreName}</a>
+            <c:if test="${!genreStatus.last}"><span>,</span></c:if>
+        </c:forEach>
         <span class="text-on-surface line-clamp-1">${book.title}</span>
     </nav>
 
 
-    <section class="flex flex-col lg:flex-row gap-8 lg:gap-14">
+    <section class="fhs-block p-5 md:p-7 flex flex-col lg:flex-row gap-7 lg:gap-10">
 
 
         <div class="flex-shrink-0 w-full lg:w-[42%] flex flex-col gap-4">
@@ -275,7 +289,7 @@
                 <c:if test="${book.featured}">
                     <div
                         class="absolute top-3 left-3 bg-[#8E24AA] text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full">
-                        ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒâ€šÃ‚Â¥ Featured</div>
+                        🔥 Featured</div>
                     </c:if>
 
                 <c:if test="${book.status != 'available' or book.stockQuantity == 0}">
@@ -290,13 +304,13 @@
 
             <c:if test="${not empty img1}">
                 <div class="grid grid-cols-4 gap-3">
-                    <%-- ÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚ÂºÃƒâ€šÃ‚Â¢nh 1: bÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¬a chÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­nh --%>
+                    <%-- Ảnh 1: bìa chính --%>
                     <button onclick="switchImg(this, '${img1}')"
                             class="prod-thumb-active rounded-lg overflow-hidden aspect-square bg-gray-50">
                         <img src="${img1}" class="w-full h-full object-cover"
                              alt="">
                     </button>
-                    <%-- ÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚ÂºÃƒâ€šÃ‚Â¢nh 2 --%>
+                    <%-- Ảnh 2 --%>
                     <c:choose>
                         <c:when test="${not empty img2}">
                             <button onclick="switchImg(this, '${img2}')"
@@ -313,7 +327,7 @@
                             </button>
                         </c:otherwise>
                     </c:choose>
-                    <%-- ÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚ÂºÃƒâ€šÃ‚Â¢nh 3 --%>
+                    <%-- Ảnh 3 --%>
                     <c:choose>
                         <c:when test="${not empty img3}">
                             <button onclick="switchImg(this, '${img3}')"
@@ -331,7 +345,7 @@
                             </button>
                         </c:otherwise>
                     </c:choose>
-                    <%-- ÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚ÂºÃƒâ€šÃ‚Â¢nh 4 --%>
+                    <%-- Ảnh 4 --%>
                     <c:choose>
                         <c:when test="${not empty img4}">
                             <button onclick="switchImg(this, '${img4}')"
@@ -358,18 +372,17 @@
 
             <!-- Tags -->
             <div class="flex flex-wrap gap-2">
-                <c:if test="${not empty book.genreName}">
-                    <span
-                        class="bg-primary/10 text-primary text-[12px] font-bold px-3 py-1 rounded-full uppercase tracking-wide">${book.genreName}</span>
-                </c:if>
+                <c:forEach var="genre" items="${book.genres}">
+                    <span class="bg-primary/10 text-primary text-[12px] font-bold px-3 py-1 rounded-full uppercase tracking-wide">${genre.genreName}</span>
+                </c:forEach>
                 <c:if test="${book.featured}">
                     <span
-                        class="bg-secondary/20 text-primary text-[12px] font-bold px-3 py-1 rounded-full uppercase tracking-wide">ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒâ€šÃ‚Â¥
+                        class="bg-secondary/20 text-primary text-[12px] font-bold px-3 py-1 rounded-full uppercase tracking-wide">🔥
                         Best Seller</span>
                     </c:if>
                     <c:if test="${not empty book.originName}">
                     <span
-                        class="bg-gray-100 text-gray-600 text-[12px] font-medium px-3 py-1 rounded-full">ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€¦Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â
+                        class="bg-gray-100 text-gray-600 text-[12px] font-medium px-3 py-1 rounded-full">🌏
                         ${book.originName}</span>
                     </c:if>
             </div>
@@ -384,7 +397,7 @@
                     Author:
                     <c:forEach var="author" items="${book.authors}" varStatus="s">
                         <span
-                            class="text-primary font-semibold not-italic hover:underline cursor-pointer">${author}</span>
+                            class="text-primary font-semibold not-italic hover: cursor-pointer">${author}</span>
                         <c:if test="${!s.last}">, </c:if>
                     </c:forEach>
                 </p>
@@ -396,8 +409,8 @@
                     <c:set var="rating" value="${book.avgRating}" />
                     <c:forEach begin="1" end="5" var="i">
                         <c:choose>
-                            <c:when test="${i <= rating}">ÃƒÆ’Ã‚Â¢Ãƒâ€¹Ã…â€œÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦</c:when>
-                            <c:otherwise><span class="text-gray-300">ÃƒÆ’Ã‚Â¢Ãƒâ€¹Ã…â€œÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦</span></c:otherwise>
+                            <c:when test="${i <= rating}">★</c:when>
+                            <c:otherwise><span class="text-gray-300">★</span></c:otherwise>
                         </c:choose>
                     </c:forEach>
                 </div>
@@ -454,7 +467,7 @@
                         <c:if test="${book.status == 'available' and book.stockQuantity > 0}">
                             <div class="flex items-center h-[58px] border border-outline-variant rounded overflow-hidden shrink-0">
                                 <button type="button" id="qty-minus"
-                                        class="px-4 py-2 text-lg font-bold text-gray-500 hover:bg-gray-100 transition-colors">ÃƒÆ’Ã‚Â¢Ãƒâ€¹Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢</button>
+                                        class="px-4 py-2 text-lg font-bold text-gray-500 hover:bg-gray-100 transition-colors">−</button>
                                 <input id="form-qty" name="quantity" type="number" value="1"
                                        min="1" max="${book.stockQuantity}"
                                        class="w-14 text-center text-[15px] font-bold border-none outline-none py-2 bg-transparent no-spinner"
@@ -541,7 +554,7 @@
 
             <!-- Specs grid -->
             <div
-                class="border-y border-outline-variant grid grid-cols-2 md:grid-cols-4 divide-x divide-outline-variant py-6">
+                class="border-y border-outline-variant grid grid-cols-2 md:grid-cols-5 divide-x divide-outline-variant py-6">
                 <div class="flex flex-col gap-1 px-4 first:pl-0">
                     <span
                         class="text-[12px] font-bold text-gray-500 uppercase tracking-wide">Format</span>
@@ -549,21 +562,11 @@
                         <c:choose>
                             <c:when test="${not empty book.contentName}">${book.contentName}
                             </c:when>
-                            <c:otherwise>ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â</c:otherwise>
-                        </c:choose>
-                    </span>
-                </div>
-                <div class="flex flex-col gap-1 px-4">
-                    <span
-                        class="text-[12px] font-bold text-gray-500 uppercase tracking-wide">Origin</span>
-                    <span class="text-[16px] font-medium text-[#222222]">
-                        <c:choose>
-                            <c:when test="${not empty book.originName}">${book.originName}
-                            </c:when>
                             <c:otherwise>—</c:otherwise>
                         </c:choose>
                     </span>
                 </div>
+
                 <div class="flex flex-col gap-1 px-4">
                     <span
                         class="text-[12px] font-bold text-gray-500 uppercase tracking-wide">Series</span>
@@ -571,7 +574,18 @@
                         <c:choose>
                             <c:when test="${not empty book.seriesName}">${book.seriesName}
                             </c:when>
-                            <c:otherwise>ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â</c:otherwise>
+                            <c:otherwise>—</c:otherwise>
+                        </c:choose>
+                    </span>
+                </div>
+                <div class="flex flex-col gap-1 px-4">
+                    <span
+                        class="text-[12px] font-bold text-gray-500 uppercase tracking-wide">Publisher</span>
+                    <span class="text-[16px] font-medium text-[#222222]">
+                        <c:choose>
+                            <c:when test="${not empty book.publisherName}">${book.publisherName}
+                            </c:when>
+                            <c:otherwise>&mdash;</c:otherwise>
                         </c:choose>
                     </span>
                 </div>
@@ -582,7 +596,7 @@
                         <c:choose>
                             <c:when test="${book.totalPages > 0}">${book.totalPages} pages
                             </c:when>
-                            <c:otherwise>ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â</c:otherwise>
+                            <c:otherwise>—</c:otherwise>
                         </c:choose>
                     </span>
                 </div>
@@ -591,13 +605,8 @@
     </section>
 
 
-<<<<<<< Updated upstream
     <!-- ══ TABS: Description / Thông tin / Review  -->
-    <section class="pt-2">
-=======
-    <!-- ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢Ãƒâ€šÃ‚ÂÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢Ãƒâ€šÃ‚Â TABS: Description / ThÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â´ng tin / Review  -->
     <section class="fhs-block p-5 md:p-7">
->>>>>>> Stashed changes
         <!-- Tab Navigation -->
         <div class="tab-nav">
             <button class="tab-btn" onclick="switchTab('tab-desc', this)">Description</button>
@@ -620,7 +629,7 @@
             </c:choose>
         </div>
 
-        <!-- Tab: ThÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â´ng tin bÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚Â»ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ sung -->
+        <!-- Tab: Thông tin bổ sung -->
         <div id="tab-info" class="tab-panel">
             <table class="w-full text-[15px]">
                 <tbody>
@@ -631,7 +640,7 @@
                                 <c:when test="${book.totalPages > 0}">${book.totalPages}
                                     trang
                                 </c:when>
-                                <c:otherwise>ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â</c:otherwise>
+                                <c:otherwise>—</c:otherwise>
                             </c:choose>
                         </td>
                     </tr>
@@ -642,21 +651,11 @@
                                 <c:when test="${not empty book.contentName}">
                                     ${book.contentName}
                                 </c:when>
-                                <c:otherwise>ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â</c:otherwise>
-                            </c:choose>
-                        </td>
-                    </tr>
-                    <tr class="border-b border-gray-100">
-                        <td class="py-3 font-semibold text-gray-500">Origin</td>
-                        <td class="py-3 text-gray-800">
-                            <c:choose>
-                                <c:when test="${not empty book.originName}">
-                                    ${book.originName}
-                                </c:when>
                                 <c:otherwise>—</c:otherwise>
                             </c:choose>
                         </td>
                     </tr>
+
                     <tr class="border-b border-gray-100">
                         <td class="py-3 font-semibold text-gray-500">Series</td>
                         <td class="py-3 text-gray-800">
@@ -664,7 +663,18 @@
                                 <c:when test="${not empty book.seriesName}">
                                     ${book.seriesName}
                                 </c:when>
-                                <c:otherwise>ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â</c:otherwise>
+                                <c:otherwise>—</c:otherwise>
+                            </c:choose>
+                        </td>
+                    </tr>
+                    <tr class="border-b border-gray-100">
+                        <td class="py-3 font-semibold text-gray-500">Publisher</td>
+                        <td class="py-3 text-gray-800">
+                            <c:choose>
+                                <c:when test="${not empty book.publisherName}">
+                                    ${book.publisherName}
+                                </c:when>
+                                <c:otherwise>&mdash;</c:otherwise>
                             </c:choose>
                         </td>
                     </tr>
@@ -672,8 +682,8 @@
                         <td class="py-3 font-semibold text-gray-500">SKU</td>
                         <td class="py-3 text-gray-800">HS-${book.bookID}</td>
                     </tr>
-                    <%-- [NEW] BÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚Â»ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ sung Dimensions / Weight tÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚Â»Ãƒâ€šÃ‚Â« code 2 (chÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚Â»ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â° hiÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚Â»ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¡n khi cÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³
-                        dÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚Â»Ãƒâ€šÃ‚Â¯ liÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚Â»ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¡u) --%>
+                    <%-- [NEW] Bổ sung Dimensions / Weight từ code 2 (chỉ hiện khi có
+                        dữ liệu) --%>
                     <c:if test="${not empty book.dimensions}">
                         <tr class="border-b border-gray-100">
                             <td class="py-3 font-semibold text-gray-500">Dimensions</td>
@@ -694,7 +704,7 @@
         <!-- Tab: Review -->
         <div id="tab-reviews" class="tab-panel active">
 
-            <!-- Header + nÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âºt viÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚ÂºÃƒâ€šÃ‚Â¿t reviews -->
+            <!-- Header + nút viết reviews -->
             <div class="flex items-center justify-between mb-6">
                 <h2 class="section-title-left text-[22px] font-bold text-primary">
                     Product Reviews (${reviews.size()})
@@ -707,7 +717,7 @@
                 </button>
             </div>
 
-            <!-- Danh sÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡ch reviews -->
+            <!-- Danh sách reviews -->
             <c:choose>
                 <c:when test="${not empty reviews}">
                     <div class="flex flex-col gap-6">
@@ -727,10 +737,10 @@
                                             <c:forEach begin="1" end="5" var="i">
                                                 <c:choose>
                                                     <c:when test="${i <= review.rating}">
-                                                        <span>ÃƒÆ’Ã‚Â¢Ãƒâ€¹Ã…â€œÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦</span>
+                                                        <span>★</span>
                                                     </c:when>
                                                     <c:otherwise><span
-                                                            class="text-gray-300">ÃƒÆ’Ã‚Â¢Ãƒâ€¹Ã…â€œÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦</span>
+                                                            class="text-gray-300">★</span>
                                                     </c:otherwise>
                                                 </c:choose>
                                             </c:forEach>
@@ -773,13 +783,16 @@
                                 </p>
                                 <c:if test="${not empty review.adminReply}">
                                     <div
-                                        class="mt-5 ml-6 p-4 bg-blue-50 rounded-lg border-l-4 border-primary">
+                                        class="mt-5 ml-6 p-4 bg-[#FDE8E9] rounded-lg border-l-4 border-primary">
                                         <div class="flex items-center gap-2 mb-2">
-                                            <span
-                                                class="font-bold text-primary">HeavenScape</span>
+                                            <span class="font-bold text-primary">
+                                                <c:choose><c:when test="${not empty review.replyAuthorName}"><c:out value="${review.replyAuthorName}" /></c:when><c:otherwise>HeavenScape Team</c:otherwise></c:choose>
+                                            </span>
+                                            <span class="rounded-full bg-white px-2 py-0.5 text-[10px] font-semibold uppercase text-primary">
+                                                <c:choose><c:when test="${not empty review.replyAuthorRole}"><c:out value="${review.replyAuthorRole}" /></c:when><c:otherwise>Staff/Admin</c:otherwise></c:choose>
+                                            </span>
                                         </div>
-                                        <p class="text-gray-700 text-sm leading-relaxed">
-                                            ${review.adminReply}</p>
+                                        <p class="text-gray-700 text-sm leading-relaxed"><c:out value="${review.adminReply}" /></p>
                                             <c:if test="${review.adminReplyDate != null}">
                                             <div class="text-xs text-gray-400 mt-2">
                                                 <fmt:formatDate
@@ -796,11 +809,7 @@
                 <c:otherwise>
                     <div
                         class="bg-white border border-dashed border-gray-300 rounded-xl p-10 text-center">
-<<<<<<< Updated upstream
-                        <div class="text-5xl mb-3">⭐</div>
-=======
-                        <div class="text-5xl mb-3">ÃƒÆ’Ã‚Â¢Ãƒâ€¹Ã…â€œÃƒÂ¢Ã¢â€šÂ¬Ã‚Â </div>
->>>>>>> Stashed changes
+                        <div class="text-5xl mb-3">☆</div>
                         <div class="font-semibold text-gray-600">No Reviews Yet</div>
                         <div class="text-gray-400 mt-2">Be the first to read and review this book.</div>
                     </div>
@@ -813,7 +822,7 @@
     <div id="reviewModal"
          class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
         <div class="bg-white w-[600px] rounded-xl p-6 relative">
-            <button id="closeReviewModal" class="absolute top-3 right-4 text-2xl">ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â</button>
+            <button id="closeReviewModal" class="absolute top-3 right-4 text-2xl">×</button>
             <h3 id="reviewModalTitle" class="text-xl font-bold mb-6">Write a Review</h3>
             <form id="reviewForm" action="${pageContext.request.contextPath}/review"
                   method="post">
@@ -822,17 +831,18 @@
                 <input type="hidden" name="bookID" value="${book.bookID}">
                 <input type="hidden" id="ratingValue" name="rating" value="5">
                 <div class="mb-4">
-                    <label class="font-semibold block mb-2">Your Rating</label>
+                    <label class="font-semibold block mb-2">Your Rating <span class="text-red-600 text-xs">*</span></label>
                     <div id="ratingStars" class="flex gap-2 text-3xl cursor-pointer">
-                        <span class="star text-yellow-400" data-value="1">ÃƒÆ’Ã‚Â¢Ãƒâ€¹Ã…â€œÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦</span>
-                        <span class="star text-yellow-400" data-value="2">ÃƒÆ’Ã‚Â¢Ãƒâ€¹Ã…â€œÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦</span>
-                        <span class="star text-yellow-400" data-value="3">ÃƒÆ’Ã‚Â¢Ãƒâ€¹Ã…â€œÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦</span>
-                        <span class="star text-yellow-400" data-value="4">ÃƒÆ’Ã‚Â¢Ãƒâ€¹Ã…â€œÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦</span>
-                        <span class="star text-yellow-400" data-value="5">ÃƒÆ’Ã‚Â¢Ãƒâ€¹Ã…â€œÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦</span>
+                        <span class="star text-yellow-400" data-value="1">★</span>
+                        <span class="star text-yellow-400" data-value="2">★</span>
+                        <span class="star text-yellow-400" data-value="3">★</span>
+                        <span class="star text-yellow-400" data-value="4">★</span>
+                        <span class="star text-yellow-400" data-value="5">★</span>
                     </div>
                     <p class="text-sm text-gray-500 mt-2">Your selection: <span
                             id="ratingText">5</span> sao</p>
                 </div>
+                <label class="font-semibold block mb-2" for="commentInput">Your Review <span class="text-red-600 text-xs">*</span></label>
                 <textarea id="commentInput" name="comment" rows="5" required
                           placeholder="Share your thoughts..."
                           class="w-full border rounded-lg p-4"></textarea>
@@ -846,9 +856,9 @@
 
 
     <c:if test="${not empty relatedBooks}">
-        <section class="pt-2">
+        <section class="fhs-block p-5 md:p-7">
             <div class="flex items-center justify-between mb-5">
-                <h2 class="section-title-left text-[20px] font-bold text-primary">📚 You May Also Like</h2>
+                <h2 class="section-title-left text-[20px] font-bold text-primary">You May Also Like</h2>
                 <div class="flex gap-2">
                     <button id="sliderPrev"
                             class="w-[34px] h-[34px] border border-gray-200 rounded-full flex items-center justify-center hover:border-primary hover:text-primary transition-colors">
@@ -866,12 +876,12 @@
                     <div
                         class="slider-item prod-card-hover bg-white rounded-xl overflow-hidden flex flex-col">
                         <div
-                            class="relative block bg-[#f0f4ff] aspect-[3/4] overflow-hidden">
+                            class="relative block bg-[#F7F7F8] aspect-[3/4] overflow-hidden">
                             <a
                                 href="${pageContext.request.contextPath}/products?id=${rb.bookID}">
-                                <%-- [FIX] check ÃƒÆ’Ã¢â‚¬Å¾ÃƒÂ¢Ã¢â€šÂ¬Ã‹Å“ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âºng field ÃƒÆ’Ã¢â‚¬Å¾ÃƒÂ¢Ã¢â€šÂ¬Ã‹Å“ang ÃƒÆ’Ã¢â‚¬Å¾ÃƒÂ¢Ã¢â€šÂ¬Ã‹Å“ÃƒÆ’Ã¢â‚¬Â Ãƒâ€šÃ‚Â°ÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚Â»Ãƒâ€šÃ‚Â£c hiÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚Â»Ãƒâ€ Ã¢â‚¬â„¢n thÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚Â»ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¹
-                                    (rb.thumbnailFirst) thay vÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¬ check rb.thumbnail (chuÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚Â»ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Âi
-                                    thÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â´, cÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³ thÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚Â»Ãƒâ€ Ã¢â‚¬â„¢ khÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡c trÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚ÂºÃƒâ€šÃ‚Â¡ng thÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡i rÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚Â»ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Âng) --%>
+                                <%-- [FIX] check đúng field đang được hiển thị
+                                    (rb.thumbnailFirst) thay vì check rb.thumbnail (chuỗi
+                                    thô, có thể khác trạng thái rỗng) --%>
                                 <c:choose>
                                     <c:when test="${not empty rb.thumbnailFirst}">
                                         <img src="${rb.thumbnailFirst}"
@@ -889,11 +899,7 @@
                             </a>
                             <c:if test="${rb.featured}">
                                 <span
-<<<<<<< Updated upstream
-                                    class="absolute top-2.5 right-2.5 bg-[#8E24AA] text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full">🔥
-=======
-                                    class="absolute top-2.5 left-2.5 z-10 bg-[#8E24AA] text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full">ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒâ€šÃ‚Â¥
->>>>>>> Stashed changes
+                                    class="absolute top-2.5 left-2.5 z-10 bg-[#8E24AA] text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full">🔥
                                     Hot</span>
                                 </c:if>
                                 <jsp:include page="/views/layout/common/wishlist-heart.jsp">
@@ -915,8 +921,8 @@
                             <div class="flex items-center gap-1 text-[12px] text-[#FDD835]">
                                 <c:forEach begin="1" end="5" var="i">
                                     <c:choose>
-                                        <c:when test="${i <= rb.avgRating}">ÃƒÆ’Ã‚Â¢Ãƒâ€¹Ã…â€œÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦</c:when>
-                                        <c:otherwise><span class="text-gray-300">ÃƒÆ’Ã‚Â¢Ãƒâ€¹Ã…â€œÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦</span>
+                                        <c:when test="${i <= rb.avgRating}">★</c:when>
+                                        <c:otherwise><span class="text-gray-300">★</span>
                                         </c:otherwise>
                                     </c:choose>
                                 </c:forEach>
@@ -939,7 +945,7 @@
     </c:if>
 </main>
 
-<!-- Modal giÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚Â»ÃƒÂ¢Ã¢â€šÂ¬Ã‚Âºi hÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚ÂºÃƒâ€šÃ‚Â¡n stock -->
+<!-- Modal giới hạn stock -->
 <div id="stock-limit-modal"
      class="fixed inset-0 bg-black/50 hidden items-center justify-center z-[9999]">
     <div class="bg-white w-[420px] rounded-xl p-6 relative">
@@ -1093,10 +1099,10 @@
     function updateStars(rating) {
         stars.forEach(function (star) {
             if (star.dataset.value <= rating) {
-                star.textContent = 'ÃƒÆ’Ã‚Â¢Ãƒâ€¹Ã…â€œÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦';
+                star.textContent = '★';
                 star.classList.add('text-yellow-400');
             } else {
-                star.textContent = 'ÃƒÆ’Ã‚Â¢Ãƒâ€¹Ã…â€œÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ';
+                star.textContent = '☆';
                 star.classList.remove('text-yellow-400');
             }
         });
@@ -1189,7 +1195,7 @@
         });
     });
 
-    // ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ Review form AJAX submit ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬
+    // ── Review form AJAX submit ──────────────────────────────────────────
     var reviewForm = document.getElementById('reviewForm');
     if (reviewForm) {
         reviewForm.addEventListener('submit', function (e) {

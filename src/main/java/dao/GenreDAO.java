@@ -14,9 +14,10 @@ public class GenreDAO {
 
     public List<Genre> getAllGenres() {
         List<Genre> list = new ArrayList<>();
-        String sql = "SELECT g.genreID, g.genre_name, COUNT(DISTINCT bg.bookID) AS book_count "
+        String sql = "SELECT g.genreID, g.genre_name, COUNT(b.bookID) AS book_count "
                 + "FROM Genre g "
-            + "LEFT JOIN BookGenre bg ON bg.genreID = g.genreID "
+                + "LEFT JOIN BookGenre bg ON bg.genreID = g.genreID "
+                + "LEFT JOIN Book b ON b.bookID = bg.bookID "
                 + "GROUP BY g.genreID, g.genre_name "
                 + "ORDER BY g.genreID DESC";
 
@@ -40,9 +41,10 @@ public class GenreDAO {
 
     public List<Genre> searchGenres(String keyword) {
         List<Genre> list = new ArrayList<>();
-        String sql = "SELECT g.genreID, g.genre_name, COUNT(DISTINCT bg.bookID) AS book_count "
+        String sql = "SELECT g.genreID, g.genre_name, COUNT(b.bookID) AS book_count "
                 + "FROM Genre g "
-            + "LEFT JOIN BookGenre bg ON bg.genreID = g.genreID "
+                + "LEFT JOIN BookGenre bg ON bg.genreID = g.genreID "
+                + "LEFT JOIN Book b ON b.bookID = bg.bookID "
                 + "WHERE g.genre_name LIKE ? "
                 + "GROUP BY g.genreID, g.genre_name "
                 + "ORDER BY g.genreID DESC";
@@ -69,9 +71,10 @@ public class GenreDAO {
     }
 
     public Genre getGenreById(int id) {
-        String sql = "SELECT g.genreID, g.genre_name, COUNT(DISTINCT bg.bookID) AS book_count "
+        String sql = "SELECT g.genreID, g.genre_name, COUNT(b.bookID) AS book_count "
                 + "FROM Genre g "
-            + "LEFT JOIN BookGenre bg ON bg.genreID = g.genreID "
+                + "LEFT JOIN BookGenre bg ON bg.genreID = g.genreID "
+                + "LEFT JOIN Book b ON b.bookID = bg.bookID "
                 + "WHERE g.genreID = ? "
                 + "GROUP BY g.genreID, g.genre_name";
 

@@ -8,6 +8,7 @@
         <meta charset="utf-8">
         <meta content="width=device-width, initial-scale=1.0" name="viewport">
         <title>Order Management - HeavenScape</title>
+        <link rel="icon" type="image/png" href="https://res.cloudinary.com/llfxqkny/image/upload/v1787226687/heavenscape/favicon/heavenscape_favicon.png">
         <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
         <link
             href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
@@ -17,7 +18,7 @@
         <style>
             body {
                 font-family: 'Inter', sans-serif;
-                background-color: #f3faff;
+                background-color: #F7F7F8;
             }
 
             .material-symbols-outlined {
@@ -33,7 +34,7 @@
             }
 
             ::-webkit-scrollbar-thumb {
-                background: #c2c6d4;
+                background: #D9D9DC;
                 border-radius: 10px;
             }
 
@@ -43,60 +44,57 @@
         </style>
     </head>
 
-    <body class="bg-[#f3faff] text-[#071e27] flex min-h-screen">
+    <body class="bg-[#F7F7F8] text-[#1B1B1B] flex min-h-screen">
         <%@ include file="/views/layout/common/toast.jsp" %>
         <%@ include file="/views/layout/dashboard/sidebar.jsp" %>
 
         <main class="flex-1 md:ml-64 min-h-screen flex flex-col justify-between">
 
-            <header
-                class="bg-white border-b border-[#c2c6d4] h-14 sticky top-0 z-30 flex items-center px-6">
-                <h2 class="font-semibold text-base text-[#071e27]">Order Management</h2>
-            </header>
-
             <div class="p-6 max-w-[1280px] mx-auto flex-1 w-full space-y-6">
 
-                <div>
-                    <h1 class="text-2xl font-bold text-[#071e27]">Order List</h1>
-                    <p class="text-sm text-gray-500 mt-1">Manage and update the processing status of
+                <div class="hs-admin-page-heading">
+                    <div>
+                    <h1 class="hs-admin-page-title">Order List</h1>
+                    <p class="hs-admin-page-subtitle">Manage and update the processing status of
                         HeavenScape.</p>
+                    </div>
                 </div>
 
-                <div class="bg-white rounded-xl shadow-sm border border-[#c2c6d4] overflow-hidden">
+                <div class="bg-white rounded-xl shadow-sm border border-[#D9D9DC] overflow-hidden">
 
                     <div
-                        class="p-4 border-b border-[#c2c6d4] flex flex-wrap items-center justify-between gap-4 bg-gray-50">
+                        class="p-4 border-b border-[#D9D9DC] flex flex-wrap items-center justify-between gap-4 bg-gray-50">
                         <div class="flex items-center gap-2 overflow-x-auto no-scrollbar">
                             <a href="${pageContext.request.contextPath}/dashboard/customer-order?status=all&keyword=${keyword}"
-                               class="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ${empty status or status == 'all' ? 'bg-[#004d99] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors'}">
+                               class="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ${empty status or status == 'all' ? 'bg-[#C92127] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors'}">
                                 All
                             </a>
                             <a href="${pageContext.request.contextPath}/dashboard/customer-order?status=pending&keyword=${keyword}"
-                               class="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ${status == 'pending' ? 'bg-[#004d99] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors'}">
+                               class="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ${status == 'pending' ? 'bg-[#C92127] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors'}">
                                 Pending Confirmation
                             </a>
                             <a href="${pageContext.request.contextPath}/dashboard/customer-order?status=confirmed&keyword=${keyword}"
-                               class="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ${status == 'confirmed' ? 'bg-[#004d99] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors'}">
+                               class="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ${status == 'confirmed' ? 'bg-[#C92127] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors'}">
                                 Confirmed
                             </a>
                             <a href="${pageContext.request.contextPath}/dashboard/customer-order?status=shipping&keyword=${keyword}"
-                               class="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ${status == 'shipping' ? 'bg-[#004d99] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors'}">
+                               class="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ${status == 'shipping' ? 'bg-[#C92127] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors'}">
                                 Shipping
                             </a>
                             <a href="${pageContext.request.contextPath}/dashboard/customer-order?status=completed&keyword=${keyword}"
-                               class="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ${status == 'completed' ? 'bg-[#004d99] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors'}">
+                               class="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ${status == 'completed' ? 'bg-[#C92127] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors'}">
                                 Completed
                             </a>
                             <a href="${pageContext.request.contextPath}/dashboard/customer-order?status=cancelled&keyword=${keyword}"
-                               class="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ${status == 'cancelled' ? 'bg-[#004d99] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors'}">
+                               class="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ${status == 'cancelled' ? 'bg-[#C92127] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors'}">
                                 Cancelled
                             </a>
                             <a href="${pageContext.request.contextPath}/dashboard/customer-order?status=pending_refund&keyword=${keyword}"
-                               class="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ${status == 'pending_refund' ? 'bg-[#004d99] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors'}">
+                               class="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ${status == 'pending_refund' ? 'bg-[#C92127] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors'}">
                                 Refund Pending
                             </a>
                             <a href="${pageContext.request.contextPath}/dashboard/customer-order?status=refunded&keyword=${keyword}"
-                               class="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ${status == 'refunded' ? 'bg-[#004d99] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors'}">
+                               class="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ${status == 'refunded' ? 'bg-[#C92127] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors'}">
                                 Refunded
                             </a>
                         </div>
@@ -105,7 +103,7 @@
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse">
                             <thead>
-                                <tr class="bg-gray-50 border-b border-[#c2c6d4]">
+                                <tr class="bg-gray-50 border-b border-[#D9D9DC]">
                                     <th
                                         class="px-6 py-3.5 text-xs text-gray-500 uppercase tracking-wider font-semibold">
                                         Order Code</th>
@@ -140,10 +138,10 @@
                                 </c:if>
 
                                 <c:forEach var="order" items="${orderList}">
-                                    <tr class="hover:bg-blue-50/50 transition-colors">
+                                    <tr class="hover:bg-[#FDE8E9]/50 transition-colors">
                                         <td class="px-6 py-3.5">
                                             <span
-                                                class="text-sm font-semibold text-[#004d99]">${order.orderCode}</span>
+                                                class="text-sm font-semibold text-[#C92127]">${order.orderCode}</span>
                                         </td>
                                         <td class="px-6 py-3.5">
                                             <span
@@ -182,7 +180,7 @@
                                                     </c:when>
                                                     <c:when test="${order.status == 'confirmed'}">
                                                     <span
-                                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-blue-50 text-[#004d99] text-xs font-semibold">Confirmed</span>
+                                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-[#FDE8E9] text-[#C92127] text-xs font-semibold">Confirmed</span>
                                                     </c:when>
                                                     <c:when test="${order.status == 'shipping'}">
                                                     <span
@@ -195,12 +193,12 @@
                                                     <c:when test="${order.status == 'cancelled'}">
                                                         <c:choose>
                                                             <c:when
-                                                                test="${order.paymentMethod == 'vnpay' && order.paymentStatus == 'pending_refund'}">
+                                                                test="${order.paymentMethod == 'cod' && order.paymentStatus == 'pending_refund'}">
                                                             <span
                                                                 class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-700 text-xs font-semibold">Refund Pending</span>
                                                             </c:when>
                                                             <c:when
-                                                                test="${order.paymentMethod == 'vnpay' && order.paymentStatus == 'refunded'}">
+                                                                test="${order.paymentMethod == 'cod' && order.paymentStatus == 'refunded'}">
                                                             <span
                                                                 class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-blue-100 text-[#134aa4] text-xs font-semibold">Refunded</span>
                                                             </c:when>
@@ -215,9 +213,21 @@
                                                         class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-red-50 text-[#D32F2F] text-xs font-semibold">Cancelled</span>
                                                     </c:otherwise>
                                                 </c:choose>
+                                                <c:if test="${order.status == 'cancelled'}">
+                                                    <div class="mt-1 max-w-[220px] text-xs text-on-surface-variant">
+                                                        <c:choose>
+                                                            <c:when test="${order.paymentStatus == 'refunded'}"><strong>Refund by:</strong> Staff</c:when>
+                                                            <c:otherwise>
+                                                                <strong>Cancelled by:</strong>
+                                                                <c:choose><c:when test="${not empty order.cancelledByName}"><c:out value="${order.cancelledByName}" /></c:when><c:otherwise>Account unavailable</c:otherwise></c:choose>
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                        <c:if test="${not empty order.cancelReason}"><br><strong>Reason:</strong> <c:out value="${order.cancelReason}" /></c:if>
+                                                    </div>
+                                                </c:if>
                                         </td>
                                         <td class="px-6 py-3.5 text-right">
-                                            <div class="flex items-center justify-end gap-2">
+                                            <div class="action-group">
 
                                                 <c:choose>
                                                     <c:when test="${order.status == 'pending'}">
@@ -232,7 +242,7 @@
                                                                    class="cancelReasonInput" value="">
                                                             <select name="status"
                                                                     onchange="confirmStatusChange(this)"
-                                                                    class="bg-white border border-gray-300 text-gray-700 rounded-lg text-xs focus:ring-[#004d99] focus:border-[#004d99] px-2 py-1 cursor-pointer">
+                                                                    class="action-select">
                                                                 <option value="" disabled selected>--
                                                                     Select
                                                                     --</option>
@@ -256,7 +266,7 @@
                                                                    class="cancelReasonInput" value="">
                                                             <select name="status"
                                                                     onchange="confirmStatusChange(this)"
-                                                                    class="bg-white border border-gray-300 text-gray-700 rounded-lg text-xs focus:ring-[#004d99] focus:border-[#004d99] px-2 py-1 cursor-pointer">
+                                                                    class="action-select">
                                                                 <option value="" disabled selected>--
                                                                     Select
                                                                     --</option>
@@ -280,7 +290,7 @@
                                                                    class="cancelReasonInput" value="">
                                                             <select name="status"
                                                                     onchange="confirmStatusChange(this)"
-                                                                    class="bg-white border border-gray-300 text-gray-700 rounded-lg text-xs focus:ring-[#004d99] focus:border-[#004d99] px-2 py-1 cursor-pointer">
+                                                                    class="action-select">
                                                                 <option value="" disabled selected>-- Select --</option>
                                                                 <option value="completed">Completed
                                                                 </option>
@@ -293,10 +303,9 @@
 
 
                                                 <a href="${pageContext.request.contextPath}/dashboard/customer-order?action=view&orderID=${order.orderID}"
-                                                   class="p-1.5 bg-white border border-gray-300 text-[#004d99] rounded-lg hover:bg-blue-50 transition-all inline-flex items-center active:scale-95"
-                                                   title="View Details">
-                                                    <span
-                                                        class="material-symbols-outlined text-[18px]">visibility</span>
+                                                   class="btn-action btn-action-view"
+                                                   title="View Details" aria-label="View order details">
+                                                    <span class="material-symbols-outlined" aria-hidden="true">visibility</span>
                                                 </a>
                                             </div>
                                         </td>
@@ -307,7 +316,7 @@
                     </div>
 
                     <!-- Phân trang -->
-                    <div class="p-4 border-t border-[#c2c6d4] flex items-center justify-between">
+                    <div class="p-4 border-t border-[#D9D9DC] flex items-center justify-between">
                         <p class="text-sm text-gray-500">Trang ${currentPage} / ${totalPages}</p>
                         <div class="flex items-center gap-2">
                             <a href="${currentPage > 1 ? baseUrl.concat('&page=').concat(currentPage - 1) : '#'}"
@@ -319,7 +328,7 @@
                                 <c:choose>
                                     <c:when test="${i == currentPage}">
                                         <span
-                                            class="w-8 h-8 flex items-center justify-center rounded-lg bg-[#004d99] text-white text-xs font-semibold">${i}</span>
+                                            class="w-8 h-8 flex items-center justify-center rounded-lg bg-[#C92127] text-white text-xs font-semibold">${i}</span>
                                     </c:when>
                                     <c:otherwise>
                                         <a href="${baseUrl}&page=${i}"
@@ -353,7 +362,7 @@
                     <button type="button"
                             class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 close-confirm">Cancel</button>
                     <button type="button" id="confirmAction"
-                            class="px-4 py-2 bg-[#004d99] text-white rounded-lg hover:opacity-90">Confirm</button>
+                            class="px-4 py-2 bg-[#C92127] text-white rounded-lg hover:opacity-90">Confirm</button>
                 </div>
             </div>
         </div>
@@ -371,6 +380,7 @@
                     <span class="material-symbols-outlined text-[16px]">error</span>
                     <span id="listCancelErrorText"></span>
                 </div>
+                <label for="listCancelReasonText" class="mb-1 block text-sm font-semibold">Cancellation Reason <span class="text-red-600 text-xs">*</span></label>
                 <textarea id="listCancelReasonText" rows="4" maxlength="50"
                           class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300"
                           placeholder="Enter a cancellation reason (10–50 characters, including at least one letter)"></textarea>

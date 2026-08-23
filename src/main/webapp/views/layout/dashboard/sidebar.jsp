@@ -43,14 +43,69 @@
     boolean isStaffOrAdmin = isStaffUser || isAdminUser;
 %>
 
-<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400..700&amp;family=Hanken+Grotesk:wght@400..700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400..800&amp;display=swap" rel="stylesheet">
 <link href="${pageContext.request.contextPath}/assets/css/admin.css" rel="stylesheet">
+<style>
+    /* ===== Fahasa-inspired admin theme overrides ===== */
+    body.hs-admin-page { font-family: 'Be Vietnam Pro', sans-serif; background:#F7F7F8; }
+    .hs-admin-mobile-bar {
+        display: none; align-items: center; justify-content: space-between;
+        background: #C92127; color: #fff; padding: 12px 16px;
+    }
+    .hs-admin-sidebar {
+        background: #ffffff; border-right: 1px solid #E3E3E6;
+        width: 256px; min-height: 100vh; display: flex; flex-direction: column;
+    }
+    .hs-admin-brand { padding: 18px 20px; border-bottom: 3px solid #C92127; }
+    .hs-admin-brand img { width: 205px; max-width: 100%; height: auto; }
+    .hs-admin-quick-action {
+        margin: 14px 16px 0; background: #C92127; color: #fff; text-decoration: none;
+        display: flex; align-items: center; justify-content: center; gap: 6px;
+        padding: 10px; border-radius: 8px; font-weight: 700; font-size: 13.5px;
+        transition: background .15s;
+    }
+    .hs-admin-quick-action:hover { background: #8E171B; }
+    .hs-admin-nav { display: flex; flex-direction: column; gap: 2px; padding: 16px 12px; flex: 1; }
+    .sidebar-link {
+        display: flex; align-items: center; gap: 12px; padding: 10px 14px;
+        border-radius: 8px; color: #5C5C5F; text-decoration: none; font-size: 14px; font-weight: 500;
+        transition: background .15s, color .15s;
+    }
+    .sidebar-link:hover { background: #FDE8E9; color: #C92127; }
+    .sidebar-link.active { background: #C92127; color: #fff; font-weight: 700; }
+    .hs-admin-user-area { border-top: 1px solid #E3E3E6; padding: 12px; position: relative; }
+    .user-trigger { display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: 8px; cursor: pointer; }
+    .user-trigger:hover { background: #F7F7F8; }
+    .hs-admin-user-role { color: #8F8F92; }
+    .user-popup {
+        display: none; position: absolute; bottom: 64px; left: 12px; right: 12px;
+        background: #fff; border: 1px solid #E3E3E6; border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(0,0,0,.12); overflow: hidden;
+    }
+    .user-popup.open { display: block; }
+    .user-popup a { display: flex; align-items: center; gap: 10px; padding: 10px 14px; color: #1B1B1B; text-decoration: none; font-size: 13.5px; }
+    .user-popup a:hover { background: #F7F7F8; }
+    .user-popup a.danger { color: #D32F2F; }
+    .user-popup .divider { border-top: 1px solid #E3E3E6; }
+    @media (max-width: 767px) {
+        .hs-admin-mobile-bar { display: flex; }
+        .hs-admin-sidebar {
+            position: fixed; top: 0; left: -280px; z-index: 100; transition: left .2s;
+            box-shadow: 4px 0 20px rgba(0,0,0,.15);
+        }
+        .hs-admin-sidebar.open { left: 0; }
+        .hs-admin-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 90;
+        }
+        .hs-admin-overlay.open { display: block; }
+    }
+</style>
 
 <div class="hs-admin-mobile-bar" aria-label="Admin navigation">
     <button type="button" id="adminMenuButton" aria-label="Open navigation" aria-controls="adminSidebar" aria-expanded="false">
         <span class="material-symbols-outlined">menu</span>
     </button>
-    <strong style="font-family:'Source Serif 4',Georgia,serif;">HeavenScape Admin</strong>
+    <strong style="font-family:'Be Vietnam Pro',Georgia,serif;">HeavenScape Admin</strong>
     <span class="material-symbols-outlined" aria-hidden="true">auto_stories</span>
 </div>
 <div class="hs-admin-overlay" id="adminSidebarOverlay"></div>
@@ -64,25 +119,18 @@
         </a>
     </div>
 
-    <% if (isStaffUser) { %>
-    <a class="hs-admin-quick-action" href="${pageContext.request.contextPath}/dashboard/product-management?action=create">
-        <span class="material-symbols-outlined" style="font-size:19px;">add</span>
-        New Listing
-    </a>
-    <% } %>
-
     <nav class="hs-admin-nav">
 
         <a href="${pageContext.request.contextPath}/dashboard"
            class="sidebar-link <%= isDashboardPage ? "active" : ""%>">
-            <span class="material-symbols-outlined">dashboard</span>
+            <span class="material-symbols-outlined">monitoring</span>
             Dashboard
         </a>
 
         <c:choose><c:when test="${sessionScope.account.role == 'staff'}">
         <a href="${pageContext.request.contextPath}/dashboard/customer-order"
            class="sidebar-link <%= currentPage.contains("customer-order") ? "active" : ""%>">
-            <span class="material-symbols-outlined">shopping_cart</span>
+            <span class="material-symbols-outlined">local_mall</span>
             Orders
         </a>
         </c:when></c:choose>
@@ -93,7 +141,7 @@
         %>
         <a href="${pageContext.request.contextPath}/dashboard/product-management"
            class="sidebar-link <%= khoHangActive ? "active" : ""%>">
-            <span class="material-symbols-outlined">inventory_2</span>
+            <span class="material-symbols-outlined">warehouse</span>
             Inventory
         </a>
         <% } %>
@@ -101,15 +149,9 @@
 
 
         <% if (isStaffUser) { %>
-<<<<<<< Updated upstream
-        <a href="${pageContext.request.contextPath}/dashboard/category-management"
-           class="sidebar-link <%= sidebarCurrentPath.startsWith("/dashboard/category-management") ? "active" : ""%>">
-            <span class="material-symbols-outlined">category</span>
-=======
-        <a href="${pageContext.request.contextPath}/dashboard/genre-management"
-           class="sidebar-link <%= sidebarCurrentPath.startsWith("/dashboard/genre-management") ? "active" : ""%>">
+          <a href="${pageContext.request.contextPath}/dashboard/genre-management"
+              class="sidebar-link <%= sidebarCurrentPath.startsWith("/dashboard/genre-management") ? "active" : ""%>">
             <span class="material-symbols-outlined">account_tree</span>
->>>>>>> Stashed changes
             Genre
         </a>
         <% } %>
@@ -117,13 +159,13 @@
         <% if (isStaffOrAdmin) { %>
         <a href="${pageContext.request.contextPath}/dashboard/account-management"
            class="sidebar-link <%= currentPage.contains("account-management") ? "active" : ""%>">
-            <span class="material-symbols-outlined">group</span>
+            <span class="material-symbols-outlined">manage_accounts</span>
             Account
         </a>
 
         <a href="${pageContext.request.contextPath}/dashboard/review-management"
            class="sidebar-link <%= currentPage.contains("review") ? "active" : ""%>">
-            <span class="material-symbols-outlined">rate_review</span>
+            <span class="material-symbols-outlined">reviews</span>
             Review
         </a>
         <% } %>
@@ -131,7 +173,7 @@
         <% if (isStaffUser) { %>
         <a href="${pageContext.request.contextPath}/dashboard/voucher-management"
            class="sidebar-link <%= currentPage.contains("voucher") ? "active" : ""%>">
-            <span class="material-symbols-outlined">sell</span>
+            <span class="material-symbols-outlined">confirmation_number</span>
             Voucher
         </a>
         <% } %>
@@ -141,13 +183,13 @@
 
     <div class="hs-admin-user-area">
         <div class="user-popup" id="userPopup">
-            <a href="${pageContext.request.contextPath}/profile">
+            <a href="${pageContext.request.contextPath}/dashboard/profile">
                 <span class="material-symbols-outlined" style="font-size:18px;">
                     manage_accounts
                 </span>
                 Personal Profile
             </a>
-            <a href="${pageContext.request.contextPath}/profile/change-password">
+            <a href="${pageContext.request.contextPath}/dashboard/profile/change-password">
                 <span class="material-symbols-outlined" style="font-size:18px;">
                     lock_reset
                 </span>

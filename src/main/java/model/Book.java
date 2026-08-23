@@ -22,8 +22,8 @@ public class Book {
     private String status;
 
     // FK info
-    private List<Integer> genreIDs;
-    private List<String> genreNames;
+    private int categoryID;
+    private String categoryName;
     private int contentID;
     private String contentName;
     private int seriesID;
@@ -39,6 +39,7 @@ public class Book {
     private boolean featured;
 
     private List<String> authors;
+    private List<Genre> genres;
 
     private Timestamp createdAt;
     private Timestamp updatedAt;
@@ -124,28 +125,20 @@ public class Book {
         this.status = v;
     }
 
-    public List<Integer> getGenreIDs() {
-        return genreIDs;
+    public int getCategoryID() {
+        return categoryID;
     }
 
-    public void setGenreIDs(List<Integer> v) {
-        this.genreIDs = v;
+    public void setCategoryID(int v) {
+        this.categoryID = v;
     }
 
-    public List<String> getGenreNames() {
-        return genreNames;
+    public String getCategoryName() {
+        return categoryName;
     }
 
-    public void setGenreNames(List<String> v) {
-        this.genreNames = v;
-    }
-
-    public int getGenreID() {
-        return genreIDs == null || genreIDs.isEmpty() ? 0 : genreIDs.get(0);
-    }
-
-    public String getGenreName() {
-        return genreNames == null ? "" : String.join(", ", genreNames);
+    public void setCategoryName(String v) {
+        this.categoryName = v;
     }
 
     public int getContentID() {
@@ -242,6 +235,14 @@ public class Book {
 
     public void setAuthors(List<String> v) {
         this.authors = v;
+    }
+
+    public List<Genre> getGenres() {
+        return genres;
+    }
+
+    public void setGenres(List<Genre> v) {
+        this.genres = v;
     }
 
     public Timestamp getCreatedAt() {

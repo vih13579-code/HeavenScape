@@ -17,13 +17,12 @@ public class BookDAO {
      * Rating is calculated by subquery, so there is no need for a very long GROUP
      * BY.
      */
-        private static final String BOOK_SELECT = "SELECT b.*, "
-            + "(SELECT STRING_AGG(g2.genre_name, ', ') FROM BookGenre bg2 "
-            + "JOIN Genre g2 ON g2.genreID = bg2.genreID WHERE bg2.bookID = b.bookID) AS genre_names, "
-            + "c.content_name, s.series_name, o.origin_name, p.publisher_name, "
+    private static final String BOOK_SELECT = "SELECT b.*, g.category_name, c.content_name, s.series_name, "
+            + "o.origin_name, p.publisher_name, "
             + "ISNULL((SELECT AVG(CAST(r.rating AS FLOAT)) FROM Review r WHERE r.bookID = b.bookID), 0) AS avg_rating, "
             + "(SELECT COUNT(*) FROM Review r WHERE r.bookID = b.bookID) AS review_count "
             + "FROM Book b "
+            + "LEFT JOIN Category g ON b.categoryID = g.categoryID "
             + "LEFT JOIN Content c ON b.contentID = c.contentID "
             + "LEFT JOIN BookSeries s ON b.seriesID = s.seriesID "
             + "LEFT JOIN BookOrigin o ON b.originID = o.originID "
@@ -58,13 +57,13 @@ public class BookDAO {
     }
 
     public List<Book> getBooksFiltered(int offset, int pageSize, String orderClause,
-            String keyword, List<Integer> genreIDs, List<Integer> authorIDs,
+            String keyword, List<Integer> categoryIDs, List<Integer> authorIDs,
             BigDecimal minPrice, BigDecimal maxPrice, List<String> availability) {
 
         StringBuilder sql = new StringBuilder(BOOK_SELECT)
                 .append("WHERE ").append(PUBLIC_STATUS).append(" ");
 
-        appendPublicFilters(sql, keyword, genreIDs, authorIDs, minPrice, maxPrice,
+        appendPublicFilters(sql, keyword, categoryIDs, authorIDs, minPrice, maxPrice,
                 availability);
         sql.append(orderClause)
                 .append(" OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
@@ -74,7 +73,7 @@ public class BookDAO {
         try (Connection conn = new DBContext().getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql.toString())) {
 
-            int index = bindPublicFilters(ps, 1, keyword, genreIDs, authorIDs,
+            int index = bindPublicFilters(ps, 1, keyword, categoryIDs, authorIDs,
                     minPrice, maxPrice);
             ps.setInt(index++, offset);
             ps.setInt(index, pageSize);
@@ -91,20 +90,20 @@ public class BookDAO {
         return books;
     }
 
-    public int countBooksFiltered(String keyword, List<Integer> genreIDs,
+    public int countBooksFiltered(String keyword, List<Integer> categoryIDs,
             List<Integer> authorIDs, BigDecimal minPrice, BigDecimal maxPrice,
             List<String> availability) {
 
         StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM Book b WHERE ")
                 .append(PUBLIC_STATUS).append(" ");
 
-        appendPublicFilters(sql, keyword, genreIDs, authorIDs, minPrice, maxPrice,
+        appendPublicFilters(sql, keyword, categoryIDs, authorIDs, minPrice, maxPrice,
                 availability);
 
         try (Connection conn = new DBContext().getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql.toString())) {
 
-            bindPublicFilters(ps, 1, keyword, genreIDs, authorIDs,
+            bindPublicFilters(ps, 1, keyword, categoryIDs, authorIDs,
                     minPrice, maxPrice);
 
             try (ResultSet rs = ps.executeQuery()) {
@@ -190,11 +189,10 @@ public class BookDAO {
         return getFeaturedByOrders(limit);
     }
 
-    public List<Book> getRelatedBooks(int bookID, int genreID, int limit) {
+    public List<Book> getRelatedBooks(int bookID, int categoryID, int limit) {
         String sql = BOOK_SELECT
                 + "WHERE " + PUBLIC_STATUS + " "
-                + "AND b.bookID != ? AND EXISTS (SELECT 1 FROM BookGenre bg "
-                + "WHERE bg.bookID = b.bookID AND bg.genreID = ?) "
+                + "AND b.bookID != ? AND b.categoryID = ? "
                 + "ORDER BY review_count DESC "
                 + "OFFSET 0 ROWS FETCH NEXT ? ROWS ONLY";
 
@@ -204,7 +202,7 @@ public class BookDAO {
                 PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, bookID);
-            ps.setInt(2, genreID);
+            ps.setInt(2, categoryID);
             ps.setInt(3, limit);
 
             try (ResultSet rs = ps.executeQuery()) {
@@ -216,6 +214,34 @@ public class BookDAO {
             e.printStackTrace();
         }
 
+        return books;
+    }
+
+    public List<Book> getRelatedBooksByGenre(int bookID, List<Integer> genreIDs, int limit) {
+        if (genreIDs == null || genreIDs.isEmpty()) {
+            return new ArrayList<>();
+        }
+        String sql = BOOK_SELECT + "WHERE " + PUBLIC_STATUS + " AND b.bookID != ? "
+                + "AND EXISTS (SELECT 1 FROM BookGenre bg WHERE bg.bookID = b.bookID AND bg.genreID IN ("
+                + placeholders(genreIDs.size()) + ")) ORDER BY review_count DESC "
+                + "OFFSET 0 ROWS FETCH NEXT ? ROWS ONLY";
+        List<Book> books = new ArrayList<>();
+        try (Connection conn = new DBContext().getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            int index = 1;
+            ps.setInt(index++, bookID);
+            for (Integer genreID : genreIDs) {
+                ps.setInt(index++, genreID);
+            }
+            ps.setInt(index, limit);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    books.add(readBook(conn, rs));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return books;
     }
 
@@ -240,7 +266,7 @@ public class BookDAO {
         try (Connection conn = new DBContext().getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql.toString())) {
 
-            bindDateRange(ps, 1, from, to);
+            int index = bindDateRange(ps, 1, from, to);
 
             try (ResultSet rs = ps.executeQuery()) {
                 return rs.next() ? rs.getInt(1) : 0;
@@ -316,10 +342,10 @@ public class BookDAO {
     }
 
     public List<Book> getBooksAdmin(int offset, int pageSize, String keyword,
-            String status, Integer genreID) {
+            String status, Integer categoryID) {
 
         StringBuilder sql = new StringBuilder(BOOK_SELECT).append("WHERE 1 = 1 ");
-        appendAdminFilters(sql, keyword, status, genreID);
+        appendAdminFilters(sql, keyword, status, categoryID);
         sql.append("ORDER BY b.created_at DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
 
         List<Book> books = new ArrayList<>();
@@ -327,7 +353,7 @@ public class BookDAO {
         try (Connection conn = new DBContext().getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql.toString())) {
 
-            int index = bindAdminFilters(ps, 1, keyword, status, genreID);
+            int index = bindAdminFilters(ps, 1, keyword, status, categoryID);
             ps.setInt(index++, offset);
             ps.setInt(index, pageSize);
 
@@ -343,14 +369,14 @@ public class BookDAO {
         return books;
     }
 
-    public int countBooksAdmin(String keyword, String status, Integer genreID) {
+    public int countBooksAdmin(String keyword, String status, Integer categoryID) {
         StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM Book b WHERE 1 = 1 ");
-        appendAdminFilters(sql, keyword, status, genreID);
+        appendAdminFilters(sql, keyword, status, categoryID);
 
         try (Connection conn = new DBContext().getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql.toString())) {
 
-            bindAdminFilters(ps, 1, keyword, status, genreID);
+            bindAdminFilters(ps, 1, keyword, status, categoryID);
 
             try (ResultSet rs = ps.executeQuery()) {
                 return rs.next() ? rs.getInt(1) : 0;
@@ -359,6 +385,12 @@ public class BookDAO {
             e.printStackTrace();
             return 0;
         }
+    }
+
+    public Map<Integer, String> getCategoryMap() {
+        return getLookupMap(
+                "SELECT categoryID, category_name FROM Category ORDER BY category_name",
+                "categoryID", "category_name");
     }
 
     public Map<Integer, String> getGenreMap() {
@@ -402,17 +434,21 @@ public class BookDAO {
                 "publisherID", "publisher_name");
     }
 
+    public boolean createBook(Book book, String authorsStr, int createdBy) {
+        return createBook(book, authorsStr, new ArrayList<>(), createdBy);
+    }
+
     public boolean createBook(Book book, String authorsStr, List<Integer> genreIDs, int createdBy) {
         String sql = "INSERT INTO Book "
                 + "(title, description, price, stock_quantity, thumbnail, total_pages, dimensions, weight, "
-                + "status, contentID, seriesID, originID, publisherID, created_by) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                + "status, categoryID, contentID, seriesID, originID, publisherID, created_by) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = new DBContext().getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             bindBookFields(ps, book);
-            ps.setInt(14, createdBy);
+            ps.setInt(15, createdBy);
 
             if (ps.executeUpdate() == 0) {
                 return false;
@@ -433,18 +469,22 @@ public class BookDAO {
         }
     }
 
+    public boolean updateBook(Book book, String authorsStr, int updatedBy) {
+        return updateBook(book, authorsStr, new ArrayList<>(), updatedBy);
+    }
+
     public boolean updateBook(Book book, String authorsStr, List<Integer> genreIDs, int updatedBy) {
         String sql = "UPDATE Book SET "
                 + "title=?, description=?, price=?, stock_quantity=?, thumbnail=?, total_pages=?, "
-                + "dimensions=?, weight=?, status=?, contentID=?, seriesID=?, originID=?, publisherID=?, "
+                + "dimensions=?, weight=?, status=?, categoryID=?, contentID=?, seriesID=?, originID=?, publisherID=?, "
                 + "updated_by=?, updated_at=GETDATE() WHERE bookID=?";
 
         try (Connection conn = new DBContext().getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
 
             bindBookFields(ps, book);
-            ps.setInt(14, updatedBy);
-            ps.setInt(15, book.getBookID());
+            ps.setInt(15, updatedBy);
+            ps.setInt(16, book.getBookID());
 
             boolean updated = ps.executeUpdate() > 0;
             if (updated) {
@@ -507,16 +547,13 @@ public class BookDAO {
     }
 
     private void syncGenres(Connection conn, int bookID, List<Integer> genreIDs) throws SQLException {
-        try (PreparedStatement ps = conn.prepareStatement(
-                "DELETE FROM BookGenre WHERE bookID = ?")) {
+        try (PreparedStatement ps = conn.prepareStatement("DELETE FROM BookGenre WHERE bookID = ?")) {
             ps.setInt(1, bookID);
             ps.executeUpdate();
         }
-
-        if (genreIDs == null) {
+        if (genreIDs == null || genreIDs.isEmpty()) {
             return;
         }
-
         try (PreparedStatement ps = conn.prepareStatement(
                 "INSERT INTO BookGenre (bookID, genreID) VALUES (?, ?)")) {
             for (Integer genreID : genreIDs) {
@@ -652,7 +689,7 @@ public class BookDAO {
     }
 
     private void appendPublicFilters(StringBuilder sql, String keyword,
-            List<Integer> genreIDs, List<Integer> authorIDs,
+            List<Integer> categoryIDs, List<Integer> authorIDs,
             BigDecimal minPrice, BigDecimal maxPrice, List<String> availability) {
 
         if (hasText(keyword)) {
@@ -660,10 +697,9 @@ public class BookDAO {
                     + "SELECT 1 FROM BookAuthor ba JOIN Author a ON a.authorID = ba.authorID "
                     + "WHERE ba.bookID = b.bookID AND a.fullname LIKE ?)) ");
         }
-        if (genreIDs != null && !genreIDs.isEmpty()) {
-            sql.append("AND EXISTS (SELECT 1 FROM BookGenre bg "
-                + "WHERE bg.bookID = b.bookID AND bg.genreID IN (")
-                .append(placeholders(genreIDs.size())).append(")) ");
+        if (categoryIDs != null && !categoryIDs.isEmpty()) {
+                sql.append("AND EXISTS (SELECT 1 FROM BookGenre bg WHERE bg.bookID = b.bookID AND bg.genreID IN (")
+                    .append(placeholders(categoryIDs.size())).append(")) ");
         }
         if (authorIDs != null && !authorIDs.isEmpty()) {
             sql.append("AND EXISTS (SELECT 1 FROM BookAuthor ba2 "
@@ -690,7 +726,7 @@ public class BookDAO {
     }
 
     private int bindPublicFilters(PreparedStatement ps, int index, String keyword,
-            List<Integer> genreIDs, List<Integer> authorIDs,
+            List<Integer> categoryIDs, List<Integer> authorIDs,
             BigDecimal minPrice, BigDecimal maxPrice) throws SQLException {
 
         if (hasText(keyword)) {
@@ -698,9 +734,9 @@ public class BookDAO {
             ps.setString(index++, value);
             ps.setString(index++, value);
         }
-        if (genreIDs != null) {
-            for (Integer genreID : genreIDs) {
-                ps.setInt(index++, genreID);
+        if (categoryIDs != null) {
+            for (Integer categoryID : categoryIDs) {
+                ps.setInt(index++, categoryID);
             }
         }
         if (authorIDs != null) {
@@ -729,7 +765,7 @@ public class BookDAO {
     }
 
     private void appendAdminFilters(StringBuilder sql, String keyword,
-            String status, Integer genreID) {
+            String status, Integer categoryID) {
 
         if (hasText(keyword)) {
             sql.append("AND (b.title LIKE ? OR b.bookID = ?) ");
@@ -737,14 +773,13 @@ public class BookDAO {
         if (hasText(status)) {
             sql.append("AND b.status = ? ");
         }
-        if (genreID != null && genreID > 0) {
-            sql.append("AND EXISTS (SELECT 1 FROM BookGenre bg "
-                    + "WHERE bg.bookID = b.bookID AND bg.genreID = ?) ");
+        if (categoryID != null && categoryID > 0) {
+            sql.append("AND EXISTS (SELECT 1 FROM BookGenre bg WHERE bg.bookID = b.bookID AND bg.genreID = ?) ");
         }
     }
 
     private int bindAdminFilters(PreparedStatement ps, int index, String keyword,
-            String status, Integer genreID) throws SQLException {
+            String status, Integer categoryID) throws SQLException {
 
         if (hasText(keyword)) {
             String value = keyword.trim();
@@ -754,8 +789,8 @@ public class BookDAO {
         if (hasText(status)) {
             ps.setString(index++, status);
         }
-        if (genreID != null && genreID > 0) {
-            ps.setInt(index++, genreID);
+        if (categoryID != null && categoryID > 0) {
+            ps.setInt(index++, categoryID);
         }
 
         return index;
@@ -792,10 +827,11 @@ public class BookDAO {
         String status = book.getStatus() == null ? "available" : book.getStatus();
         ps.setString(9, status);
 
-        setNullableInt(ps, 10, book.getContentID());
-        setNullableInt(ps, 11, book.getSeriesID());
-        setNullableInt(ps, 12, book.getOriginID());
-        setNullableInt(ps, 13, book.getPublisherID());
+        setNullableInt(ps, 10, book.getCategoryID());
+        setNullableInt(ps, 11, book.getContentID());
+        setNullableInt(ps, 12, book.getSeriesID());
+        setNullableInt(ps, 13, book.getOriginID());
+        setNullableInt(ps, 14, book.getPublisherID());
     }
 
     private void setNullableInt(PreparedStatement ps, int index, int value) throws SQLException {
@@ -859,7 +895,23 @@ public class BookDAO {
     private Book readBook(Connection conn, ResultSet rs) throws SQLException {
         Book book = mapBook(rs);
         book.setAuthors(getAuthorsByBookID(conn, book.getBookID()));
+        book.setGenres(getGenresByBookID(conn, book.getBookID()));
         return book;
+    }
+
+    private List<model.Genre> getGenresByBookID(Connection conn, int bookID) throws SQLException {
+        List<model.Genre> genres = new ArrayList<>();
+        String sql = "SELECT g.genreID, g.genre_name FROM Genre g "
+                + "JOIN BookGenre bg ON bg.genreID = g.genreID WHERE bg.bookID = ? ORDER BY g.genre_name";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, bookID);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    genres.add(new model.Genre(rs.getInt("genreID"), rs.getString("genre_name")));
+                }
+            }
+        }
+        return genres;
     }
 
     private Book mapBook(ResultSet rs) throws SQLException {
@@ -874,10 +926,8 @@ public class BookDAO {
         book.setDimensions(rs.getString("dimensions"));
         book.setWeight(rs.getBigDecimal("weight"));
         book.setStatus(rs.getString("status"));
-        String genreNames = rs.getString("genre_names");
-        book.setGenreNames(genreNames == null || genreNames.isEmpty()
-            ? new ArrayList<>() : new ArrayList<>(java.util.Arrays.asList(genreNames.split(", "))));
-        book.setGenreIDs(getGenreIDsByBookID(rs.getStatement().getConnection(), rs.getInt("bookID")));
+        book.setCategoryID(rs.getInt("categoryID"));
+        book.setCategoryName(rs.getString("category_name"));
         book.setContentID(rs.getInt("contentID"));
         book.setContentName(rs.getString("content_name"));
         book.setSeriesID(rs.getInt("seriesID"));
@@ -911,20 +961,6 @@ public class BookDAO {
         }
 
         return authors;
-    }
-
-    private List<Integer> getGenreIDsByBookID(Connection conn, int bookID) throws SQLException {
-        List<Integer> genreIDs = new ArrayList<>();
-        String sql = "SELECT genreID FROM BookGenre WHERE bookID = ? ORDER BY genreID";
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, bookID);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    genreIDs.add(rs.getInt("genreID"));
-                }
-            }
-        }
-        return genreIDs;
     }
 
     private boolean hasText(String value) {

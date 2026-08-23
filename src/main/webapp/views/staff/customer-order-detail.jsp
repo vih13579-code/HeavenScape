@@ -8,12 +8,13 @@
         <meta charset="utf-8">
         <meta content="width=device-width, initial-scale=1.0" name="viewport">
         <title>Order Details - HeavenScape</title>
+        <link rel="icon" type="image/png" href="https://res.cloudinary.com/llfxqkny/image/upload/v1787226687/heavenscape/favicon/heavenscape_favicon.png">
         <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
         <style>
             body {
                 font-family: 'Inter', system-ui, sans-serif;
-                background-color: #f3faff;
+                background-color: #F7F7F8;
             }
 
             .material-symbols-outlined {
@@ -27,7 +28,7 @@
                 top: 24px;
                 bottom: 0;
                 width: 2px;
-                background-color: #c2c6d4;
+                background-color: #D9D9DC;
             }
 
             .stepper-line:last-child::before {
@@ -43,7 +44,7 @@
             }
 
             ::-webkit-scrollbar-thumb {
-                background: #c2c6d4;
+                background: #D9D9DC;
                 border-radius: 10px;
             }
 
@@ -53,7 +54,7 @@
         </style>
     </head>
 
-    <body class="bg-[#f3faff] text-[#071e27] flex min-h-screen">
+    <body class="bg-[#F7F7F8] text-[#1B1B1B] flex min-h-screen">
         <%@ include file="/views/layout/common/toast.jsp" %>
         <%@ include file="/views/layout/dashboard/sidebar.jsp" %>
 
@@ -62,7 +63,7 @@
 
                 <div class="mb-4">
                     <a href="${pageContext.request.contextPath}/dashboard/customer-order"
-                       class="flex items-center gap-2 text-[#004d99] font-bold text-sm hover:underline">
+                       class="flex items-center gap-2 text-[#C92127] font-bold text-sm hover:underline">
                         <span class="material-symbols-outlined text-[18px]">arrow_back</span>
                         Back to List
                     </a>
@@ -71,12 +72,12 @@
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
                         <div class="flex items-center gap-3">
-                            <h1 class="text-3xl font-bold text-[#071e27]">Order #${order.orderCode}</h1>
+                            <h1 class="text-3xl font-bold text-[#1B1B1B]">Order #${order.orderCode}</h1>
 
                             <span class="px-3 py-1 rounded-full text-sm font-semibold
                                   <c:choose>
                                       <c:when test="${order.status == 'pending'}">bg-[#fff3cd] text-[#e65c00]</c:when>
-                                      <c:when test="${order.status == 'confirmed'}">bg-[#dbeafe] text-[#004d99]</c:when>
+                                      <c:when test="${order.status == 'confirmed'}">bg-[#FDE8E9] text-[#C92127]</c:when>
                                       <c:when test="${order.status == 'shipping'}">bg-[#e0e7ff] text-[#134aa4]</c:when>
                                       <c:when test="${order.status == 'completed'}">bg-[#d4edda] text-[#2E7D32]</c:when>
                                       <c:otherwise>bg-[#ffdad6] text-[#D32F2F]</c:otherwise>
@@ -90,7 +91,7 @@
                                 </c:choose>
                             </span>
 
-                            <c:if test="${order.status == 'cancelled' && order.paymentMethod == 'vnpay'}">
+                            <c:if test="${order.status == 'cancelled' && order.paymentMethod == 'cod'}">
                                 <c:choose>
                                     <c:when test="${order.paymentStatus == 'pending_refund'}">
                                         <span class="px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-1 bg-amber-50 text-amber-600 border border-amber-200">
@@ -120,7 +121,7 @@
                                     <c:when test="${order.status == 'pending'}">
                                         <input type="hidden" name="status" value="confirmed">
                                         <button type="button" onclick="confirmActionDetail('Confirm Order', 'Are you sure you want to confirm this order?', 'statusForm')"
-                                                class="flex items-center gap-2 px-4 py-2 bg-[#004d99] text-white rounded-lg text-sm font-semibold hover:opacity-90 shadow-sm transition-all">
+                                                class="flex items-center gap-2 px-4 py-2 bg-[#C92127] text-white rounded-lg text-sm font-semibold hover:opacity-90 shadow-sm transition-all">
                                             <span class="material-symbols-outlined text-[20px]">task_alt</span>
                                             Confirm Order
                                         </button>
@@ -164,24 +165,24 @@
 
                     <div class="lg:col-span-2 space-y-6">
 
-                        <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-[#c2c6d4]">
-                            <div class="p-6 border-b border-[#c2c6d4] bg-[#f3faff] flex justify-between items-center">
-                                <h2 class="text-xl font-semibold text-[#071e27]">Product List</h2>
-                                <span class="text-[#424752] text-sm">${orderDetails.size()} items</span>
+                        <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-[#D9D9DC]">
+                            <div class="p-6 border-b border-[#D9D9DC] bg-[#F7F7F8] flex justify-between items-center">
+                                <h2 class="text-xl font-semibold text-[#1B1B1B]">Product List</h2>
+                                <span class="text-[#5C5C5F] text-sm">${orderDetails.size()} items</span>
                             </div>
                             <div class="overflow-x-auto">
                                 <table class="w-full text-left">
                                     <thead class="bg-[#F5F7F9]">
                                         <tr>
-                                            <th class="px-6 py-4 text-sm font-semibold text-[#424752]">Product</th>
-                                            <th class="px-6 py-4 text-sm font-semibold text-[#424752]">Price</th>
-                                            <th class="px-6 py-4 text-sm font-semibold text-[#424752]">Quantity</th>
-                                            <th class="px-6 py-4 text-sm font-semibold text-[#424752] text-right">Total</th>
+                                            <th class="px-6 py-4 text-sm font-semibold text-[#5C5C5F]">Product</th>
+                                            <th class="px-6 py-4 text-sm font-semibold text-[#5C5C5F]">Price</th>
+                                            <th class="px-6 py-4 text-sm font-semibold text-[#5C5C5F]">Quantity</th>
+                                            <th class="px-6 py-4 text-sm font-semibold text-[#5C5C5F] text-right">Total</th>
                                         </tr>
                                     </thead>
-                                    <tbody class="divide-y divide-[#c2c6d4]">
+                                    <tbody class="divide-y divide-[#D9D9DC]">
                                         <c:forEach var="item" items="${orderDetails}">
-                                            <tr class="hover:bg-[#e6f6ff] transition-colors">
+                                            <tr class="hover:bg-[#FDE8E9] transition-colors">
                                                 <td class="px-6 py-4">
                                                     <div class="flex items-center gap-4">
                                                         <c:choose>
@@ -189,21 +190,21 @@
                                                                 <img alt="${item.title}" class="w-12 h-16 object-cover rounded-md shadow-sm" src="${item.thumbnailFirst}">
                                                             </c:when>
                                                             <c:otherwise>
-                                                                <div class="w-12 h-16 flex items-center justify-center bg-[#dbf1fe] rounded text-[#c2c6d4]">
+                                                                <div class="w-12 h-16 flex items-center justify-center bg-[#FDE8E9] rounded text-[#D9D9DC]">
                                                                     <span class="material-symbols-outlined text-[24px]">book</span>
                                                                 </div>
                                                             </c:otherwise>
                                                         </c:choose>
                                                         <div>
-                                                            <p class="text-sm font-semibold text-[#004d99]">${item.title}</p>
+                                                            <p class="text-sm font-semibold text-[#C92127]">${item.title}</p>
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td class="px-6 py-4 text-base text-[#071e27]">
+                                                <td class="px-6 py-4 text-base text-[#1B1B1B]">
                                                     <fmt:formatNumber value="${item.unitPrice}" pattern="#,###" />VND
                                                 </td>
-                                                <td class="px-6 py-4 text-base text-[#071e27]">${item.quantity}</td>
-                                                <td class="px-6 py-4 text-base text-right font-bold text-[#071e27]">
+                                                <td class="px-6 py-4 text-base text-[#1B1B1B]">${item.quantity}</td>
+                                                <td class="px-6 py-4 text-base text-right font-bold text-[#1B1B1B]">
                                                     <fmt:formatNumber value="${item.subtotal}" pattern="#,###" />VND
                                                 </td>
                                             </tr>
@@ -219,11 +220,11 @@
                                 <c:set var="staffTotalBookCount" value="${staffTotalBookCount + item.quantity}" />
                             </c:forEach>
 
-                            <div class="p-6 bg-[#f3faff] border-t border-[#c2c6d4]">
+                            <div class="p-6 bg-[#F7F7F8] border-t border-[#D9D9DC]">
                                 <div class="flex flex-col items-end gap-2 text-sm">
-                                    <div class="flex justify-between w-72 text-[#424752]">
+                                    <div class="flex justify-between w-72 text-[#5C5C5F]">
                                         <span>Subtotal (${staffTotalBookCount} items):</span>
-                                        <span class="font-semibold text-[#071e27]"><fmt:formatNumber value="${staffBookSubtotal}" pattern="#,###" /> VND</span>
+                                        <span class="font-semibold text-[#1B1B1B]"><fmt:formatNumber value="${staffBookSubtotal}" pattern="#,###" /> VND</span>
                                     </div>
                                     <c:if test="${staffBookSubtotal > order.totalPrice}">
                                         <div class="flex justify-between w-72 text-green-700 font-semibold">
@@ -231,24 +232,24 @@
                                             <span>- <fmt:formatNumber value="${staffBookSubtotal - order.totalPrice}" pattern="#,###" /> VND</span>
                                         </div>
                                     </c:if>
-                                    <div class="flex justify-between w-72 pt-2 border-t border-[#c2c6d4]">
-                                        <span class="text-lg font-bold text-[#071e27]">Total Payment:</span>
-                                        <span class="text-lg font-bold text-[#004d99]"><fmt:formatNumber value="${order.totalPrice}" pattern="#,###" /> VND</span>
+                                    <div class="flex justify-between w-72 pt-2 border-t border-[#D9D9DC]">
+                                        <span class="text-lg font-bold text-[#1B1B1B]">Total Payment:</span>
+                                        <span class="text-lg font-bold text-[#C92127]"><fmt:formatNumber value="${order.totalPrice}" pattern="#,###" /> VND</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="bg-white p-6 rounded-xl shadow-sm border border-[#c2c6d4]">
+                            <div class="bg-white p-6 rounded-xl shadow-sm border border-[#D9D9DC]">
                                 <div class="flex items-center gap-2 mb-4">
-                                    <span class="material-symbols-outlined text-[#004d99]">payments</span>
-                                    <h3 class="text-sm font-semibold text-[#071e27] uppercase tracking-wider">Payment Status</h3>
+                                    <span class="material-symbols-outlined text-[#C92127]">payments</span>
+                                    <h3 class="text-sm font-semibold text-[#1B1B1B] uppercase tracking-wider">Payment Status</h3>
                                 </div>
                                 <div class="space-y-3">
                                     <div class="flex justify-between items-center">
-                                        <span class="text-sm text-[#424752]">Method:</span>
-                                        <span class="text-sm font-semibold text-[#071e27]">
+                                        <span class="text-sm text-[#5C5C5F]">Method:</span>
+                                        <span class="text-sm font-semibold text-[#1B1B1B]">
                                             <c:choose>
                                                 <c:when test="${order.paymentMethod == 'cod'}">Cash on Delivery (COD)</c:when>
                                                 <c:otherwise>Bank Transfer (VNPAY)</c:otherwise>
@@ -256,7 +257,7 @@
                                         </span>
                                     </div>
                                     <div class="flex justify-between items-center">
-                                        <span class="text-sm text-[#424752]">Status:</span>
+                                        <span class="text-sm text-[#5C5C5F]">Status:</span>
                                         <c:choose>
                                             <c:when test="${order.paymentStatus == 'paid'}">
                                                 <span class="px-3 py-1 bg-green-100 text-[#2E7D32] rounded-full text-xs font-semibold">Paid</span>
@@ -275,15 +276,15 @@
                                 </div>
                             </div>
 
-                            <div class="bg-white p-6 rounded-xl shadow-sm border border-[#c2c6d4]">
+                            <div class="bg-white p-6 rounded-xl shadow-sm border border-[#D9D9DC]">
                                 <div class="flex items-center gap-2 mb-4">
-                                    <span class="material-symbols-outlined text-[#004d99]">local_shipping</span>
-                                    <h3 class="text-sm font-semibold text-[#071e27] uppercase tracking-wider">Shipping</h3>
+                                    <span class="material-symbols-outlined text-[#C92127]">local_shipping</span>
+                                    <h3 class="text-sm font-semibold text-[#1B1B1B] uppercase tracking-wider">Shipping</h3>
                                 </div>
                                 <div class="space-y-3">
                                     <div class="flex justify-between items-center">
-                                        <span class="text-sm text-[#424752]">Estimated Delivery:</span>
-                                        <span class="text-sm text-[#071e27]">1–3 days after confirmation</span>
+                                        <span class="text-sm text-[#5C5C5F]">Estimated Delivery:</span>
+                                        <span class="text-sm text-[#1B1B1B]">1–3 days after confirmation</span>
                                     </div>
                                 </div>
                             </div>
@@ -292,38 +293,38 @@
 
                     <div class="space-y-6">
 
-                        <div class="bg-white p-6 rounded-xl shadow-sm border border-[#c2c6d4]">
-                            <h3 class="text-xl font-semibold text-[#071e27] mb-6">Recipient</h3>
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-[#D9D9DC]">
+                            <h3 class="text-xl font-semibold text-[#1B1B1B] mb-6">Recipient</h3>
                             <div class="mb-6">
-                                <p class="text-sm font-semibold text-[#071e27]">${order.recipientName}</p>
+                                <p class="text-sm font-semibold text-[#1B1B1B]">${order.recipientName}</p>
                             </div>
                             <div class="space-y-4">
                                 <div class="flex items-start gap-3">
                                     <span class="material-symbols-outlined text-[#727783] text-[20px]">mail</span>
                                     <div>
-                                        <p class="text-xs text-[#424752]">Email</p>
-                                        <p class="text-sm text-[#004d99]">${order.customerEmail}</p>
+                                        <p class="text-xs text-[#5C5C5F]">Email</p>
+                                        <p class="text-sm text-[#C92127]">${order.customerEmail}</p>
                                     </div>
                                 </div>
                                 <div class="flex items-start gap-3">
                                     <span class="material-symbols-outlined text-[#727783] text-[20px]">phone</span>
                                     <div>
-                                        <p class="text-xs text-[#424752]">Phone Number</p>
-                                        <p class="text-sm text-[#071e27]">${order.recipientPhone}</p>
+                                        <p class="text-xs text-[#5C5C5F]">Phone Number</p>
+                                        <p class="text-sm text-[#1B1B1B]">${order.recipientPhone}</p>
                                     </div>
                                 </div>
                                 <div class="flex items-start gap-3">
                                     <span class="material-symbols-outlined text-[#727783] text-[20px]">location_on</span>
                                     <div>
-                                        <p class="text-xs text-[#424752]">Shipping Address</p>
-                                        <p class="text-sm text-[#071e27] leading-relaxed">${order.street}, ${order.district}, ${order.city}</p>
+                                        <p class="text-xs text-[#5C5C5F]">Shipping Address</p>
+                                        <p class="text-sm text-[#1B1B1B] leading-relaxed">${order.street}, ${order.district}, ${order.city}</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="bg-white p-6 rounded-xl shadow-sm border border-[#c2c6d4]">
-                            <h3 class="text-xl font-semibold text-[#071e27] mb-6">Order Progress</h3>
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-[#D9D9DC]">
+                            <h3 class="text-xl font-semibold text-[#1B1B1B] mb-6">Order Progress</h3>
                             <div class="space-y-6">
 
                                 <c:set var="currentStep" value="0" />
@@ -334,20 +335,29 @@
 
                                 <c:choose>
                                     <c:when test="${order.status == 'cancelled'}">
+                                        <div class="mb-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-700">
+                                            <c:choose>
+                                                <c:when test="${order.paymentStatus == 'refunded'}"><strong>Refund by:</strong> Staff</c:when>
+                                                <c:otherwise>
+                                                    <strong>Cancelled by:</strong>
+                                                    <c:choose><c:when test="${not empty order.cancelledByName}"><c:out value="${order.cancelledByName}" /></c:when><c:otherwise>Account unavailable</c:otherwise></c:choose>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </div>
                                         <c:choose>
-                                            <c:when test="${order.paymentMethod == 'vnpay' && order.paymentStatus == 'pending_refund'}">
+                                            <c:when test="${order.paymentMethod == 'cod' && order.paymentStatus == 'pending_refund'}">
                                                 <div class="space-y-3">
                                                     <div class="flex flex-col gap-2 p-4 bg-amber-50 rounded-lg border border-amber-200">
                                                         <div class="flex items-center gap-3">
                                                             <span class="material-symbols-outlined text-amber-500 text-[22px]" style="font-variation-settings: 'FILL' 1;">schedule</span>
                                                             <div class="flex-1">
                                                                 <p class="text-sm font-semibold text-amber-700">Order Cancelled &mdash; Refund Processing</p>
-                                                                <p class="text-xs text-amber-600 mt-0.5">VNPAY — Transfer Not Yet Confirmed</p>
+                                                                <p class="text-xs text-amber-600 mt-0.5">COD — Transfer Not Yet Confirmed</p>
                                                             </div>
                                                         </div>
                                                         <c:if test="${not empty order.cancelReason}">
                                                             <p class="text-xs text-amber-600 pl-8">
-                                                                <strong>Cancellation Reason:</strong> ${order.cancelReason}
+                                                                <strong>Cancellation Reason:</strong> <c:out value="${order.cancelReason}" />
                                                             </p>
                                                         </c:if>
                                                     </div>
@@ -364,18 +374,18 @@
                                                 </div>
                                             </c:when>
 
-                                            <c:when test="${order.paymentMethod == 'vnpay' && order.paymentStatus == 'refunded'}">
+                                            <c:when test="${order.paymentMethod == 'cod' && order.paymentStatus == 'refunded'}">
                                                 <div class="flex flex-col gap-2 p-4 bg-green-50 rounded-lg border border-green-200">
                                                     <div class="flex items-center gap-3">
                                                         <span class="material-symbols-outlined text-green-600 text-[22px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
                                                         <div>
                                                             <p class="text-sm font-semibold text-green-700">Order Cancelled &mdash; Refunded</p>
-                                                            <p class="text-xs text-green-600 mt-0.5">VNPAY — Transfer Confirmed</p>
+                                                            <p class="text-xs text-green-600 mt-0.5">COD — Transfer Confirmed</p>
                                                         </div>
                                                     </div>
                                                     <c:if test="${not empty order.cancelReason}">
                                                         <p class="text-xs text-green-600 pl-8">
-                                                            <strong>Cancellation Reason:</strong> ${order.cancelReason}
+                                                            <strong>Cancellation Reason:</strong> <c:out value="${order.cancelReason}" />
                                                         </p>
                                                     </c:if>
                                                 </div>
@@ -389,7 +399,7 @@
                                                     </div>
                                                     <c:if test="${not empty order.cancelReason}">
                                                         <p class="text-xs text-[#D32F2F] pl-8">
-                                                            <strong>Cancellation Reason:</strong> ${order.cancelReason}
+                                                            <strong>Cancellation Reason:</strong> <c:out value="${order.cancelReason}" />
                                                         </p>
                                                     </c:if>
                                                 </div>
@@ -400,31 +410,31 @@
                                     <c:otherwise>
                                         <div class="relative pl-8 stepper-line">
                                             <div class="absolute left-0 top-0 w-8 h-8 flex items-center justify-center z-10">
-                                                <div class="w-3 h-3 rounded-full ${currentStep >= 4 ? 'bg-[#2E7D32]' : 'bg-[#c2c6d4]'}"></div>
+                                                <div class="w-3 h-3 rounded-full ${currentStep >= 4 ? 'bg-[#2E7D32]' : 'bg-[#D9D9DC]'}"></div>
                                             </div>
-                                            <p class="text-sm font-semibold ${currentStep >= 4 ? 'text-[#2E7D32]' : 'text-[#071e27]'}">Completed</p>
+                                            <p class="text-sm font-semibold ${currentStep >= 4 ? 'text-[#2E7D32]' : 'text-[#1B1B1B]'}">Completed</p>
                                         </div>
 
                                         <div class="relative pl-8 stepper-line">
                                             <div class="absolute left-0 top-0 w-8 h-8 flex items-center justify-center z-10">
-                                                <div class="w-3 h-3 rounded-full ${currentStep >= 3 ? 'bg-[#134aa4]' : 'bg-[#c2c6d4]'}"></div>
+                                                <div class="w-3 h-3 rounded-full ${currentStep >= 3 ? 'bg-[#134aa4]' : 'bg-[#D9D9DC]'}"></div>
                                             </div>
-                                            <p class="text-sm font-semibold ${currentStep >= 3 ? 'text-[#134aa4]' : 'text-[#071e27]'}">Shipping</p>
+                                            <p class="text-sm font-semibold ${currentStep >= 3 ? 'text-[#134aa4]' : 'text-[#1B1B1B]'}">Shipping</p>
                                         </div>
 
                                         <div class="relative pl-8 stepper-line">
                                             <div class="absolute left-0 top-0 w-8 h-8 flex items-center justify-center z-10">
-                                                <div class="w-3 h-3 rounded-full ${currentStep >= 2 ? 'bg-[#004d99]' : 'bg-[#c2c6d4]'}"></div>
+                                                <div class="w-3 h-3 rounded-full ${currentStep >= 2 ? 'bg-[#C92127]' : 'bg-[#D9D9DC]'}"></div>
                                             </div>
-                                            <p class="text-sm font-semibold ${currentStep >= 2 ? 'text-[#004d99]' : 'text-[#071e27]'}">Confirmed</p>
+                                            <p class="text-sm font-semibold ${currentStep >= 2 ? 'text-[#C92127]' : 'text-[#1B1B1B]'}">Confirmed</p>
                                         </div>
 
                                         <div class="relative pl-8 stepper-line">
                                             <div class="absolute left-0 top-0 w-8 h-8 flex items-center justify-center z-10">
-                                                <div class="w-3 h-3 rounded-full ${currentStep >= 1 ? 'bg-[#FFA000]' : 'bg-[#c2c6d4]'}"></div>
+                                                <div class="w-3 h-3 rounded-full ${currentStep >= 1 ? 'bg-[#FFA000]' : 'bg-[#D9D9DC]'}"></div>
                                             </div>
-                                            <p class="text-sm font-semibold ${currentStep >= 1 ? 'text-[#FFA000]' : 'text-[#071e27]'}">Pending Confirmation</p>
-                                            <p class="text-sm text-[#424752]"><fmt:formatDate value="${order.createdAt}" pattern="HH:mm - dd/MM/yyyy" /></p>
+                                            <p class="text-sm font-semibold ${currentStep >= 1 ? 'text-[#FFA000]' : 'text-[#1B1B1B]'}">Pending Confirmation</p>
+                                            <p class="text-sm text-[#5C5C5F]"><fmt:formatDate value="${order.createdAt}" pattern="HH:mm - dd/MM/yyyy" /></p>
                                         </div>
                                     </c:otherwise>
                                 </c:choose>
@@ -444,7 +454,7 @@
                 <p class="text-gray-600 mb-6" id="confirmMessage">Are you sure you want to continue?</p>
                 <div class="flex justify-end gap-3">
                     <button type="button" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 close-confirm">Cancel</button>
-                    <button type="button" id="confirmAction" class="px-4 py-2 bg-[#004d99] text-white rounded-lg hover:opacity-90">Confirm</button>
+                    <button type="button" id="confirmAction" class="px-4 py-2 bg-[#C92127] text-white rounded-lg hover:opacity-90">Confirm</button>
                 </div>
             </div>
         </div>
@@ -459,6 +469,7 @@
                     <span class="material-symbols-outlined text-[16px]">error</span>
                     <span id="cancelReasonErrorText"></span>
                 </div>
+                <label for="cancelReasonText" class="mb-1 block text-sm font-semibold">Cancellation Reason <span class="text-red-600 text-xs">*</span></label>
                 <textarea id="cancelReasonText" rows="4" maxlength="50"
                           class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300"
                           placeholder="Enter a cancellation reason (10–50 characters, including at least one letter)"></textarea>

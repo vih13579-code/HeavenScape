@@ -6,23 +6,44 @@
 <style>
     .input-style{
         width:100%;
+        min-height:46px;
         padding:12px 16px;
         border:1px solid #d1d5db;
-        border-radius:10px;
+        border-radius:8px;
     }
     .input-style:focus{
         outline:none;
-        border-color:#2563eb;
-        box-shadow:0 0 0 3px rgba(37,99,235,.15);
+        border-color:#C92127;
+        box-shadow:0 0 0 3px rgba(201,33,39,.12);
+    }
+    .profile-card {
+        overflow:hidden;
+        border:1px solid #e5e7eb;
+        border-radius:14px;
+        background:#fff;
+        box-shadow:0 4px 18px rgba(0,0,0,.05);
+    }
+    #profile { width:100%; max-width:100%; }
+    #profileForm .grid > div { min-width:0; }
+    @media (max-width:640px) {
+        #profile { padding:20px; }
+        #profile h1 { font-size:24px; line-height:1.25; }
+    }
+    .profile-form-button {
+        min-height:46px;
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        border-radius:8px;
     }
 </style>
-<div class="max-w-7xl mx-auto py-10 px-4">
-    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+<div class="fhs-page-inner">
+    <div class="grid grid-cols-1 lg:grid-cols-[250px_minmax(0,1fr)] gap-4">
         <!-- SIDEBAR -->
         <c:set var="activeMenu" value="profile" scope="request"/>
         <%@ include file="/views/layout/profile/sidebar.jsp" %>
 
-        <div class="lg:col-span-3 space-y-6">
+        <div class="space-y-6 min-w-0">
             <c:if test="${not empty sessionScope.message}">
                 <div id="toastMessageData" class="hidden" data-message="${fn:escapeXml(sessionScope.message)}"></div>
                 <c:remove var="message" scope="session"/>
@@ -48,13 +69,14 @@
                     <div class="grid md:grid-cols-2 gap-6">
                         <div>
                             <label class="block mb-2 font-medium">
-                                Full Name
+                                Full Name <span class="text-red-600 text-xs">*</span>
                             </label>
                             <input
                                 type="text"
                                 name="fullname"
                                 id="fullname"
-                                value="${customer.fullname}"
+                                value="${fn:escapeXml(customer.fullname)}"
+                                data-initial-value="${fn:escapeXml(customer.fullname)}"
                                 required
                                 class="input-style">
                             <p id="fullnameError" class="text-red-500 text-sm mt-1 hidden"></p>
@@ -63,41 +85,33 @@
                             <label class="block mb-2 font-medium">
                                 Email
                             </label>
-                            <div class="flex gap-2">
+                            <div class="flex flex-col sm:flex-row gap-2">
                                 <input
                                     type="email"
-                                    value="${customer.email}"
+                                    value="${fn:escapeXml(customer.email)}"
                                     disabled
                                     class="input-style bg-gray-100">
                                 <button
                                     type="button"
                                     id="openChangeEmailBtn"
-                                    class="shrink-0 px-4 py-3 rounded-xl border border-primary text-primary font-medium hover:bg-primary hover:text-white transition-all">
+                                    class="profile-form-button shrink-0 px-4 border border-primary text-primary font-medium hover:bg-primary hover:text-white transition-all">
                                     Change Email
                                 </button>
                             </div>
                         </div>
                         <div>
                             <label class="block mb-2 font-medium">
-                                Phone Number
+                                Phone Number <span class="text-red-600 text-xs">*</span>
                             </label>
                             <input
                                 type="text"
                                 name="phone"
                                 id="phone"
-                                value="${customer.phone}"
+                                value="${fn:escapeXml(customer.phone)}"
+                                data-initial-value="${fn:escapeXml(customer.phone)}"
+                                required
                                 class="input-style">
                             <p id="phoneError" class="text-red-500 text-sm mt-1 hidden"></p>
-                        </div>
-                        <div>
-                            <label class="block mb-2 font-medium">
-                                Status
-                            </label>
-                            <input
-                                type="text"
-                                value="${customer.status}"
-                                disabled
-                                class="input-style bg-gray-100">
                         </div>
                         <div>
                             <label class="block mb-2 font-medium">
@@ -140,7 +154,7 @@
                         <button
                             type="submit"
                             id="saveBtn"
-                            class="bg-primary hover:bg-primary-dark text-white px-8 py-3 rounded-xl shadow disabled:bg-gray-400 disabled:cursor-not-allowed disabled:opacity-60 transition-all"
+                            class="profile-form-button bg-primary hover:bg-primary-dark text-white px-8 shadow disabled:bg-gray-400 disabled:cursor-not-allowed disabled:opacity-60 transition-all"
                             disabled>
                             Save Changes
                         </button>
@@ -161,7 +175,7 @@
             We will send an OTP to the new email address for verification before updating it.
         </p>
         <form action="${pageContext.request.contextPath}/profile/change-email" method="post">
-            <label class="block mb-2 font-medium text-sm">New Email</label>
+            <label class="block mb-2 font-medium text-sm">New Email <span class="text-red-600 text-xs">*</span></label>
             <input
                 type="email"
                 name="newEmail"
@@ -204,13 +218,6 @@
 </script>
 
 <script>
-    const initialValues = {
-        fullname: "${customer.fullname}",
-        phone: "${customer.phone}",
-        gender: "${customer.gender}",
-        dob: "${customer.dob}"
-    };
-
     const form = document.getElementById('profileForm');
     const saveBtn = document.getElementById('saveBtn');
     const fullnameInput = document.getElementById('fullname');
@@ -220,6 +227,12 @@
     const genderSelect = document.getElementById('gender');
     const dobInput = document.getElementById('dob');
     const dobError = document.getElementById('dobError');
+    const initialValues = {
+        fullname: fullnameInput.dataset.initialValue || '',
+        phone: phoneInput.dataset.initialValue || '',
+        gender: genderSelect.value,
+        dob: dobInput.value
+    };
 
     function setFieldError(inputEl, errorEl, message) {
         if (message) {

@@ -4,60 +4,149 @@
 <%@ include file="/views/layout/homepage/header.jsp" %>
 <style>
     .address-list{
-        display:flex;
-        flex-direction:column;
+        display:grid;
         gap:12px;
     }
     .address-item{
-        display:flex;
+        display:grid;
+        grid-template-columns:minmax(0,1fr) 132px 82px 88px;
         align-items:center;
-        gap:10px;
-        flex-wrap:wrap;
-    }
-    .address-display{
-        flex:1;
-        min-width:260px;
-        padding:12px 16px;
-        border:1px solid #d1d5db;
+        gap:12px;
+        padding:14px 16px;
+        border:1px solid #e1e3e6;
         border-radius:10px;
         background:#fff;
-        color:#111827;
+        transition:border-color .2s, box-shadow .2s;
+    }
+    .address-item:hover{
+        border-color:#efb1b5;
+        box-shadow:0 4px 14px rgba(201,33,39,.07);
+    }
+    .address-display{
+        min-width:0;
+        color:#24272b;
+        font-size:14px;
+        font-weight:500;
+        line-height:1.55;
+        overflow-wrap:anywhere;
     }
     .default-badge{
-        display:inline-block;
-        border:1px solid #2563eb;
-        color:#2563eb;
-        border-radius:5px;
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        min-height:30px;
+        padding:5px 10px;
+        border:1px solid #bfe7cb;
+        border-radius:999px;
+        background:#edf8f1;
+        color:#17643a;
         font-size:12px;
-        padding:3px 8px;
+        font-weight:700;
         white-space:nowrap;
     }
-    .address-actions{
+    .address-default-slot,
+    .address-action-slot{
+        min-width:0;
         display:flex;
         align-items:center;
-        gap:10px;
-        white-space:nowrap;
+        justify-content:center;
     }
-    .edit-btn,.default-btn,.add-address-btn{
-        color:#2563eb;
+    .address-action-form{
+        width:100%;
+        margin:0;
+    }
+    .address-action-btn{
+        width:100%;
+        min-height:36px;
+        padding:7px 10px;
+        border:1px solid transparent;
+        border-radius:7px;
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        font-size:12px;
         font-weight:700;
-        background:none;
-        border:0;
+        line-height:1.2;
+        white-space:nowrap;
         cursor:pointer;
+        transition:background-color .2s, border-color .2s, color .2s;
+    }
+    .default-btn{
+        background:#fff0f1;
+        color:#C92127;
+    }
+    .default-btn:hover{
+        background:#fde0e2;
+    }
+    .edit-btn{
+        border-color:#d5d7da;
+        background:#fff;
+        color:#374151;
+    }
+    .edit-btn:hover{
+        border-color:#9ca3af;
+        background:#f7f7f8;
     }
     .delete-btn{
-        color:#dc2626;
-        font-weight:700;
-        background:none;
-        border:0;
-        cursor:pointer;
+        border-color:#efb1b5;
+        background:#fff7f7;
+        color:#b4232c;
+    }
+    .delete-btn:hover{
+        border-color:#C92127;
+        background:#fff0f1;
     }
     .address-header-row{
         display:flex;
-        align-items:center;
-        justify-content:space-between;
-        margin-bottom:20px;
-        gap:16px;
+        align-items:flex-start;
+        justify-content:flex-start;
+        margin-bottom:18px;
+        gap:22px;
+    }
+    .add-address-btn{
+        min-height:38px;
+        margin-top:4px;
+        padding:8px 14px;
+        border:1px solid #C92127;
+        border-radius:8px;
+        background:#C92127;
+        color:#fff;
+        font-size:13px;
+        font-weight:700;
+        white-space:nowrap;
+        cursor:pointer;
+        transition:background-color .2s, border-color .2s;
+    }
+    .add-address-btn:hover{
+        border-color:#A7191E;
+        background:#A7191E;
+    }
+    @media(max-width:760px){
+        .address-item{
+            grid-template-columns:repeat(3,minmax(0,1fr));
+        }
+        .address-display{
+            grid-column:1/-1;
+            padding-bottom:12px;
+            border-bottom:1px solid #ececef;
+        }
+    }
+    @media(max-width:520px){
+        .address-header-row{
+            flex-direction:column;
+            gap:12px;
+        }
+        .add-address-btn{
+            margin-top:0;
+        }
+        .address-item{
+            padding:12px;
+            gap:8px;
+        }
+        .address-action-btn{
+            padding-inline:6px;
+            font-size:11px;
+        }
     }
     .modal-overlay{
         position:fixed;
@@ -109,7 +198,7 @@
         margin-top:18px;
     }
     .btn-cancel-modal{
-        background:#dbeafe;
+        background:#FDE8E9;
         color:#111827;
         border:0;
         border-radius:4px;
@@ -118,7 +207,7 @@
         cursor:pointer;
     }
     .btn-save-modal{
-        background:#1d4fa3;
+        background:#C92127;
         color:#fff;
         border:0;
         border-radius:4px;
@@ -128,13 +217,13 @@
     }
 </style>
 
-<div class="max-w-7xl mx-auto py-10 px-4">
-    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+<div class="fhs-page-inner">
+    <div class="grid grid-cols-1 lg:grid-cols-[250px_minmax(0,1fr)] gap-4">
 
         <c:set var="activeMenu" value="address" scope="request"/>
         <%@ include file="/views/layout/profile/sidebar.jsp" %>
 
-        <div class="lg:col-span-3 space-y-6">
+        <div class="space-y-6 min-w-0">
             <c:if test="${not empty sessionScope.message}">
                 <div id="toastMessageData" class="hidden"
                      data-message="${fn:escapeXml(sessionScope.message)}"></div>
@@ -189,36 +278,40 @@
                                     ${address.street}, ${address.district}, ${address.city}
                                 </div>
 
-                                <c:if test="${address['default']}">
-                                    <span class="default-badge">Default</span>
-                                </c:if>
-
-                                <div class="address-actions">
-                                    <c:if test="${!address['default']}">
-                                        <form action="${pageContext.request.contextPath}/profile/address"
-                                              method="post"
-                                              style="display:inline;">
+                                <div class="address-default-slot">
+                                    <c:choose>
+                                        <c:when test="${address['default']}">
+                                            <span class="default-badge">Default</span>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <form action="${pageContext.request.contextPath}/profile/address"
+                                              method="post" class="address-action-form">
                                             <input type="hidden" name="action" value="setDefaultAddress">
                                             <input type="hidden" name="addressID" value="${address.addressID}">
-                                            <button type="submit" class="default-btn">
+                                            <button type="submit" class="address-action-btn default-btn">
                                                 Set as Default
                                             </button>
-                                        </form>
-                                    </c:if>
+                                            </form>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </div>
 
+                                <div class="address-action-slot">
                                     <button type="button"
-                                            class="edit-btn"
+                                            class="address-action-btn edit-btn"
                                             onclick="openAddressModal('${address.addressID}')">
                                         Edit
                                     </button>
+                                </div>
 
+                                <div class="address-action-slot">
                                     <form action="${pageContext.request.contextPath}/profile/address"
                                           method="post"
-                                          style="display:inline;"
+                                          class="address-action-form"
                                           onsubmit="openDeleteAddressModal(this); return false;">
                                         <input type="hidden" name="action" value="deleteAddress">
                                         <input type="hidden" name="addressID" value="${address.addressID}">
-                                        <button type="submit" class="delete-btn">Delete</button>
+                                        <button type="submit" class="address-action-btn delete-btn">Delete</button>
                                     </form>
                                 </div>
                             </div>
@@ -246,14 +339,14 @@
 
         <div class="modal-grid">
             <div>
-                <label class="modal-label">Province / City</label>
+                <label class="modal-label">Province / City <span class="text-red-600 text-xs">*</span></label>
                 <select id="modalCity" class="modal-field">
                     <option value="">Select Province / City</option>
                 </select>
             </div>
 
             <div>
-                <label class="modal-label">Ward / Commune</label>
+                <label class="modal-label">Ward / Commune <span class="text-red-600 text-xs">*</span></label>
                 <select id="modalWard" class="modal-field">
                     <option value="">Select Ward / Commune</option>
                 </select>
@@ -261,7 +354,7 @@
         </div>
 
         <div>
-            <label class="modal-label">Street Address</label>
+            <label class="modal-label">Street Address <span class="text-red-600 text-xs">*</span></label>
             <textarea id="modalStreet"
                       rows="4"
                       class="modal-field"
@@ -291,7 +384,7 @@
             <button type="button" onclick="closeDeleteAddressModal()"
                     style="border:0;background:none;font-size:24px;cursor:pointer;line-height:1;">&times;</button>
         </div>
-        <p style="margin-top:18px;color:#424752;">Are you sure you want to delete this address?</p>
+        <p style="margin-top:18px;color:#5C5C5F;">Are you sure you want to delete this address?</p>
         <div class="modal-actions">
             <button type="button" class="btn-cancel-modal" onclick="closeDeleteAddressModal()">Cancel</button>
             <button type="button" class="btn-save-modal" onclick="confirmDeleteAddress()">Confirm</button>

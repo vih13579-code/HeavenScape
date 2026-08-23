@@ -11,9 +11,9 @@
      class="fixed bottom-6 right-6 z-[70] flex items-center gap-3 px-4 py-3
             bg-white rounded-xl border shadow-card-hover
             transform translate-y-16 opacity-0 pointer-events-none"
-     style="border-color:#c2c6d4; min-width:260px; transition: all 0.3s ease;">
+     style="border-color:#D9D9DC; min-width:260px; transition: all 0.3s ease;">
     <span class="material-symbols-outlined" style="color:#2E7D32;" id="toastIcon">check_circle</span>
-    <span class="text-sm font-medium" style="color:#071e27;" id="toastMsg">Action completed successfully!</span>
+    <span class="text-sm font-medium" style="color:#1B1B1B;" id="toastMsg">Action completed successfully!</span>
     <button onclick="hideToast()" class="ml-auto" style="color:#727783;">
         <span class="material-symbols-outlined" style="font-size:18px;">close</span>
     </button>

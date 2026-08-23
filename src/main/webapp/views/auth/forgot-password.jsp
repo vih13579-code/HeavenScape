@@ -13,6 +13,7 @@
         <meta charset="utf-8">
         <meta content="width=device-width, initial-scale=1.0" name="viewport">
         <title>Forgot Password | HeavenScape</title>
+        <link rel="icon" type="image/png" href="https://res.cloudinary.com/llfxqkny/image/upload/v1787226687/heavenscape/favicon/heavenscape_favicon.png">
         <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
@@ -23,22 +24,22 @@
                     extend: {
                         "colors": {
                             "error": "#D32F2F",
-                            "on-primary": "#ffffff",
-                            "outline": "#727783",
-                            "on-surface-variant": "#424752",
-                            "on-error-container": "#93000a",
+                            "on-primary": "#FFFFFF",
+                            "outline": "#8F8F92",
+                            "on-surface-variant": "#5C5C5F",
+                            "on-error-container": "#93000A",
                             "surface": "#FFFFFF",
-                            "primary-container": "#1565c0",
-                            "on-primary-container": "#dae5ff",
-                            "primary": "#004d99",
-                            "on-surface": "#071e27",
-                            "background": "#f3faff",
-                            "outline-variant": "#c2c6d4",
-                            "error-container": "#ffdad6",
-                            "surface-container-low": "#e6f6ff",
+                            "primary-container": "#FDE8E9",
+                            "on-primary-container": "#7A0F13",
+                            "primary": "#C92127",
+                            "on-surface": "#1B1B1B",
+                            "background": "#F7F7F8",
+                            "outline-variant": "#D9D9DC",
+                            "error-container": "#FFDAD6",
+                            "surface-container-low": "#F7F7F8",
                             "success": "#2E7D32",
-                            "success-container": "#E8F5E9",
-                            "on-success-container": "#1B5E20"
+                            "success-container": "#DDF4DE",
+                            "on-success-container": "#0B3D0E"
                         },
                         "spacing": {
                             "stack-sm": "12px",
@@ -72,7 +73,7 @@
             }
         </script>
         <style>
-            body { font-family: 'Inter', sans-serif; background-color: #f3faff; }
+            body { font-family: 'Inter', sans-serif; background-color: #F7F7F8; }
             .material-symbols-outlined {
                 font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
                 vertical-align: middle;
@@ -130,7 +131,7 @@
                     <%-- Form --%>
                     <form class="space-y-stack-md" action="${pageContext.request.contextPath}/forgot-password" method="POST">
                         <div class="space-y-2">
-                            <label class="font-label-md text-label-md text-on-surface" for="email">Email Address</label>
+                            <label class="font-label-md text-label-md text-on-surface" for="email">Email Address <span class="text-error text-xs">*</span></label>
                             <div class="relative">
                                 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">mail</span>
                                 <input class="w-full pl-10 pr-4 py-3 bg-surface border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all font-body-md text-body-md outline-none"

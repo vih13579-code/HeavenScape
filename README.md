@@ -65,8 +65,8 @@ git clone: https://github.com/vih13579-code/HeavenScape.git
 #   (see src/main/java/utils/DBContext.java)
 # Run web/database/20260822_order_cancellation_voucher.sql after the base dump
 #   to add cancellation-source and order-voucher tracking columns
-# Run src/main/resources/db/20260823_genre_migration.sql after restoring the database
-#   to rename Category to Genre, remove Book.categoryID, and create BookGenre links
+# Run database/20260823_genre_many_to_many.sql after the base dump
+#   to migrate categories and enable multiple genres per book
 # Configure Google OAuth and VNPAY credentials in web.xml / VNPayConfig
 # Build and run the application
 

@@ -13,6 +13,8 @@ import model.Book;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -121,6 +123,7 @@ public class AdminProductController extends HttpServlet {
         lookupDAO.ensureDefaultLookups();
         req.setAttribute("book", book);
         req.setAttribute("genreMap", bookDAO.getGenreMap());
+        req.setAttribute("selectedGenreIDs", book == null ? new ArrayList<>() : book.getGenres());
         req.setAttribute("originMap", bookDAO.getOriginMap());
         req.setAttribute("contentMap", bookDAO.getContentMap());
         req.setAttribute("seriesMap", bookDAO.getSeriesMap());
@@ -159,6 +162,7 @@ public class AdminProductController extends HttpServlet {
         lookupDAO.ensureDefaultLookups();
         req.setAttribute("book", book);
         req.setAttribute("genreMap", bookDAO.getGenreMap());
+        req.setAttribute("selectedGenreIDs", book.getGenres());
         req.setAttribute("originMap", bookDAO.getOriginMap());
         req.setAttribute("contentMap", bookDAO.getContentMap());
         req.setAttribute("seriesMap", bookDAO.getSeriesMap());
@@ -190,7 +194,13 @@ public class AdminProductController extends HttpServlet {
         }
         Book b = buildBookFromRequest(req);
         String authors = req.getParameter("authors");
-        boolean ok = bookDAO.createBook(b, authors, b.getGenreIDs(), account.getId());
+        List<Integer> genreIDs = parsePositiveIntParams(req.getParameterValues("genreID"));
+        if (genreIDs.isEmpty()) {
+            session.setAttribute("errorMessage", "Please select at least one genre!");
+            resp.sendRedirect(req.getContextPath() + "/dashboard/product-management?action=create");
+            return;
+        }
+        boolean ok = bookDAO.createBook(b, authors, genreIDs, account.getId());
         if (ok) {
             session.setAttribute("successMessage", "Book added successfully!");
         } else {
@@ -228,7 +238,13 @@ public class AdminProductController extends HttpServlet {
         Book b = buildBookFromRequest(req);
         b.setBookID(bookID);
         String authors = req.getParameter("authors");
-        boolean ok = bookDAO.updateBook(b, authors, b.getGenreIDs(), account.getId());
+        List<Integer> genreIDs = parsePositiveIntParams(req.getParameterValues("genreID"));
+        if (genreIDs.isEmpty()) {
+            session.setAttribute("errorMessage", "Please select at least one genre!");
+            resp.sendRedirect(req.getContextPath() + "/dashboard/product-management?action=edit&id=" + bookID);
+            return;
+        }
+        boolean ok = bookDAO.updateBook(b, authors, genreIDs, account.getId());
         if (ok) {
             session.setAttribute("successMessage", "Book updated successfully!");
         } else {
@@ -360,7 +376,6 @@ public class AdminProductController extends HttpServlet {
             status = !requestedStatus.isEmpty() ? requestedStatus : "available";
         }
         b.setStatus(status);
-        b.setGenreIDs(parsePositiveIntParams(req.getParameterValues("genreID")));
         Integer cid = parseIntParam(req.getParameter("contentID"));
         if (cid != null) {
             b.setContentID(cid);
@@ -427,16 +442,15 @@ public class AdminProductController extends HttpServlet {
     }
 
     private List<Integer> parsePositiveIntParams(String[] params) {
-        List<Integer> values = new java.util.ArrayList<>();
-        if (params == null) {
-            return values;
-        }
-        for (String param : params) {
-            Integer value = parseIntParam(param);
-            if (value != null && !values.contains(value)) {
-                values.add(value);
+        LinkedHashSet<Integer> values = new LinkedHashSet<>();
+        if (params != null) {
+            for (String param : params) {
+                Integer value = parseIntParam(param);
+                if (value != null) {
+                    values.add(value);
+                }
             }
         }
-        return values;
+        return new ArrayList<>(values);
     }
 }

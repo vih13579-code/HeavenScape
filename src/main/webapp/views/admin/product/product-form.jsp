@@ -7,6 +7,7 @@
         <meta charset="utf-8">
         <meta content="width=device-width, initial-scale=1.0" name="viewport">
         <title>${formAction == 'create' ? 'Add New Book' : 'Edit Book'} - HeavenScape</title>
+        <link rel="icon" type="image/png" href="https://res.cloudinary.com/llfxqkny/image/upload/v1787226687/heavenscape/favicon/heavenscape_favicon.png">
         <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
@@ -15,13 +16,13 @@
                 darkMode: "class",
                 theme: {extend: {
                         colors: {
-                            "primary": "#004d99", "primary-container": "#1565c0",
-                            "secondary-container": "#fdd835", "secondary": "#705d00",
-                            "background": "#f3faff", "surface": "#ffffff",
-                            "on-surface": "#071e27", "on-surface-variant": "#424752",
-                            "outline-variant": "#c2c6d4", "success": "#2E7D32",
-                            "error": "#D32F2F", "warning": "#FFA000",
-                            "background-alt": "#F5F7F9"
+                            "primary": "#C92127", "primary-container": "#FDE8E9",
+                            "secondary-container": "#FFE3C2", "secondary": "#F97316",
+                            "background": "#F7F7F8", "surface": "#FFFFFF",
+                            "on-surface": "#1B1B1B", "on-surface-variant": "#5C5C5F",
+                            "outline-variant": "#D9D9DC", "success": "#2E7D32",
+                            "error": "#D32F2F", "warning": "#F9A825",
+                            "background-alt": "#FFFFFF"
                         },
                         fontFamily: {sans: ["Inter", "sans-serif"]}
                     }}
@@ -39,20 +40,20 @@
                 display:block;
                 font-size:13px;
                 font-weight:600;
-                color:#424752;
-                margin-bottom:5px;
+                color:#5C5C5F;
+                margin-bottom:6px;
             }
             .field-input {
                 width:100%;
-                border:1px solid #c2c6d4;
-                border-radius:10px;
-                padding:9px 13px;
+                border:1px solid #D9D9DC;
+                border-radius:8px;
+                padding:10px 12px;
                 font-size:14px;
                 outline:none;
                 transition:border .18s, box-shadow .18s;
             }
             .field-input:focus {
-                border-color:#004d99;
+                border-color:#C92127;
                 box-shadow:0 0 0 3px rgba(0,77,153,.1);
             }
             .field-input.error {
@@ -76,51 +77,13 @@
             .lookup-row .field-input {
                 flex:1;
             }
-            .genre-picker {
-                position:relative;
-                flex:1;
-            }
-            .genre-picker summary {
-                list-style:none;
-                cursor:pointer;
-                min-height:42px;
-                display:flex;
-                align-items:center;
-                justify-content:space-between;
-                gap:8px;
-                color:#5C5C5F;
-            }
-            .genre-picker summary::-webkit-details-marker { display:none; }
-            .genre-picker-options {
-                position:absolute;
-                left:0;
-                right:0;
-                top:calc(100% + 4px);
-                z-index:20;
-                max-height:220px;
-                overflow-y:auto;
-                padding:8px;
-                background:#fff;
-                border:1px solid #D9D9DC;
-                border-radius:8px;
-                box-shadow:0 10px 24px rgba(0,0,0,.12);
-            }
-            .genre-picker-option {
-                display:flex;
-                align-items:center;
-                gap:8px;
-                padding:7px 6px;
-                font-size:14px;
-                cursor:pointer;
-            }
-            .genre-picker-option:hover { background:#FDE8E9; }
             .lookup-add-btn {
                 width:42px;
                 min-width:42px;
-                border:1px solid #c2c6d4;
+                border:1px solid #D9D9DC;
                 border-radius:10px;
-                background:#f3faff;
-                color:#004d99;
+                background:#F7F7F8;
+                color:#C92127;
                 font-size:22px;
                 font-weight:700;
                 line-height:1;
@@ -130,8 +93,8 @@
                 transition:background .18s, border-color .18s;
             }
             .lookup-add-btn:hover {
-                background:#e6f6ff;
-                border-color:#004d99;
+                background:#FDE8E9;
+                border-color:#C92127;
             }
             .lookup-modal-backdrop {
                 position:fixed;
@@ -152,15 +115,15 @@
                 box-shadow:0 16px 40px rgba(0,77,153,.18);
             }
             .preview-img {
-                width:120px;
-                height:160px;
-                border:1.5px dashed #c2c6d4;
-                border-radius:10px;
+                width:132px;
+                height:176px;
+                border:1.5px dashed #D9D9DC;
+                border-radius:8px;
                 display:flex;
                 align-items:center;
                 justify-content:center;
                 overflow:hidden;
-                background:#f3faff;
+                background:#F7F7F8;
             }
             .preview-img img {
                 width:100%;
@@ -168,20 +131,87 @@
                 object-fit:cover;
             }
             .preview-img-sm {
-                width:80px;
-                height:100px;
-                border:1.5px dashed #c2c6d4;
+                width:100%;
+                height:122px;
+                border:1.5px dashed #D9D9DC;
                 border-radius:8px;
                 display:flex;
                 align-items:center;
                 justify-content:center;
                 overflow:hidden;
-                background:#f3faff;
+                background:#F7F7F8;
             }
             .preview-img-sm img {
                 width:100%;
                 height:100%;
                 object-fit:cover;
+            }
+            .form-section {
+                padding:18px;
+                border:1px solid #E6E6E8;
+                border-radius:10px;
+                background:#fff;
+            }
+            .form-section-title {
+                margin:0 0 14px;
+                color:#1B1B1B;
+                font-size:13px;
+                font-weight:800;
+                letter-spacing:.04em;
+                text-transform:uppercase;
+            }
+            .cover-image-row {
+                display:grid;
+                grid-template-columns:132px minmax(0,1fr);
+                gap:18px;
+                align-items:start;
+            }
+            .gallery-grid {
+                display:grid;
+                grid-template-columns:repeat(3,minmax(0,1fr));
+                gap:14px;
+            }
+            .gallery-item {
+                min-width:0;
+                display:flex;
+                flex-direction:column;
+                gap:8px;
+            }
+            .upload-action {
+                min-height:40px;
+                display:inline-flex;
+                align-items:center;
+                justify-content:center;
+                gap:8px;
+                border:1px solid #F3B7BA;
+                border-radius:8px;
+                background:#fff;
+                color:#C92127;
+                cursor:pointer;
+                font-size:13px;
+                font-weight:700;
+                transition:background .18s, border-color .18s;
+            }
+            .upload-action:hover {
+                background:#FFF0F1;
+                border-color:#C92127;
+            }
+            .upload-action-sm {
+                width:100%;
+                min-height:36px;
+                font-size:12px;
+            }
+            @media (max-width: 768px) {
+                .cover-image-row {
+                    grid-template-columns:1fr;
+                }
+                .preview-img {
+                    width:100%;
+                    max-width:180px;
+                }
+                .gallery-grid {
+                    grid-template-columns:1fr;
+                }
             }
         </style>
     </head>
@@ -191,11 +221,11 @@
         <%@ include file="/views/layout/common/toast.jsp" %>
 
         <main class="flex-1 md:ml-64 min-h-screen p-6">
-            <div class="max-w-[820px] mx-auto">
+            <div class="max-w-[980px] mx-auto">
 
                 
                 <div class="flex items-center gap-2 text-sm text-on-surface-variant mb-5">
-                    <a href="${pageContext.request.contextPath}/dashboard/product-management" class="hover:text-primary transition-colors">Book Inventory</a>
+                    <a href="${pageContext.request.contextPath}/dashboard/product-management" class="hover:text-primary transition-colors">Inventory</a>
                     <span class="material-symbols-outlined text-[16px]">chevron_right</span>
                     <span class="text-on-surface font-semibold">${formAction == 'create' ? 'Add New Book' : 'Edit Book'}</span>
                 </div>
@@ -209,7 +239,7 @@
                         <div>
                             <h2 class="font-bold text-lg">${formAction == 'create' ? 'Add New Book' : 'Edit Book'}</h2>
                             <p class="text-sm text-on-surface-variant">
-                                <c:if test="${formAction == 'update'}">ID: ${book.bookID} &middot; </c:if>
+                                <c:if test="${formAction == 'update'}">ID: ${book.bookID} · </c:if>
                                     Complete the information below
                                 </p>
                             </div>
@@ -218,16 +248,17 @@
           
                     <form method="post" id="bookForm"
                           action="${pageContext.request.contextPath}/dashboard/product-management"
-                          class="p-6 space-y-6" novalidate>
+                          class="p-6 space-y-5" novalidate>
                         <input type="hidden" name="action" value="${formAction}">
                         <c:if test="${formAction == 'update'}">
                             <input type="hidden" name="bookID" value="${book.bookID}">
                         </c:if>
 
                         
-                        <div class="flex flex-col gap-4">
+                        <div class="form-section">
+                            <p class="form-section-title">Book Images</p>
                            
-                            <div class="flex gap-4 items-start">
+                            <div class="cover-image-row">
                                 <div class="preview-img flex-shrink-0" id="thumbPreview">
                                     <c:choose>
                                         <c:when test="${not empty book.thumbnail}">
@@ -240,14 +271,14 @@
                                     </c:choose>
 
                                 </div>
-                                <div class="flex-1">
+                                <div class="min-w-0">
                                     <label class="field-label" for="thumbnail">Cover Image URL <span class="text-error">*</span></label>
                                     <input type="url" id="thumbnail" name="thumbnail" required
                                            class="field-input" placeholder="https://example.com/cover.jpg"
                                            value="${book.thumbnail}"
                                            oninput="previewThumb(this.value, 'thumbImg', 'thumbPlaceholder')">
                                     <div class="mt-2">
-                                        <label class="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg cursor-pointer hover:bg-blue-100 transition-colors text-sm font-medium">
+                                        <label class="upload-action px-4">
                                             <span class="material-symbols-outlined text-[18px]">upload</span>
                                             Upload Image to Cloudinary
                                             <input type="file" id="thumbFile" accept="image/*" class="hidden" onchange="uploadImage(this, 'thumbnail', 'thumbImg', 'thumbPlaceholder')">
@@ -257,59 +288,50 @@
                                     <p class="text-xs text-on-surface-variant mt-1.5">The main cover image appears in listings and on the product page.</p>
                                 </div>
                             </div>
-<<<<<<< Updated upstream
                             <%-- 3 ảnh phụ --%>
-                            <div class="p-4 bg-blue-50/50 rounded-xl border border-blue-100">
-                                <p class="text-[12px] font-bold text-on-surface-variant uppercase tracking-wide mb-3">Additional Images (Product Gallery)</p>
-                                <div class="grid grid-cols-3 gap-3">
-                                    <div>
-                                        <div class="preview-img-sm mb-2" id="imgPreview2">
-=======
-                            <%-- 3 ÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚ÂºÃƒâ€šÃ‚Â£nh phÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚Â»Ãƒâ€šÃ‚Â¥ --%>
                             <div class="mt-5">
                                 <p class="form-section-title">Additional Images (Product Gallery)</p>
                                 <div class="gallery-grid">
                                     <div class="gallery-item">
                                         <div class="preview-img-sm" id="imgPreview2">
->>>>>>> Stashed changes
                                             <span class="material-symbols-outlined text-gray-300 text-2xl" id="imgPlaceholder2">image</span>
                                             <img id="imgThumb2" alt="" class="hidden w-full h-full object-cover">
                                         </div>
                                         <input type="url" id="image2" name="image2"
-                                               class="field-input text-xs py-1.5" placeholder="Image 2 URL..."
+                                               class="field-input text-sm" placeholder="Image 2 URL..."
                                                value="${image2}"
                                                oninput="previewThumb(this.value, 'imgThumb2', 'imgPlaceholder2')">
-                                        <label class="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-600 rounded cursor-pointer hover:bg-blue-100 transition-colors text-xs mt-1">
+                                        <label class="upload-action upload-action-sm">
                                             <span class="material-symbols-outlined text-[14px]">upload</span>
                                             Upload
                                             <input type="file" id="imgFile2" accept="image/*" class="hidden" onchange="uploadImage(this, 'image2', 'imgThumb2', 'imgPlaceholder2')">
                                         </label>
                                     </div>
-                                    <div>
-                                        <div class="preview-img-sm mb-2" id="imgPreview3">
+                                    <div class="gallery-item">
+                                        <div class="preview-img-sm" id="imgPreview3">
                                             <span class="material-symbols-outlined text-gray-300 text-2xl" id="imgPlaceholder3">image</span>
                                             <img id="imgThumb3" alt="" class="hidden w-full h-full object-cover">
                                         </div>
                                         <input type="url" id="image3" name="image3"
-                                               class="field-input text-xs py-1.5" placeholder="Image 3 URL..."
+                                               class="field-input text-sm" placeholder="Image 3 URL..."
                                                value="${image3}"
                                                oninput="previewThumb(this.value, 'imgThumb3', 'imgPlaceholder3')">
-                                        <label class="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-600 rounded cursor-pointer hover:bg-blue-100 transition-colors text-xs mt-1">
+                                        <label class="upload-action upload-action-sm">
                                             <span class="material-symbols-outlined text-[14px]">upload</span>
                                             Upload
                                             <input type="file" id="imgFile3" accept="image/*" class="hidden" onchange="uploadImage(this, 'image3', 'imgThumb3', 'imgPlaceholder3')">
                                         </label>
                                     </div>
-                                    <div>
-                                        <div class="preview-img-sm mb-2" id="imgPreview4">
+                                    <div class="gallery-item">
+                                        <div class="preview-img-sm" id="imgPreview4">
                                             <span class="material-symbols-outlined text-gray-300 text-2xl" id="imgPlaceholder4">image</span>
                                             <img id="imgThumb4" alt="" class="hidden w-full h-full object-cover">
                                         </div>
                                         <input type="url" id="image4" name="image4"
-                                               class="field-input text-xs py-1.5" placeholder="Image 4 URL..."
+                                               class="field-input text-sm" placeholder="Image 4 URL..."
                                                value="${image4}"
                                                oninput="previewThumb(this.value, 'imgThumb4', 'imgPlaceholder4')">
-                                        <label class="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-600 rounded cursor-pointer hover:bg-blue-100 transition-colors text-xs mt-1">
+                                        <label class="upload-action upload-action-sm">
                                             <span class="material-symbols-outlined text-[14px]">upload</span>
                                             Upload
                                             <input type="file" id="imgFile4" accept="image/*" class="hidden" onchange="uploadImage(this, 'image4', 'imgThumb4', 'imgPlaceholder4')">
@@ -330,7 +352,7 @@
 
 
                         <div>
-                            <label class="field-label" for="authors"> Author <span class="text-error">*</span></label>
+                            <label class="field-label" for="authors">Author <span class="text-error">*</span></label>
                             <input type="text" id="authors" name="authors" required
                                    class="field-input" placeholder="John Doe, Jane Smith (separate names with commas)"
                                    value="<c:if test="${not empty book.authors}"><c:forEach var='a' items='${book.authors}' varStatus='s'>${a}<c:if test='${!s.last}'>, </c:if></c:forEach></c:if>">
@@ -339,7 +361,7 @@
                                        </div>
 
 
-                        <div class="grid grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="field-label" for="priceDisplay">Price (VND) <span class="text-error">*</span></label>
                                 <input type="text" id="priceDisplay" inputmode="numeric" autocomplete="off"
@@ -366,34 +388,23 @@
                         </div>
 
 
-                        <div class="grid grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label class="field-label" for="genreID">Genre</label>
+                                <label class="field-label" for="genreID">Genres</label>
                                 <div class="lookup-row">
-<<<<<<< Updated upstream
-                                    <select id="genreID" name="genreID" class="field-input">
-                                        <option value="">-- Select Genre --</option>
+                                    <div id="genreID" class="field-input max-h-[122px] overflow-y-auto space-y-1" role="group" aria-label="Book genres">
                                         <c:forEach var="entry" items="${genreMap}">
-                                            <option value="${entry.key}" <c:if test="${book.genreID == entry.key}">selected</c:if>>${entry.value}</option>
-                                        </c:forEach>
-                                    </select>
-                                    <button type="button" class="lookup-add-btn" data-lookup-type="genre" data-target-select="genreID" title="Add Genre">+</button>
-=======
-                                    <details class="genre-picker field-input" id="genrePicker">
-                                        <summary><span id="genrePickerLabel">-- Select Genre --</span><span class="material-symbols-outlined text-[18px]">expand_more</span></summary>
-                                        <div class="genre-picker-options" id="genreOptions">
-                                        <c:forEach var="entry" items="${genreMap}">
-                                            <label class="genre-picker-option">
-                                                <input type="checkbox" name="genreID" value="${entry.key}" data-genre-name="${entry.value}"
-                                                       <c:forEach var="selectedGenreID" items="${book.genreIDs}"><c:if test="${selectedGenreID == entry.key}">checked</c:if></c:forEach>>
+                                            <label class="flex items-center gap-2 px-2 py-1 rounded-md cursor-pointer hover:bg-primary-container">
+                                                <input type="checkbox" name="genreID" value="${entry.key}" data-genre-checkbox
+                                                       <c:forEach var="selectedGenre" items="${selectedGenreIDs}"><c:if test="${selectedGenre.genreID == entry.key}">checked</c:if></c:forEach>
+                                                       class="text-primary focus:ring-primary">
                                                 <span>${entry.value}</span>
                                             </label>
                                         </c:forEach>
-                                        </div>
-                                    </details>
-                                    <button type="button" class="lookup-add-btn" data-lookup-type="genre" data-target-select="genreOptions" title="Add Genre">+</button>
->>>>>>> Stashed changes
+                                    </div>
+                                    <button type="button" class="lookup-add-btn" data-lookup-type="genre" data-target-select="genreID" title="Add Genre">+</button>
                                 </div>
+                                <p id="genreError" class="err-msg">Select at least one genre.</p>
                             </div>
                             <div>
                                 <label class="field-label" for="contentID">Format</label>
@@ -410,7 +421,7 @@
                         </div>
 
 
-                        <div class="grid grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div>
                                 <label class="field-label" for="originID">Origin</label>
                                 <div class="lookup-row">
@@ -435,10 +446,22 @@
                                     <button type="button" class="lookup-add-btn" data-lookup-type="series" data-target-select="seriesID" title="Add Series">+</button>
                                 </div>
                             </div>
+                            <div>
+                                <label class="field-label" for="publisherID">Publisher <span class="text-error">*</span></label>
+                                <div class="lookup-row">
+                                    <select id="publisherID" name="publisherID" class="field-input" required>
+                                        <option value="">-- Select Publisher --</option>
+                                        <c:forEach var="entry" items="${publisherMap}">
+                                            <option value="${entry.key}" <c:if test="${book.publisherID == entry.key}">selected</c:if>>${entry.value}</option>
+                                        </c:forEach>
+                                    </select>
+                                    <button type="button" class="lookup-add-btn" data-lookup-type="publisher" data-target-select="publisherID" title="Add Publisher">+</button>
+                                </div>
+                            </div>
                         </div>
 
 
-                        <div class="grid grid-cols-3 gap-4">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div>
                                 <label class="field-label" for="totalPages">Page Count</label>
                                 <input type="number" id="totalPages" name="totalPages" min="0"
@@ -700,11 +723,7 @@
             });
 
 
-<<<<<<< Updated upstream
-            const lookupLabels = {genre: 'genre', content: 'format', origin: 'origin', series: 'series'};
-=======
-            const lookupLabels = {genre: 'Genre', content: 'format', origin: 'origin', series: 'series', publisher: 'publisher'};
->>>>>>> Stashed changes
+            const lookupLabels = {genre: 'genre', content: 'format', origin: 'origin', series: 'series', publisher: 'publisher'};
             let activeLookupType = '';
             let activeLookupSelectId = '';
 
@@ -725,54 +744,31 @@
             }
 
             function appendLookupOption(selectId, id, name) {
-                const options = document.getElementById(selectId);
-                if (!options)
-                    return;
-                if (options.tagName === 'SELECT') {
-                    const existingSelectOption = Array.from(options.options)
-                            .find(option => String(option.value) === String(id));
-                    if (existingSelectOption) {
-                        options.value = String(id);
+                if (selectId === 'genreID') {
+                    const group = document.getElementById(selectId);
+                    if (!group || group.querySelector('input[value="' + id + '"]'))
                         return;
-                    }
-                    const selectOption = document.createElement('option');
-                    selectOption.value = String(id);
-                    selectOption.textContent = name;
-                    options.appendChild(selectOption);
-                    options.value = String(id);
+                    const label = document.createElement('label');
+                    label.className = 'flex items-center gap-2 px-2 py-1 rounded-md cursor-pointer hover:bg-primary-container';
+                    label.innerHTML = '<input type="checkbox" name="genreID" value="' + id + '" data-genre-checkbox checked class="text-primary focus:ring-primary"><span></span>';
+                    label.querySelector('span').textContent = name;
+                    group.appendChild(label);
                     return;
                 }
-                const existing = Array.from(options.querySelectorAll('input[name="genreID"]')).find(opt => String(opt.value) === String(id));
+                const select = document.getElementById(selectId);
+                if (!select)
+                    return;
+                const existing = Array.from(select.options).find(opt => String(opt.value) === String(id));
                 if (existing) {
-                    existing.checked = true;
+                    select.value = String(id);
                     return;
                 }
-                const item = document.createElement('label');
-                item.className = 'genre-picker-option';
-                const input = document.createElement('input');
-                input.type = 'checkbox';
-                input.name = 'genreID';
-                input.value = String(id);
-                input.dataset.genreName = name;
-                input.checked = true;
-                item.appendChild(input);
-                const text = document.createElement('span');
-                text.textContent = name;
-                item.appendChild(text);
-                options.appendChild(item);
-                updateGenrePickerLabel();
+                const option = document.createElement('option');
+                option.value = String(id);
+                option.textContent = name;
+                select.appendChild(option);
+                select.value = String(id);
             }
-
-            function updateGenrePickerLabel() {
-                const selected = Array.from(document.querySelectorAll('#genreOptions input[name="genreID"]:checked'));
-                const label = document.getElementById('genrePickerLabel');
-                if (label) {
-                    label.textContent = selected.length ? selected.map(input => input.dataset.genreName).join(', ') : '-- Select Genre --';
-                }
-            }
-
-            document.getElementById('genreOptions').addEventListener('change', updateGenrePickerLabel);
-            updateGenrePickerLabel();
 
             async function saveLookupItem() {
                 const name = document.getElementById('lookupModalInput').value.trim();
@@ -816,6 +812,15 @@
 
             document.querySelectorAll('.lookup-add-btn').forEach(btn => {
                 btn.addEventListener('click', () => openLookupModal(btn.dataset.lookupType, btn.dataset.targetSelect));
+            });
+            document.getElementById('bookForm').addEventListener('submit', function (event) {
+                const genreError = document.getElementById('genreError');
+                const hasGenre = document.querySelectorAll('[data-genre-checkbox]:checked').length > 0;
+                genreError.classList.toggle('show', !hasGenre);
+                if (!hasGenre) {
+                    event.preventDefault();
+                    document.getElementById('genreID').focus();
+                }
             });
             document.getElementById('lookupModalCancel').addEventListener('click', closeLookupModal);
             document.getElementById('lookupModalSave').addEventListener('click', saveLookupItem);

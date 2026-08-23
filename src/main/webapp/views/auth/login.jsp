@@ -7,6 +7,7 @@
         <meta charset="utf-8">
         <meta content="width=device-width, initial-scale=1.0" name="viewport">
         <title>Log In | HeavenScape</title>
+        <link rel="icon" type="image/png" href="https://res.cloudinary.com/llfxqkny/image/upload/v1787226687/heavenscape/favicon/heavenscape_favicon.png">
         <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
@@ -16,58 +17,58 @@
                 theme: {
                     extend: {
                         "colors": {
-                            "surface-dim": "#c7dde9",
-                            "tertiary": "#134aa4",
+                            "surface-dim": "#E9E9EB",
+                            "tertiary": "#F5A623",
                             "error": "#D32F2F",
-                            "primary-fixed": "#d6e3ff",
-                            "secondary": "#705d00",
-                            "on-tertiary-fixed": "#001945",
-                            "surface-container-high": "#d5ecf8",
-                            "on-primary": "#ffffff",
-                            "outline": "#727783",
-                            "on-surface-variant": "#424752",
-                            "inverse-on-surface": "#dff4ff",
-                            "on-error-container": "#93000a",
-                            "on-tertiary": "#ffffff",
-                            "on-secondary": "#ffffff",
-                            "on-secondary-fixed-variant": "#544600",
-                            "on-primary-container": "#dae5ff",
+                            "primary-fixed": "#FFDAD9",
+                            "secondary": "#F97316",
+                            "on-tertiary-fixed": "#241A00",
+                            "surface-container-high": "#EBEBED",
+                            "on-primary": "#FFFFFF",
+                            "outline": "#8F8F92",
+                            "on-surface-variant": "#5C5C5F",
+                            "inverse-on-surface": "#F5F5F5",
+                            "on-error-container": "#93000A",
+                            "on-tertiary": "#402D00",
+                            "on-secondary": "#FFFFFF",
+                            "on-secondary-fixed-variant": "#7A3A00",
+                            "on-primary-container": "#7A0F13",
                             "surface": "#FFFFFF",
-                            "on-tertiary-fixed-variant": "#00429c",
-                            "surface-container": "#dbf1fe",
-                            "on-background": "#071e27",
-                            "tertiary-fixed": "#d9e2ff",
-                            "warning": "#FFA000",
-                            "surface-container-low": "#e6f6ff",
-                            "surface-tint": "#005db7",
-                            "surface-bright": "#f3faff",
-                            "tertiary-container": "#3563be",
-                            "primary-container": "#1565c0",
-                            "primary": "#004d99",
-                            "on-secondary-fixed": "#221b00",
-                            "on-surface": "#071e27",
-                            "on-primary-fixed": "#001b3d",
-                            "background-alt": "#F5F7F9",
-                            "surface-container-highest": "#cfe6f2",
-                            "on-error": "#ffffff",
-                            "background": "#f3faff",
-                            "tertiary-fixed-dim": "#b0c6ff",
-                            "surface-variant": "#cfe6f2",
-                            "inverse-surface": "#1e333c",
-                            "secondary-fixed": "#ffe16e",
-                            "primary-fixed-dim": "#a9c7ff",
-                            "secondary-container": "#fdd835",
-                            "surface-container-lowest": "#ffffff",
-                            "inverse-primary": "#a9c7ff",
-                            "on-tertiary-container": "#dde5ff",
-                            "secondary-fixed-dim": "#e8c41d",
-                            "on-primary-fixed-variant": "#00468c",
+                            "on-tertiary-fixed-variant": "#5C4200",
+                            "surface-container": "#F1F1F3",
+                            "on-background": "#1B1B1B",
+                            "tertiary-fixed": "#FFE8A3",
+                            "warning": "#F9A825",
+                            "surface-container-low": "#F7F7F8",
+                            "surface-tint": "#C92127",
+                            "surface-bright": "#FFFFFF",
+                            "tertiary-container": "#FFF3D6",
+                            "primary-container": "#FDE8E9",
+                            "primary": "#C92127",
+                            "on-secondary-fixed": "#2B1700",
+                            "on-surface": "#1B1B1B",
+                            "on-primary-fixed": "#410006",
+                            "background-alt": "#FFFFFF",
+                            "surface-container-highest": "#E3E3E6",
+                            "on-error": "#FFFFFF",
+                            "background": "#F7F7F8",
+                            "tertiary-fixed-dim": "#F0C34D",
+                            "surface-variant": "#EFE0DF",
+                            "inverse-surface": "#303030",
+                            "secondary-fixed": "#FFDCC0",
+                            "primary-fixed-dim": "#FFB3B0",
+                            "secondary-container": "#FFE3C2",
+                            "surface-container-lowest": "#FFFFFF",
+                            "inverse-primary": "#FFB3B0",
+                            "on-tertiary-container": "#402D00",
+                            "secondary-fixed-dim": "#FFB876",
+                            "on-primary-fixed-variant": "#93000A",
                             "success": "#2E7D32",
-                            "outline-variant": "#c2c6d4",
-                            "on-secondary-container": "#705e00",
-                            "error-container": "#ffdad6",
-                            "success-container": "#E8F5E9",
-                            "on-success-container": "#1B5E20"
+                            "outline-variant": "#D9D9DC",
+                            "on-secondary-container": "#7A3A00",
+                            "error-container": "#FFDAD6",
+                            "success-container": "#DDF4DE",
+                            "on-success-container": "#0B3D0E"
                         },
                         "borderRadius": {
                             "DEFAULT": "0.25rem",
@@ -116,7 +117,7 @@
         <style>
             body {
                 font-family: 'Inter', sans-serif;
-                background-color: #f3faff;
+                background-color: #F7F7F8;
             }
             .material-symbols-outlined {
                 font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
@@ -177,7 +178,7 @@
 
                     <form class="space-y-stack-md" action="${pageContext.request.contextPath}/login" method="POST">
                         <div class="space-y-2">
-                            <label class="font-label-md text-label-md text-on-surface" for="email">Email</label>
+                            <label class="font-label-md text-label-md text-on-surface" for="email">Email <span class="text-error text-xs">*</span></label>
                             <div class="relative">
                                 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">mail</span>
 
@@ -193,7 +194,7 @@
 
                         <div class="space-y-2">
                             <div class="flex justify-between items-center">
-                                <label class="font-label-md text-label-md text-on-surface" for="password">Password</label>
+                                <label class="font-label-md text-label-md text-on-surface" for="password">Password <span class="text-error text-xs">*</span></label>
                                 <a class="font-label-sm text-label-sm text-primary hover:underline transition-all" href="${pageContext.request.contextPath}/forgot-password">Forgot Password?</a>
                             </div>
                             <div class="relative">

@@ -5,16 +5,488 @@
 <%@ include file="/views/layout/homepage/header.jsp" %>
 <%@ include file="/views/layout/common/toast.jsp" %>
 
-<body class="bg-background-alt text-on-background font-body-md min-h-screen">
-    <main class="max-w-[1280px] mx-auto px-4 md:px-16 py-12 min-h-[716px] text-[#071e27]">
+<style>
+    .fhs-checkout-body {
+        background: #F0F0F0;
+        color: #333;
+        font-family: Arial, Helvetica, sans-serif;
+        min-height: 100vh;
+    }
 
-        <h1
-            class="text-[20px] font-bold mb-stack-md text-primary pl-3 border-l-4 border-secondary">
-            SECURE CHECKOUT
-        </h1>
+    .fhs-checkout-page {
+        max-width: 1230px;
+        margin: 0 auto;
+        padding: 22px 16px 48px;
+        color: #333;
+    }
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-start">
-            <div class="lg:col-span-8 space-y-6">
+    .fhs-checkout-heading {
+        margin: 0 0 14px;
+        font-size: 22px;
+        line-height: 1.3;
+        font-weight: 700;
+        color: #333;
+    }
+
+    .fhs-checkout-progress {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 16px;
+        padding: 12px 16px;
+        background: #fff;
+        border-radius: 8px;
+        font-size: 12px;
+        color: #777;
+    }
+
+    .fhs-checkout-progress .step {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        white-space: nowrap;
+    }
+
+    .fhs-checkout-progress .dot {
+        width: 22px;
+        height: 22px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: #D8D8D8;
+        color: #fff;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .fhs-checkout-progress .done .dot,
+    .fhs-checkout-progress .active .dot {
+        background: #C92127;
+    }
+
+    .fhs-checkout-progress .active {
+        color: #C92127;
+        font-weight: 700;
+    }
+
+    .fhs-checkout-progress .line {
+        flex: 1 1 60px;
+        max-width: 90px;
+        height: 1px;
+        background: #E3E3E3;
+    }
+
+    .fhs-checkout-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 380px;
+        gap: 14px;
+        align-items: start;
+    }
+
+    .fhs-checkout-left {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        min-width: 0;
+    }
+
+    .fhs-checkout-left > :not([hidden]) ~ :not([hidden]) {
+        margin-top: 0 !important;
+    }
+
+    /* FAHASA-like order: address -> payment -> order review */
+    .fhs-checkout-left > section:nth-child(1) { order: 3; }
+    .fhs-checkout-left > section:nth-child(2) { order: 1; }
+    .fhs-checkout-left > section:nth-child(3) { order: 2; }
+
+    .fhs-checkout-page section,
+    .fhs-order-summary {
+        background: #fff !important;
+        border: 0 !important;
+        border-radius: 8px !important;
+        box-shadow: 0 1px 2px rgba(0,0,0,.04);
+    }
+
+    .fhs-checkout-page section > div:first-child,
+    .fhs-checkout-page section > h2 {
+        color: #333 !important;
+    }
+
+    .fhs-checkout-page section > div:first-child {
+        padding: 15px 18px !important;
+        border-bottom: 1px solid #E8E8E8 !important;
+    }
+
+    .fhs-checkout-page section > h2 {
+        margin: 0 !important;
+        padding: 15px 18px !important;
+        border-bottom: 1px solid #E8E8E8;
+        font-size: 15px !important;
+        font-weight: 700 !important;
+    }
+
+    .fhs-checkout-page section h2 {
+        color: #333 !important;
+        font-size: 15px !important;
+        font-weight: 700 !important;
+    }
+
+    .fhs-checkout-page section h2 svg {
+        width: 18px;
+        height: 18px;
+        color: #C92127;
+    }
+
+    /* Address section */
+    .fhs-checkout-left > section:nth-child(2) {
+        padding: 0 18px 18px !important;
+    }
+
+    .fhs-checkout-left > section:nth-child(2) > .flex:first-child {
+        margin: 0 -18px 16px !important;
+        padding: 15px 18px !important;
+        border-bottom: 1px solid #E8E8E8;
+    }
+
+    #btnShowAddressForm {
+        border: 0 !important;
+        padding: 5px 0 !important;
+        border-radius: 0 !important;
+        color: #C92127 !important;
+        background: transparent !important;
+        font-size: 12px !important;
+    }
+
+    #selectedAddressBox {
+        border: 1px solid #DADADA !important;
+        background: #fff !important;
+        border-radius: 6px !important;
+        padding: 14px 15px !important;
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 16px;
+        align-items: center;
+    }
+
+    #selectedAddressBox:hover {
+        border-color: #C92127 !important;
+    }
+
+    #selectedAddressBox > div {
+        min-width: 0;
+    }
+
+    #selectedAddressBox button {
+        flex: 0 0 auto;
+        white-space: nowrap;
+    }
+
+    #selectedDefaultBadge,
+    .default-option-badge {
+        background: #C92127 !important;
+        border-radius: 3px !important;
+    }
+
+    #addressDropdown {
+        border: 1px solid #DADADA !important;
+        border-radius: 6px !important;
+        box-shadow: 0 8px 20px rgba(0,0,0,.12) !important;
+    }
+
+    .address-option {
+        padding: 14px 15px !important;
+        border-bottom: 1px solid #ECECEC !important;
+    }
+
+    .address-option:hover {
+        background: #FFF7F7 !important;
+    }
+
+    /* Payment */
+    .fhs-checkout-left > section:nth-child(3) {
+        padding: 0 18px 18px !important;
+    }
+
+    .fhs-checkout-left > section:nth-child(3) > h2 {
+        margin: 0 -18px 15px !important;
+    }
+
+    #paymentGroup {
+        display: grid;
+        gap: 8px;
+    }
+
+    .payment-card {
+        min-height: 56px;
+        padding: 11px 14px !important;
+        border: 1px solid #DDDDDD !important;
+        border-radius: 6px !important;
+        background: #fff !important;
+    }
+
+    .payment-card:hover {
+        border-color: #C92127 !important;
+        background: #FFF9F9 !important;
+    }
+
+    .payment-card:has(input:checked) {
+        border-color: #C92127 !important;
+        background: #FFF5F5 !important;
+        box-shadow: 0 0 0 1px rgba(201, 33, 39, .08);
+    }
+
+    .payment-card input[type="radio"] {
+        appearance: none;
+        width: 18px !important;
+        height: 18px !important;
+        flex: 0 0 18px;
+        border: 1.5px solid #A7A7A7;
+        border-radius: 50%;
+        background: #fff;
+        display: grid;
+        place-content: center;
+        outline: none;
+        cursor: pointer;
+    }
+
+    .payment-card input[type="radio"]::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #C92127;
+        transform: scale(0);
+        transition: transform .12s ease;
+    }
+
+    .payment-card input[type="radio"]:checked {
+        border-color: #C92127;
+    }
+
+    .payment-card input[type="radio"]:checked::before {
+        transform: scale(1);
+    }
+
+    .payment-card p {
+        color: #333 !important;
+    }
+
+    .payment-card > div > div:first-child {
+        width: 36px !important;
+        height: 36px !important;
+        border-radius: 6px !important;
+        background: #FFF0F1 !important;
+        color: #C92127 !important;
+    }
+
+    /* Review order */
+    .fhs-checkout-left > section:nth-child(1) > div:first-child a {
+        color: #C92127 !important;
+    }
+
+    .fhs-checkout-left > section:nth-child(1) .divide-y > div {
+        padding: 16px 18px !important;
+        gap: 14px !important;
+    }
+
+    .fhs-checkout-left > section:nth-child(1) .divide-y > div > div:first-child {
+        width: 74px !important;
+        height: 100px !important;
+        border-radius: 4px !important;
+        background: #FAFAFA !important;
+        border: 1px solid #EFEFEF !important;
+    }
+
+    .fhs-checkout-left > section:nth-child(1) .divide-y img {
+        object-fit: contain !important;
+    }
+
+    /* Summary */
+    .fhs-checkout-aside {
+        position: sticky;
+        top: 16px;
+    }
+
+    .fhs-order-summary {
+        padding: 0 !important;
+        overflow: hidden;
+    }
+
+    .fhs-order-summary > h2 {
+        margin: 0 !important;
+        padding: 15px 18px !important;
+        border-bottom: 1px solid #E8E8E8;
+        border-left: 0 !important;
+        color: #333 !important;
+        font-size: 15px !important;
+        font-weight: 700 !important;
+    }
+
+    .fhs-order-summary > div,
+    .fhs-order-summary > form {
+        margin-left: 18px;
+        margin-right: 18px;
+    }
+
+    .fhs-order-summary > div:first-of-type {
+        margin-top: 18px;
+    }
+
+    .fhs-voucher-heading {
+        min-height: 24px;
+        gap: 12px;
+    }
+
+    .fhs-voucher-heading > * {
+        white-space: nowrap;
+    }
+
+    .fhs-voucher-controls {
+        align-items: stretch;
+    }
+
+    .fhs-checkout-summary-row,
+    .fhs-checkout-total-row {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: baseline;
+        gap: 16px;
+    }
+
+    .fhs-checkout-summary-row > :last-child,
+    .fhs-checkout-total-row > :last-child {
+        text-align: right;
+        white-space: nowrap;
+    }
+
+    #voucherCodeInput {
+        min-width: 0;
+        height: 38px;
+        border: 1px solid #D8D8D8 !important;
+        border-radius: 5px !important;
+        font-size: 13px !important;
+    }
+
+    #btnApplyVoucher,
+    #btnRemoveVoucher {
+        border-radius: 5px !important;
+        min-width: 76px;
+        padding: 0 12px !important;
+        font-size: 12px !important;
+    }
+
+    #btnApplyVoucher {
+        background: #C92127 !important;
+    }
+
+    .voucher-card--disabled {
+        opacity: .45;
+        filter: grayscale(.85);
+        cursor: not-allowed;
+        background: #f3f4f6 !important;
+        border-color: #cbd5e1 !important;
+    }
+
+    .voucher-card--disabled .btn-copy-voucher {
+        cursor: not-allowed;
+    }
+
+    #grandTotalDisplay {
+        color: #C92127 !important;
+        font-size: 22px !important;
+    }
+
+    .fhs-order-summary > form {
+        margin-bottom: 18px;
+    }
+
+    #checkout-form button[type="submit"] {
+        width: 100%;
+        min-height: 46px;
+        border-radius: 6px !important;
+        background: #C92127 !important;
+        color: #fff !important;
+        box-shadow: none !important;
+        transform: none !important;
+        font-size: 14px !important;
+        font-weight: 700 !important;
+    }
+
+    #checkout-form button[type="submit"]:hover {
+        background: #A8191F !important;
+    }
+
+    /* Dialogs */
+    #newAddressForm > div,
+    #deleteAddressConfirm > div,
+    #confirmOrderModal > div,
+    #voucherListModal > div {
+        border-radius: 8px !important;
+    }
+
+    #newAddressForm > div > div:first-child {
+        background: #C92127 !important;
+    }
+
+    @media (max-width: 960px) {
+        .fhs-checkout-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .fhs-checkout-aside {
+            position: static;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .fhs-checkout-page {
+            padding: 14px 10px 32px;
+        }
+
+        .fhs-checkout-progress {
+            gap: 6px;
+            padding: 10px 12px;
+            overflow-x: auto;
+        }
+
+        .fhs-checkout-progress .line {
+            min-width: 24px;
+        }
+
+        .fhs-checkout-left > section:nth-child(1) .divide-y > div {
+            flex-direction: row !important;
+        }
+
+        .fhs-checkout-left > section:nth-child(1) .divide-y > div > div:first-child {
+            width: 66px !important;
+            height: 90px !important;
+            flex: 0 0 66px !important;
+        }
+
+        #newRecipientFields,
+        #newAddressForm .grid-cols-2 {
+            grid-template-columns: 1fr !important;
+        }
+    }
+</style>
+
+
+<body class="fhs-checkout-body">
+    <main class="fhs-checkout-page">
+
+        <h1 class="fhs-checkout-heading">Checkout</h1>
+
+        <div class="fhs-checkout-progress" aria-label="Checkout progress">
+            <span class="step done"><span class="dot">1</span>Cart</span>
+            <span class="line"></span>
+            <span class="step active"><span class="dot">2</span>Checkout</span>
+            <span class="line"></span>
+            <span class="step"><span class="dot">3</span>Complete</span>
+        </div>
+
+        <div class="fhs-checkout-grid">
+            <div class="fhs-checkout-left">
 
                 <!-- Payment -->
                 <section
@@ -52,12 +524,13 @@
                                     </c:choose>
                                 </div>
 
-                                <div class="flex-grow">
-                                    <div class="flex justify-between items-start">
-                                        <div>
+                                <div class="flex-grow min-w-0">
+                                    <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                                        <div class="min-w-0 flex-1">
                                             <h3
-                                                class="text-[15px] font-bold text-on-surface mb-1">
-                                                ${item.title}</h3>
+                                                class="text-[15px] font-bold text-on-surface mb-1 truncate"
+                                                title="${fn:escapeXml(item.title)}">
+                                                <c:out value="${item.title}" /></h3>
                                             <p class="text-[13px] text-on-surface-variant">
                                                 ${item.authorsDisplay}</p>
                                             <div class="mt-4">
@@ -69,7 +542,7 @@
                                         </div>
 
                                         <span
-                                            class="text-[17px] font-bold text-primary whitespace-nowrap">
+                                            class="shrink-0 text-[17px] font-bold text-primary whitespace-nowrap sm:ml-4 sm:text-right">
                                             <fmt:formatNumber value="${item.subtotal}"
                                                               type="number" groupingUsed="true" /> VND
                                         </span>
@@ -190,7 +663,7 @@
                             </p>
                             <div class="grid grid-cols-2 gap-3">
                                 <button type="button" id="btnCancelDeleteAddress"
-                                        class="bg-blue-100 text-[#071e27] py-3 rounded font-bold text-[13px]">
+                                        class="bg-[#FFE3C2] text-[#1B1B1B] py-3 rounded font-bold text-[13px]">
                                     Cancel
                                 </button>
                                 <button type="button" id="btnConfirmDeleteAddress"
@@ -214,7 +687,7 @@
                             <div class="p-5 space-y-4">
                                 <div id="newRecipientFields" class="grid grid-cols-2 gap-3">
                                     <div>
-                                        <label class="block text-[12px] font-bold mb-1">Recipient Name</label>
+                                        <label class="block text-[12px] font-bold mb-1">Recipient Name <span class="text-red-600">*</span></label>
                                         <input id="newFullname" type="text"
                                                placeholder="Enter full name"
                                                value="${sessionScope.account.fullname}"
@@ -222,7 +695,7 @@
                                     </div>
 
                                     <div>
-                                        <label class="block text-[12px] font-bold mb-1">Phone Number</label>
+                                        <label class="block text-[12px] font-bold mb-1">Phone Number <span class="text-red-600">*</span></label>
                                         <input id="newPhone" type="text"
                                                placeholder="Enter phone number"
                                                value="${sessionScope.account.phone}"
@@ -232,7 +705,7 @@
 
                                 <div class="grid grid-cols-2 gap-3">
                                     <div>
-                                        <label class="block text-[12px] font-bold mb-1">Province / City</label>
+                                        <label class="block text-[12px] font-bold mb-1">Province / City <span class="text-red-600">*</span></label>
                                         <select id="newCity"
                                                 class="w-full border border-outline-variant rounded px-3 py-2 text-[13px]">
                                             <option value="">Loading...</option>
@@ -240,7 +713,7 @@
                                     </div>
 
                                     <div>
-                                        <label class="block text-[12px] font-bold mb-1">Ward / Commune</label>
+                                        <label class="block text-[12px] font-bold mb-1">Ward / Commune <span class="text-red-600">*</span></label>
                                         <select id="newWard"
                                                 class="w-full border border-outline-variant rounded px-3 py-2 text-[13px]">
                                             <option value="">Select Ward / Commune</option>
@@ -249,21 +722,21 @@
                                 </div>
 
                                 <div>
-                                    <label class="block text-[12px] font-bold mb-1">Street Address</label>
+                                    <label class="block text-[12px] font-bold mb-1">Street Address <span class="text-red-600">*</span></label>
                                     <textarea id="newStreet" rows="3"
                                               placeholder="House number, street name..."
                                               class="w-full border border-outline-variant rounded px-3 py-2 text-[13px]"></textarea>
                                 </div>
 
                                 <label
-                                    class="flex items-center gap-2 bg-blue-50 px-3 py-2 rounded text-[12px]">
+                                    class="flex items-center gap-2 bg-[#FDE8E9] px-3 py-2 rounded text-[12px]">
                                     <input type="checkbox" id="defaultAddress">
                                     Set as default shipping address
                                 </label>
 
                                 <div class="grid grid-cols-2 gap-3 pt-2">
                                     <button type="button" id="btnCancelAddress"
-                                            class="bg-blue-100 text-[#071e27] py-3 rounded font-bold text-[13px]">
+                                            class="bg-[#FFE3C2] text-[#1B1B1B] py-3 rounded font-bold text-[13px]">
                                         Cancel
                                     </button>
 
@@ -281,7 +754,7 @@
                 <section
                     class="bg-surface rounded-xl style-card border border-outline-variant p-6">
                     <h2 class="text-[16px] font-bold text-primary flex items-center gap-2 mb-6">
-                        <i data-lucide="wallet-cards"></i> Payment Method
+                        <i data-lucide="wallet-cards"></i> Payment Method <span class="text-red-600 text-xs">*</span>
                     </h2>
 
                     <div class="space-y-3" id="paymentGroup">
@@ -293,7 +766,7 @@
                                     <i data-lucide="credit-card"></i>
                                 </div>
                                 <div>
-                                    <p class="text-[14px] font-bold text-on-surface-variant">
+                                    <p class="text-[14px] font-bold">
                                         Bank Transfer (VNPAY)</p>
                                 </div>
                             </div>
@@ -322,15 +795,12 @@
                 </section>
             </div>
 
-            <aside class="lg:col-span-4 sticky top-6">
-                <div class="bg-surface rounded-xl style-card border border-outline-variant p-6">
-                    <h2
-                        class="text-[16px] font-black text-primary uppercase border-l-4 border-secondary pl-3 mb-6">
-                        Order Summary
-                    </h2>
+            <aside class="fhs-checkout-aside">
+                <div class="fhs-order-summary">
+                    <h2>Order Summary</h2>
 
-                    <div class="mb-6">
-                        <div class="flex items-center justify-between mb-2">
+                    <div class="mb-5 fhs-voucher-section">
+                        <div class="fhs-voucher-heading flex items-center justify-between mb-2">
                             <label class="text-[13px] font-bold text-on-surface block">Voucher Code</label>
                             <button type="button" id="btnShowVoucherList"
                                     class="text-[12px] font-bold text-primary hover:underline flex items-center gap-1">
@@ -338,7 +808,7 @@
                                 Store Vouchers
                             </button>
                         </div>
-                        <div class="flex gap-2">
+                        <div class="fhs-voucher-controls flex gap-2">
                             <input type="text" id="voucherCodeInput"
                                    placeholder="Enter voucher code" value="${appliedVoucherCode}"
                                    ${not empty appliedVoucherCode ? 'disabled' : '' }
@@ -355,8 +825,8 @@
                         </div>
                     </div>
 
-                    <div class="space-y-3 mb-6">
-                        <div class="flex justify-between text-[14px]">
+                    <div class="space-y-3 mb-5 fhs-summary-lines">
+                        <div class="fhs-checkout-summary-row text-[14px]">
                             <span class="text-on-surface-variant">Subtotal (${totalQuantity} items)</span>
                             <span id="subtotalDisplay" class="font-bold" data-value="${total}">
                                 <fmt:formatNumber value="${total}" type="number"
@@ -364,23 +834,23 @@
                             </span>
                         </div>
 
-                        <div class="flex justify-between text-[14px] text-green-600">
+                        <div class="fhs-checkout-summary-row text-[14px] text-green-600">
                             <span>Voucher Discount</span>
                             <span id="discountDisplay" class="font-bold"
                                   data-value="${empty appliedDiscount ? 0 : appliedDiscount}">
                                 <c:choose>
-                                    <c:when test="${not empty appliedDiscount}">
+                                    <c:when test="${not empty appliedDiscount and appliedDiscount > 0}">
                                         -
                                         <fmt:formatNumber value="${appliedDiscount}"
                                                           type="number" groupingUsed="true" /> VND
                                     </c:when>
-                                    <c:otherwise>- 0 VND</c:otherwise>
+                                    <c:otherwise>0 VND</c:otherwise>
                                 </c:choose>
                             </span>
                         </div>
 
                         <div
-                            class="pt-4 border-t border-surface-container flex justify-between items-end">
+                            class="fhs-checkout-total-row pt-4 border-t border-surface-container">
                             <span class="text-[15px] font-bold text-primary">Total</span>
                             <span id="grandTotalDisplay"
                                   class="text-[22px] font-black text-primary">
@@ -406,8 +876,8 @@
                         <input type="hidden" name="deletedAddressIds" id="deletedAddressIds"
                                value="">
 
-                        <button type="submit" class="w-full bg-secondary text-primary py-3.5 rounded-full font-black text-[15px]
-                                shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all
+                        <button type="submit" class="w-full bg-primary text-white py-3.5 rounded-full font-black text-[15px]
+                                shadow-sm hover:bg-[#a9191f] hover:scale-[1.02] active:scale-[0.98] transition-all
                                 flex items-center justify-center gap-2 uppercase tracking-wide">
                             PLACE ORDER
                         </button>
@@ -437,7 +907,7 @@
                 
                 
                 <button type="button" id="btnConfirmOrder"
-                        class="px-4 py-2 bg-[#004d99] text-white rounded-lg hover:opacity-90">
+                        class="px-4 py-2 bg-[#C92127] text-white rounded-lg hover:opacity-90">
                     Confirm
                 </button>
             </div>
@@ -988,9 +1458,10 @@
         }
 
         function updateOrderSummary(discountAmount, newTotal) {
-            const subtotal = parseFloat(document.getElementById('subtotalDisplay').dataset.value);
             document.getElementById('discountDisplay').dataset.value = discountAmount;
-            document.getElementById('discountDisplay').textContent = '- ' + formatMoney(discountAmount);
+            document.getElementById('discountDisplay').textContent = Number(discountAmount) > 0
+                    ? '- ' + formatMoney(discountAmount)
+                    : formatMoney(0);
             document.getElementById('grandTotalDisplay').textContent = formatMoney(newTotal);
         }
 
@@ -1072,6 +1543,10 @@
         }
 
         function renderVoucherItem(v) {
+            var disabledClass = v.eligible ? '' : ' voucher-card--disabled';
+            var disabledAttributes = v.eligible ? '' : ' disabled tabindex="-1" aria-disabled="true"';
+            var eligibilityHtml = v.eligible ? ''
+                    : '<p class="mt-2 text-[12px] font-semibold text-red-600">' + escapeHtml(v.ineligibleReason || 'This voucher is not eligible for the current order.') + '</p>';
             var minOrderHtml = (v.minOrderValue !== null && v.minOrderValue !== undefined)
                     ? '<span class="inline-flex items-center gap-1"><i data-lucide="shopping-cart" class="w-3 h-3"></i>Minimum order ' + formatCurrencyVND(v.minOrderValue) + '</span>'
                     : '';
@@ -1086,13 +1561,13 @@
             }
 
             return ''
-                    + '<div class="border border-dashed border-primary/40 rounded-lg p-4 bg-primary/[0.03]">'
+                    + '<div class="border border-dashed border-primary/40 rounded-lg p-4 bg-primary/[0.03]' + disabledClass + '" aria-disabled="' + (!v.eligible) + '">'
                     + '  <div class="flex items-center justify-between gap-3">'
                     + '    <div>'
                     + '      <p class="text-[15px] font-black text-primary">Save ' + v.discountPercent + '%</p>'
                     + '      <div class="flex items-center gap-2 mt-1">'
                     + '        <span class="px-2 py-1 bg-white border border-outline-variant rounded text-[13px] font-bold tracking-wide">' + escapeHtml(v.code) + '</span>'
-                    + '        <button type="button" class="btn-copy-voucher text-primary hover:opacity-70" data-code="' + escapeHtml(v.code) + '" title="Copy Code">'
+                    + '        <button type="button" class="btn-copy-voucher text-primary hover:opacity-70" data-code="' + escapeHtml(v.code) + '" title="' + (v.eligible ? 'Copy Code' : 'Voucher is not eligible') + '"' + disabledAttributes + '>'
                     + '          <i data-lucide="copy" class="w-4 h-4"></i>'
                     + '        </button>'
                     + '      </div>'
@@ -1100,6 +1575,7 @@
                     + '    <span class="text-[11px] text-on-surface-variant whitespace-nowrap">Expires: ' + v.endDate + '</span>'
                     + '  </div>'
                     + conditionsHtml
+                    + eligibilityHtml
                     + '</div>';
         }
 
