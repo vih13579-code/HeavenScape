@@ -6,11 +6,12 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Genre Details - HeavenScape</title>
+        <link rel="icon" type="image/png" href="https://res.cloudinary.com/llfxqkny/image/upload/v1787226687/heavenscape/favicon/heavenscape_favicon.png">
         <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
         <script>
-            tailwind.config = {theme: {extend: {colors: {primary: '#004d99', background: '#f3faff', surface: '#ffffff', 'surface-container-low': '#e6f6ff', 'on-surface': '#071e27', 'on-surface-variant': '#424752', 'outline-variant': '#c2c6d4'}, fontFamily: {sans: ['Inter', 'sans-serif']}, boxShadow: {card: '0 4px 20px rgba(21,101,192,0.08)'}}}}
+            tailwind.config = {theme: {extend: {colors: {primary: '#C92127', background: '#F7F7F8', surface: '#ffffff', 'surface-container-low': '#FDE8E9', 'on-surface': '#1B1B1B', 'on-surface-variant': '#5C5C5F', 'outline-variant': '#D9D9DC'}, fontFamily: {sans: ['Inter', 'sans-serif']}, boxShadow: {card: '0 4px 20px rgba(21,101,192,0.08)'}}}}
         </script>
         <style>body{font-family:'Inter',sans-serif}.material-symbols-outlined{vertical-align:middle}</style>
     </head>
@@ -18,34 +19,22 @@
         <%@ include file="/views/layout/dashboard/sidebar.jsp" %>
         <main class="flex-1 md:ml-64 min-h-screen">
             <div class="px-6 py-8 max-w-3xl mx-auto space-y-6">
-                <a href="${pageContext.request.contextPath}/dashboard/category-management" class="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline">
+                <a href="${pageContext.request.contextPath}/dashboard/genre-management" class="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline">
                     <span class="material-symbols-outlined text-[18px]">arrow_back</span>
                     Back to List
                 </a>
 
 
 
-                <c:if test="${not empty sessionScope.success}">
-                    <div class="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-semibold text-green-700">
-                        ${sessionScope.success}
-                    </div>
-                    <c:remove var="success" scope="session"/>
-                </c:if>
-                <c:if test="${not empty sessionScope.error}">
-                    <div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
-                        ${sessionScope.error}
-                    </div>
-                    <c:remove var="error" scope="session"/>
-                </c:if>
                 <section class="bg-surface rounded-2xl border border-outline-variant shadow-card overflow-hidden">
                     <div class="px-6 py-5 border-b border-outline-variant flex items-center justify-between">
                         <div>
                             <h1 class="text-2xl font-bold">Genre Details</h1>
-                            <p class="text-sm text-on-surface-variant mt-1">Detailed information about this book genre.</p>
+                            <p class="text-sm text-on-surface-variant mt-1">Detailed information about this book Genre.</p>
                         </div>
-                        <c:if test="${canManageCategory}">
+                        <c:if test="${canManageGenre}">
                             <button type="button" onclick="openUpdateModal()"
-                                    class="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-white hover:bg-[#003f7d] transition">
+                                    class="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-white hover:bg-[#8E171B] transition">
                                 <span class="material-symbols-outlined text-[18px]">edit</span>
                                 Update
                             </button>
@@ -55,7 +44,7 @@
                     <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div class="rounded-xl bg-surface-container-low p-5">
                             <p class="text-sm font-semibold text-on-surface-variant">Genre ID</p>
-                            <p class="text-2xl font-extrabold text-primary mt-2">#CAT-${genre.genreID}</p>
+                            <p class="text-2xl font-extrabold text-primary mt-2">HSC-${genre.genreID}</p>
                         </div>
                         <div class="rounded-xl bg-surface-container-low p-5 md:col-span-2">
                             <p class="text-sm font-semibold text-on-surface-variant">Genre Name</p>
@@ -81,15 +70,15 @@
                             </button>
                         </div>
 
-                        <form action="${pageContext.request.contextPath}/dashboard/category-management" method="post" class="p-6 space-y-5">
+                        <form action="${pageContext.request.contextPath}/dashboard/genre-management" method="post" class="p-6 space-y-5">
                             <input type="hidden" name="action" value="update">
                             <input type="hidden" name="id" value="${genre.genreID}">
 
                             <div>
-                                <label class="block text-sm font-bold mb-2">Genre Name</label>
+                                <label class="block text-sm font-bold mb-2">Genre Name <span class="text-red-600 text-xs">*</span></label>
                                 <input type="text" name="genre_name" required maxlength="100" value="${genre.genreName}"
                                        class="w-full rounded-xl border-outline-variant bg-surface-container-low px-4 py-3 text-sm focus:border-primary focus:ring-primary">
-                                <p class="text-xs text-on-surface-variant mt-2">The genre name is required and must be unique.</p>
+                                <p class="text-xs text-on-surface-variant mt-2">The Genre name is required and must be unique.</p>
                             </div>
 
                             <div class="flex justify-end gap-3 pt-2">
@@ -98,7 +87,7 @@
                                     Cancel
                                 </button>
                                 <button type="submit"
-                                        class="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-bold text-white hover:bg-[#003f7d] transition">
+                                        class="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-bold text-white hover:bg-[#8E171B] transition">
                                     <span class="material-symbols-outlined text-[19px]">save</span>
                                     Save
                                 </button>
@@ -122,5 +111,6 @@
                 </script>
             </div>
         </main>
+        <%@ include file="/views/layout/common/toast.jsp" %>
     </body>
 </html>

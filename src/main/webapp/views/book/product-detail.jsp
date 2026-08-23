@@ -77,7 +77,7 @@
         }
     }
 
-    /* ── Tabs ── */
+    /* ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ Tabs ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ */
     .tab-nav {
         border-bottom: 1px solid var(--hs-outline-variant);
         display: flex;
@@ -115,7 +115,7 @@
         display: block;
     }
 
-    /* ── Review cards ── */
+    /* ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ Review cards ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ */
     .badge-purchased {
         display: inline-flex;
         align-items: center;
@@ -147,7 +147,7 @@
         margin-top: 14px;
     }
 
-    /* ── Write review form ── */
+    /* ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ Write review form ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ */
     .btn-write-review {
         display: inline-flex;
         align-items: center;
@@ -275,7 +275,7 @@
                 <c:if test="${book.featured}">
                     <div
                         class="absolute top-3 left-3 bg-[#8E24AA] text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full">
-                        🔥 Featured</div>
+                        ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒâ€šÃ‚Â¥ Featured</div>
                     </c:if>
 
                 <c:if test="${book.status != 'available' or book.stockQuantity == 0}">
@@ -290,13 +290,13 @@
 
             <c:if test="${not empty img1}">
                 <div class="grid grid-cols-4 gap-3">
-                    <%-- Ảnh 1: bìa chính --%>
+                    <%-- ÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚ÂºÃƒâ€šÃ‚Â¢nh 1: bÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¬a chÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­nh --%>
                     <button onclick="switchImg(this, '${img1}')"
                             class="prod-thumb-active rounded-lg overflow-hidden aspect-square bg-gray-50">
                         <img src="${img1}" class="w-full h-full object-cover"
                              alt="">
                     </button>
-                    <%-- Ảnh 2 --%>
+                    <%-- ÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚ÂºÃƒâ€šÃ‚Â¢nh 2 --%>
                     <c:choose>
                         <c:when test="${not empty img2}">
                             <button onclick="switchImg(this, '${img2}')"
@@ -313,7 +313,7 @@
                             </button>
                         </c:otherwise>
                     </c:choose>
-                    <%-- Ảnh 3 --%>
+                    <%-- ÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚ÂºÃƒâ€šÃ‚Â¢nh 3 --%>
                     <c:choose>
                         <c:when test="${not empty img3}">
                             <button onclick="switchImg(this, '${img3}')"
@@ -331,7 +331,7 @@
                             </button>
                         </c:otherwise>
                     </c:choose>
-                    <%-- Ảnh 4 --%>
+                    <%-- ÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚ÂºÃƒâ€šÃ‚Â¢nh 4 --%>
                     <c:choose>
                         <c:when test="${not empty img4}">
                             <button onclick="switchImg(this, '${img4}')"
@@ -364,12 +364,12 @@
                 </c:if>
                 <c:if test="${book.featured}">
                     <span
-                        class="bg-secondary/20 text-primary text-[12px] font-bold px-3 py-1 rounded-full uppercase tracking-wide">🔥
+                        class="bg-secondary/20 text-primary text-[12px] font-bold px-3 py-1 rounded-full uppercase tracking-wide">ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒâ€šÃ‚Â¥
                         Best Seller</span>
                     </c:if>
                     <c:if test="${not empty book.originName}">
                     <span
-                        class="bg-gray-100 text-gray-600 text-[12px] font-medium px-3 py-1 rounded-full">🌏
+                        class="bg-gray-100 text-gray-600 text-[12px] font-medium px-3 py-1 rounded-full">ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€¦Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â
                         ${book.originName}</span>
                     </c:if>
             </div>
@@ -396,8 +396,8 @@
                     <c:set var="rating" value="${book.avgRating}" />
                     <c:forEach begin="1" end="5" var="i">
                         <c:choose>
-                            <c:when test="${i <= rating}">★</c:when>
-                            <c:otherwise><span class="text-gray-300">★</span></c:otherwise>
+                            <c:when test="${i <= rating}">ÃƒÆ’Ã‚Â¢Ãƒâ€¹Ã…â€œÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦</c:when>
+                            <c:otherwise><span class="text-gray-300">ÃƒÆ’Ã‚Â¢Ãƒâ€¹Ã…â€œÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦</span></c:otherwise>
                         </c:choose>
                     </c:forEach>
                 </div>
@@ -454,7 +454,7 @@
                         <c:if test="${book.status == 'available' and book.stockQuantity > 0}">
                             <div class="flex items-center h-[58px] border border-outline-variant rounded overflow-hidden shrink-0">
                                 <button type="button" id="qty-minus"
-                                        class="px-4 py-2 text-lg font-bold text-gray-500 hover:bg-gray-100 transition-colors">−</button>
+                                        class="px-4 py-2 text-lg font-bold text-gray-500 hover:bg-gray-100 transition-colors">ÃƒÆ’Ã‚Â¢Ãƒâ€¹Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢</button>
                                 <input id="form-qty" name="quantity" type="number" value="1"
                                        min="1" max="${book.stockQuantity}"
                                        class="w-14 text-center text-[15px] font-bold border-none outline-none py-2 bg-transparent no-spinner"
@@ -549,7 +549,7 @@
                         <c:choose>
                             <c:when test="${not empty book.contentName}">${book.contentName}
                             </c:when>
-                            <c:otherwise>—</c:otherwise>
+                            <c:otherwise>ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â</c:otherwise>
                         </c:choose>
                     </span>
                 </div>
@@ -571,7 +571,7 @@
                         <c:choose>
                             <c:when test="${not empty book.seriesName}">${book.seriesName}
                             </c:when>
-                            <c:otherwise>—</c:otherwise>
+                            <c:otherwise>ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â</c:otherwise>
                         </c:choose>
                     </span>
                 </div>
@@ -582,7 +582,7 @@
                         <c:choose>
                             <c:when test="${book.totalPages > 0}">${book.totalPages} pages
                             </c:when>
-                            <c:otherwise>—</c:otherwise>
+                            <c:otherwise>ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â</c:otherwise>
                         </c:choose>
                     </span>
                 </div>
@@ -591,8 +591,13 @@
     </section>
 
 
+<<<<<<< Updated upstream
     <!-- ══ TABS: Description / Thông tin / Review  -->
     <section class="pt-2">
+=======
+    <!-- ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢Ãƒâ€šÃ‚ÂÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢Ãƒâ€šÃ‚Â TABS: Description / ThÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â´ng tin / Review  -->
+    <section class="fhs-block p-5 md:p-7">
+>>>>>>> Stashed changes
         <!-- Tab Navigation -->
         <div class="tab-nav">
             <button class="tab-btn" onclick="switchTab('tab-desc', this)">Description</button>
@@ -615,7 +620,7 @@
             </c:choose>
         </div>
 
-        <!-- Tab: Thông tin bổ sung -->
+        <!-- Tab: ThÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â´ng tin bÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚Â»ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ sung -->
         <div id="tab-info" class="tab-panel">
             <table class="w-full text-[15px]">
                 <tbody>
@@ -626,7 +631,7 @@
                                 <c:when test="${book.totalPages > 0}">${book.totalPages}
                                     trang
                                 </c:when>
-                                <c:otherwise>—</c:otherwise>
+                                <c:otherwise>ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â</c:otherwise>
                             </c:choose>
                         </td>
                     </tr>
@@ -637,7 +642,7 @@
                                 <c:when test="${not empty book.contentName}">
                                     ${book.contentName}
                                 </c:when>
-                                <c:otherwise>—</c:otherwise>
+                                <c:otherwise>ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â</c:otherwise>
                             </c:choose>
                         </td>
                     </tr>
@@ -659,7 +664,7 @@
                                 <c:when test="${not empty book.seriesName}">
                                     ${book.seriesName}
                                 </c:when>
-                                <c:otherwise>—</c:otherwise>
+                                <c:otherwise>ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â</c:otherwise>
                             </c:choose>
                         </td>
                     </tr>
@@ -667,8 +672,8 @@
                         <td class="py-3 font-semibold text-gray-500">SKU</td>
                         <td class="py-3 text-gray-800">HS-${book.bookID}</td>
                     </tr>
-                    <%-- [NEW] Bổ sung Dimensions / Weight từ code 2 (chỉ hiện khi có
-                        dữ liệu) --%>
+                    <%-- [NEW] BÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚Â»ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ sung Dimensions / Weight tÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚Â»Ãƒâ€šÃ‚Â« code 2 (chÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚Â»ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â° hiÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚Â»ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¡n khi cÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³
+                        dÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚Â»Ãƒâ€šÃ‚Â¯ liÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚Â»ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¡u) --%>
                     <c:if test="${not empty book.dimensions}">
                         <tr class="border-b border-gray-100">
                             <td class="py-3 font-semibold text-gray-500">Dimensions</td>
@@ -689,7 +694,7 @@
         <!-- Tab: Review -->
         <div id="tab-reviews" class="tab-panel active">
 
-            <!-- Header + nút viết reviews -->
+            <!-- Header + nÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âºt viÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚ÂºÃƒâ€šÃ‚Â¿t reviews -->
             <div class="flex items-center justify-between mb-6">
                 <h2 class="section-title-left text-[22px] font-bold text-primary">
                     Product Reviews (${reviews.size()})
@@ -702,7 +707,7 @@
                 </button>
             </div>
 
-            <!-- Danh sách reviews -->
+            <!-- Danh sÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡ch reviews -->
             <c:choose>
                 <c:when test="${not empty reviews}">
                     <div class="flex flex-col gap-6">
@@ -722,10 +727,10 @@
                                             <c:forEach begin="1" end="5" var="i">
                                                 <c:choose>
                                                     <c:when test="${i <= review.rating}">
-                                                        <span>★</span>
+                                                        <span>ÃƒÆ’Ã‚Â¢Ãƒâ€¹Ã…â€œÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦</span>
                                                     </c:when>
                                                     <c:otherwise><span
-                                                            class="text-gray-300">★</span>
+                                                            class="text-gray-300">ÃƒÆ’Ã‚Â¢Ãƒâ€¹Ã…â€œÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦</span>
                                                     </c:otherwise>
                                                 </c:choose>
                                             </c:forEach>
@@ -791,7 +796,11 @@
                 <c:otherwise>
                     <div
                         class="bg-white border border-dashed border-gray-300 rounded-xl p-10 text-center">
+<<<<<<< Updated upstream
                         <div class="text-5xl mb-3">⭐</div>
+=======
+                        <div class="text-5xl mb-3">ÃƒÆ’Ã‚Â¢Ãƒâ€¹Ã…â€œÃƒÂ¢Ã¢â€šÂ¬Ã‚Â </div>
+>>>>>>> Stashed changes
                         <div class="font-semibold text-gray-600">No Reviews Yet</div>
                         <div class="text-gray-400 mt-2">Be the first to read and review this book.</div>
                     </div>
@@ -804,7 +813,7 @@
     <div id="reviewModal"
          class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
         <div class="bg-white w-[600px] rounded-xl p-6 relative">
-            <button id="closeReviewModal" class="absolute top-3 right-4 text-2xl">×</button>
+            <button id="closeReviewModal" class="absolute top-3 right-4 text-2xl">ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â</button>
             <h3 id="reviewModalTitle" class="text-xl font-bold mb-6">Write a Review</h3>
             <form id="reviewForm" action="${pageContext.request.contextPath}/review"
                   method="post">
@@ -815,11 +824,11 @@
                 <div class="mb-4">
                     <label class="font-semibold block mb-2">Your Rating</label>
                     <div id="ratingStars" class="flex gap-2 text-3xl cursor-pointer">
-                        <span class="star text-yellow-400" data-value="1">★</span>
-                        <span class="star text-yellow-400" data-value="2">★</span>
-                        <span class="star text-yellow-400" data-value="3">★</span>
-                        <span class="star text-yellow-400" data-value="4">★</span>
-                        <span class="star text-yellow-400" data-value="5">★</span>
+                        <span class="star text-yellow-400" data-value="1">ÃƒÆ’Ã‚Â¢Ãƒâ€¹Ã…â€œÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦</span>
+                        <span class="star text-yellow-400" data-value="2">ÃƒÆ’Ã‚Â¢Ãƒâ€¹Ã…â€œÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦</span>
+                        <span class="star text-yellow-400" data-value="3">ÃƒÆ’Ã‚Â¢Ãƒâ€¹Ã…â€œÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦</span>
+                        <span class="star text-yellow-400" data-value="4">ÃƒÆ’Ã‚Â¢Ãƒâ€¹Ã…â€œÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦</span>
+                        <span class="star text-yellow-400" data-value="5">ÃƒÆ’Ã‚Â¢Ãƒâ€¹Ã…â€œÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦</span>
                     </div>
                     <p class="text-sm text-gray-500 mt-2">Your selection: <span
                             id="ratingText">5</span> sao</p>
@@ -860,9 +869,9 @@
                             class="relative block bg-[#f0f4ff] aspect-[3/4] overflow-hidden">
                             <a
                                 href="${pageContext.request.contextPath}/products?id=${rb.bookID}">
-                                <%-- [FIX] check đúng field đang được hiển thị
-                                    (rb.thumbnailFirst) thay vì check rb.thumbnail (chuỗi
-                                    thô, có thể khác trạng thái rỗng) --%>
+                                <%-- [FIX] check ÃƒÆ’Ã¢â‚¬Å¾ÃƒÂ¢Ã¢â€šÂ¬Ã‹Å“ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âºng field ÃƒÆ’Ã¢â‚¬Å¾ÃƒÂ¢Ã¢â€šÂ¬Ã‹Å“ang ÃƒÆ’Ã¢â‚¬Å¾ÃƒÂ¢Ã¢â€šÂ¬Ã‹Å“ÃƒÆ’Ã¢â‚¬Â Ãƒâ€šÃ‚Â°ÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚Â»Ãƒâ€šÃ‚Â£c hiÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚Â»Ãƒâ€ Ã¢â‚¬â„¢n thÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚Â»ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¹
+                                    (rb.thumbnailFirst) thay vÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¬ check rb.thumbnail (chuÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚Â»ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Âi
+                                    thÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â´, cÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³ thÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚Â»Ãƒâ€ Ã¢â‚¬â„¢ khÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡c trÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚ÂºÃƒâ€šÃ‚Â¡ng thÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡i rÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚Â»ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Âng) --%>
                                 <c:choose>
                                     <c:when test="${not empty rb.thumbnailFirst}">
                                         <img src="${rb.thumbnailFirst}"
@@ -880,7 +889,11 @@
                             </a>
                             <c:if test="${rb.featured}">
                                 <span
+<<<<<<< Updated upstream
                                     class="absolute top-2.5 right-2.5 bg-[#8E24AA] text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full">🔥
+=======
+                                    class="absolute top-2.5 left-2.5 z-10 bg-[#8E24AA] text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full">ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒâ€šÃ‚Â¥
+>>>>>>> Stashed changes
                                     Hot</span>
                                 </c:if>
                                 <jsp:include page="/views/layout/common/wishlist-heart.jsp">
@@ -902,8 +915,8 @@
                             <div class="flex items-center gap-1 text-[12px] text-[#FDD835]">
                                 <c:forEach begin="1" end="5" var="i">
                                     <c:choose>
-                                        <c:when test="${i <= rb.avgRating}">★</c:when>
-                                        <c:otherwise><span class="text-gray-300">★</span>
+                                        <c:when test="${i <= rb.avgRating}">ÃƒÆ’Ã‚Â¢Ãƒâ€¹Ã…â€œÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦</c:when>
+                                        <c:otherwise><span class="text-gray-300">ÃƒÆ’Ã‚Â¢Ãƒâ€¹Ã…â€œÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦</span>
                                         </c:otherwise>
                                     </c:choose>
                                 </c:forEach>
@@ -926,7 +939,7 @@
     </c:if>
 </main>
 
-<!-- Modal giới hạn stock -->
+<!-- Modal giÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚Â»ÃƒÂ¢Ã¢â€šÂ¬Ã‚Âºi hÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚ÂºÃƒâ€šÃ‚Â¡n stock -->
 <div id="stock-limit-modal"
      class="fixed inset-0 bg-black/50 hidden items-center justify-center z-[9999]">
     <div class="bg-white w-[420px] rounded-xl p-6 relative">
@@ -1080,10 +1093,10 @@
     function updateStars(rating) {
         stars.forEach(function (star) {
             if (star.dataset.value <= rating) {
-                star.textContent = '★';
+                star.textContent = 'ÃƒÆ’Ã‚Â¢Ãƒâ€¹Ã…â€œÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦';
                 star.classList.add('text-yellow-400');
             } else {
-                star.textContent = '☆';
+                star.textContent = 'ÃƒÆ’Ã‚Â¢Ãƒâ€¹Ã…â€œÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ';
                 star.classList.remove('text-yellow-400');
             }
         });
@@ -1176,7 +1189,7 @@
         });
     });
 
-    // ── Review form AJAX submit ──────────────────────────────────────────
+    // ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ Review form AJAX submit ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬
     var reviewForm = document.getElementById('reviewForm');
     if (reviewForm) {
         reviewForm.addEventListener('submit', function (e) {

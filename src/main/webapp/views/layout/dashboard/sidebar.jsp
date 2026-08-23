@@ -101,9 +101,15 @@
 
 
         <% if (isStaffUser) { %>
+<<<<<<< Updated upstream
         <a href="${pageContext.request.contextPath}/dashboard/category-management"
            class="sidebar-link <%= sidebarCurrentPath.startsWith("/dashboard/category-management") ? "active" : ""%>">
             <span class="material-symbols-outlined">category</span>
+=======
+        <a href="${pageContext.request.contextPath}/dashboard/genre-management"
+           class="sidebar-link <%= sidebarCurrentPath.startsWith("/dashboard/genre-management") ? "active" : ""%>">
+            <span class="material-symbols-outlined">account_tree</span>
+>>>>>>> Stashed changes
             Genre
         </a>
         <% } %>

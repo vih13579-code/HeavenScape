@@ -118,7 +118,7 @@
 
                         <c:if test="${not empty keyword or not empty status or not empty genreID}">
                             <a href="${pageContext.request.contextPath}/dashboard/product-management"
-                               class="text-sm text-gray-400 hover:text-error transition-colors px-2 py-2.5 whitespace-nowrap">✕ Clear Filters</a>
+                               class="text-sm text-gray-400 hover:text-error transition-colors px-2 py-2.5 whitespace-nowrap">&times; Clear Filters</a>
                         </c:if>
                     </form>
                 </div>
@@ -131,6 +131,10 @@
                                 <tr class="bg-background-alt border-b border-outline-variant/30">
                                     <th class="px-4 py-3 font-semibold text-on-surface-variant">Book</th>
                                     <th class="px-4 py-3 font-semibold text-on-surface-variant">Genre</th>
+<<<<<<< Updated upstream
+=======
+                                    <th class="px-4 py-3 font-semibold text-on-surface-variant">Publisher</th>
+>>>>>>> Stashed changes
                                     <th class="px-4 py-3 font-semibold text-on-surface-variant text-right">Price</th>
                                     <th class="px-4 py-3 font-semibold text-on-surface-variant text-center">Stock</th>
                                     <th class="px-4 py-3 font-semibold text-on-surface-variant text-center">Status</th>
@@ -157,7 +161,7 @@
                                                     <div class="font-semibold text-on-surface line-clamp-1 max-w-[220px]">${book.title}</div>
                                                     <div class="text-xs text-on-surface-variant">ID: ${book.bookID}
                                                         <c:if test="${not empty book.authors}">
-                                                            · <c:forEach var="a" items="${book.authors}" varStatus="s">${a}<c:if test="${!s.last}">, </c:if></c:forEach>
+                                                            &middot; <c:forEach var="a" items="${book.authors}" varStatus="s">${a}<c:if test="${!s.last}">, </c:if></c:forEach>
                                                         </c:if>
                                                     </div>
                                                 </div>
@@ -251,7 +255,11 @@
                         <div class="px-4 py-3 border-t border-outline-variant/30 flex justify-center gap-1.5 flex-wrap">
                             <c:if test="${page > 1}">
                                 <a href="?page=${page-1}<c:if test="${not empty keyword}">&keyword=${keyword}</c:if><c:if test="${not empty status}">&status=${status}</c:if><c:if test="${not empty genreID}">&genre=${genreID}</c:if>"
+<<<<<<< Updated upstream
                                    class="w-9 h-9 flex items-center justify-center rounded-lg border border-outline-variant text-on-surface-variant hover:border-primary hover:text-primary transition-colors text-sm">‹</a>
+=======
+                                   class="w-9 h-9 flex items-center justify-center rounded-lg border border-outline-variant text-on-surface-variant hover:border-primary hover:text-primary transition-colors text-sm">&lsaquo;</a>
+>>>>>>> Stashed changes
                             </c:if>
                             <c:forEach begin="1" end="${totalPages}" var="i">
                                 <c:choose>
@@ -266,7 +274,11 @@
                             </c:forEach>
                             <c:if test="${page < totalPages}">
                                 <a href="?page=${page+1}<c:if test="${not empty keyword}">&keyword=${keyword}</c:if><c:if test="${not empty status}">&status=${status}</c:if><c:if test="${not empty genreID}">&genre=${genreID}</c:if>"
+<<<<<<< Updated upstream
                                    class="w-9 h-9 flex items-center justify-center rounded-lg border border-outline-variant text-on-surface-variant hover:border-primary hover:text-primary transition-colors text-sm">›</a>
+=======
+                                   class="w-9 h-9 flex items-center justify-center rounded-lg border border-outline-variant text-on-surface-variant hover:border-primary hover:text-primary transition-colors text-sm">&rsaquo;</a>
+>>>>>>> Stashed changes
                             </c:if>
                         </div>
                     </c:if>

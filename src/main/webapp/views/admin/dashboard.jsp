@@ -148,10 +148,10 @@
         <main class="flex-1 md:ml-64 min-h-screen p-6">
             <div class="max-w-[1200px] mx-auto space-y-7">
 
-                <%-- ═══ HEADER ═══ --%>
+                <%-- ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢Ãƒâ€šÃ‚ÂÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢Ãƒâ€šÃ‚ÂÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢Ãƒâ€šÃ‚Â HEADER ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢Ãƒâ€šÃ‚ÂÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢Ãƒâ€šÃ‚ÂÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢Ãƒâ€šÃ‚Â --%>
                 <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
                     <div>
-                        <h1 class="text-2xl font-bold text-on-surface">🏠 Dashboard</h1>
+                        <h1 class="text-2xl font-bold text-on-surface">ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€šÃ‚ÂÃƒâ€šÃ‚Â  Dashboard</h1>
                         <p class="text-sm text-on-surface-variant mt-1">
                             Welcome Back, <strong>${sessionScope.account.fullname}</strong>!
                             Here is an overview of the HeavenScape system.
@@ -164,7 +164,7 @@
                     </a>
                 </div>
 
-                <%-- ═══ STATS CARDS ═══ --%>
+                <%-- ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢Ãƒâ€šÃ‚ÂÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢Ãƒâ€šÃ‚ÂÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢Ãƒâ€šÃ‚Â STATS CARDS ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢Ãƒâ€šÃ‚ÂÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢Ãƒâ€šÃ‚ÂÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢Ãƒâ€šÃ‚Â --%>
                 <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
 
                     <%-- Total Books --%>
@@ -223,9 +223,9 @@
 
                     </div>
 
-                <%-- ═══ QUICK ACTIONS ═══ --%>
+                <%-- ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢Ãƒâ€šÃ‚ÂÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢Ãƒâ€šÃ‚ÂÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢Ãƒâ€šÃ‚Â QUICK ACTIONS ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢Ãƒâ€šÃ‚ÂÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢Ãƒâ€šÃ‚ÂÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢Ãƒâ€šÃ‚Â --%>
                 <div>
-                    <h2 class="text-base font-bold text-on-surface mb-3">⚡ Actions nhanh</h2>
+                    <h2 class="text-base font-bold text-on-surface mb-3">ÃƒÆ’Ã‚Â¢Ãƒâ€¦Ã‚Â¡Ãƒâ€šÃ‚Â¡ Actions nhanh</h2>
                     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
 
                         <a href="${pageContext.request.contextPath}/dashboard/product-management?action=create" class="action-card">
@@ -266,7 +266,7 @@
                     </div>
                 </div>
 
-                <%-- ═══ RECENT BOOKS TABLE ═══ --%>
+                <%-- ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢Ãƒâ€šÃ‚ÂÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢Ãƒâ€šÃ‚ÂÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢Ãƒâ€šÃ‚Â RECENT BOOKS TABLE ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢Ãƒâ€šÃ‚ÂÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢Ãƒâ€šÃ‚ÂÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢Ãƒâ€šÃ‚Â --%>
                 <div class="bg-surface rounded-2xl border border-outline-variant/30 overflow-hidden">
 
                     <div class="px-5 py-4 border-b border-outline-variant/30 flex items-center justify-between">
@@ -315,7 +315,7 @@
                                                     <div class="text-xs text-on-surface-variant">
                                                         #${book.bookID}
                                                         <c:if test="${not empty book.authors}">
-                                                            · <c:forEach var="a" items="${book.authors}" varStatus="s">${a}<c:if test="${!s.last}">, </c:if></c:forEach>
+                                                            ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â· <c:forEach var="a" items="${book.authors}" varStatus="s">${a}<c:if test="${!s.last}">, </c:if></c:forEach>
                                                         </c:if>
                                                     </div>
                                                 </div>
@@ -323,7 +323,11 @@
                                         </td>
                                         <td class="px-5 py-3">
                                             <c:if test="${not empty book.genreName}">
+<<<<<<< Updated upstream
                                                 <span style="background:#dbeafe; color:#1d4ed8; font-size:11px; font-weight:700; padding:3px 9px; border-radius:20px;">${book.genreName}</span>
+=======
+                                                <span style="background:#FDE8E9; color:#C92127; font-size:11px; font-weight:700; padding:3px 9px; border-radius:20px;">${book.genreName}</span>
+>>>>>>> Stashed changes
                                             </c:if>
                                         </td>
                                         <td class="px-5 py-3 text-right font-semibold text-primary">
@@ -394,13 +398,13 @@
                         <span>Showing ${recentBooks.size()} newest books</span>
                         <a href="${pageContext.request.contextPath}/dashboard/product-management"
                            class="text-primary font-semibold hover:underline">
-                            Manage All Books →
+                            Manage All Books ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢
                         </a>
                     </div>
 
                 </div>
 
-                <%-- ═══ BOTTOM ACTION STRIP ═══ --%>
+                <%-- ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢Ãƒâ€šÃ‚ÂÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢Ãƒâ€šÃ‚ÂÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢Ãƒâ€šÃ‚Â BOTTOM ACTION STRIP ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢Ãƒâ€šÃ‚ÂÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢Ãƒâ€šÃ‚ÂÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢Ãƒâ€šÃ‚Â --%>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 
                     <%-- Add book banner --%>

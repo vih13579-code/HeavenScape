@@ -29,12 +29,12 @@
         <servlet-name>OtpController</servlet-name>
         <servlet-class>controller.OtpController</servlet-class>
     </servlet>
-    <!-- BỔ SUNG: trước đây thiếu, gây lỗi 404 khi truy cập /forgot-password -->
+    <!-- BÃƒÂ¡Ã‚Â»Ã¢â‚¬Â SUNG: trÃƒâ€ Ã‚Â°ÃƒÂ¡Ã‚Â»Ã¢â‚¬Âºc Ãƒâ€žÃ¢â‚¬ËœÃƒÆ’Ã‚Â¢y thiÃƒÂ¡Ã‚ÂºÃ‚Â¿u, gÃƒÆ’Ã‚Â¢y lÃƒÂ¡Ã‚Â»Ã¢â‚¬â€i 404 khi truy cÃƒÂ¡Ã‚ÂºÃ‚Â­p /forgot-password -->
     <servlet>
         <servlet-name>ForgotPasswordController</servlet-name>
         <servlet-class>controller.ForgotPasswordController</servlet-class>
     </servlet>
-    <!-- BỔ SUNG: trước đây thiếu, sẽ gây lỗi 404 khi truy cập /reset-password -->
+    <!-- BÃƒÂ¡Ã‚Â»Ã¢â‚¬Â SUNG: trÃƒâ€ Ã‚Â°ÃƒÂ¡Ã‚Â»Ã¢â‚¬Âºc Ãƒâ€žÃ¢â‚¬ËœÃƒÆ’Ã‚Â¢y thiÃƒÂ¡Ã‚ÂºÃ‚Â¿u, sÃƒÂ¡Ã‚ÂºÃ‚Â½ gÃƒÆ’Ã‚Â¢y lÃƒÂ¡Ã‚Â»Ã¢â‚¬â€i 404 khi truy cÃƒÂ¡Ã‚ÂºÃ‚Â­p /reset-password -->
     <servlet>
         <servlet-name>ResetPasswordController</servlet-name>
         <servlet-class>controller.ResetPasswordController</servlet-class>
@@ -116,8 +116,8 @@
         <servlet-class>controller.ReviewManagementController</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>CategoryManagementController</servlet-name>
-        <servlet-class>controller.CategoryManagementController</servlet-class>
+        <servlet-name>GenreManagementController</servlet-name>
+        <servlet-class>controller.GenreManagementController</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>AddressManagementController</servlet-name>
@@ -247,8 +247,8 @@
         <url-pattern>/vnpay-return</url-pattern>
     </servlet-mapping>
 <servlet-mapping>
-    <servlet-name>CategoryManagementController</servlet-name>
-    <url-pattern>/dashboard/category-management</url-pattern>
+    <servlet-name>GenreManagementController</servlet-name>
+    <url-pattern>/dashboard/genre-management</url-pattern>
 </servlet-mapping>
     <servlet-mapping>
         <servlet-name>AddressManagementController</servlet-name>

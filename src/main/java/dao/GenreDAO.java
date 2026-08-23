@@ -14,9 +14,9 @@ public class GenreDAO {
 
     public List<Genre> getAllGenres() {
         List<Genre> list = new ArrayList<>();
-        String sql = "SELECT g.genreID, g.genre_name, COUNT(b.bookID) AS book_count "
+        String sql = "SELECT g.genreID, g.genre_name, COUNT(DISTINCT bg.bookID) AS book_count "
                 + "FROM Genre g "
-                + "LEFT JOIN Book b ON b.genreID = g.genreID "
+            + "LEFT JOIN BookGenre bg ON bg.genreID = g.genreID "
                 + "GROUP BY g.genreID, g.genre_name "
                 + "ORDER BY g.genreID DESC";
 
@@ -40,9 +40,9 @@ public class GenreDAO {
 
     public List<Genre> searchGenres(String keyword) {
         List<Genre> list = new ArrayList<>();
-        String sql = "SELECT g.genreID, g.genre_name, COUNT(b.bookID) AS book_count "
+        String sql = "SELECT g.genreID, g.genre_name, COUNT(DISTINCT bg.bookID) AS book_count "
                 + "FROM Genre g "
-                + "LEFT JOIN Book b ON b.genreID = g.genreID "
+            + "LEFT JOIN BookGenre bg ON bg.genreID = g.genreID "
                 + "WHERE g.genre_name LIKE ? "
                 + "GROUP BY g.genreID, g.genre_name "
                 + "ORDER BY g.genreID DESC";
@@ -69,9 +69,9 @@ public class GenreDAO {
     }
 
     public Genre getGenreById(int id) {
-        String sql = "SELECT g.genreID, g.genre_name, COUNT(b.bookID) AS book_count "
+        String sql = "SELECT g.genreID, g.genre_name, COUNT(DISTINCT bg.bookID) AS book_count "
                 + "FROM Genre g "
-                + "LEFT JOIN Book b ON b.genreID = g.genreID "
+            + "LEFT JOIN BookGenre bg ON bg.genreID = g.genreID "
                 + "WHERE g.genreID = ? "
                 + "GROUP BY g.genreID, g.genre_name";
 
@@ -173,7 +173,7 @@ public class GenreDAO {
     }
 
     public int countBooksByGenre(int id) {
-        String sql = "SELECT COUNT(*) FROM Book WHERE genreID = ?";
+        String sql = "SELECT COUNT(*) FROM BookGenre WHERE genreID = ?";
 
         try (Connection conn = db.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {

@@ -18,12 +18,33 @@
 </style>
 
 <section class="hs-catalog-hero">
+<<<<<<< Updated upstream
     <div class="relative z-10">
         <div class="hs-eyebrow mb-2">HeavenScape Bookstore</div>
         <h1 class="font-headline-md text-[36px] md:text-[44px] font-semibold text-primary leading-tight">
             <c:choose>
                 <c:when test="${not empty keyword}">Search Results: "<em class="text-tertiary-container not-italic">${keyword}</em>"</c:when>
                 <c:when test="${not empty genreID}">Category: <em class="text-tertiary-container not-italic">${genreMap[genreID]}</em></c:when>
+=======
+    <div class="relative z-10 hs-catalog-heading">
+        <nav class="hs-catalog-breadcrumb" aria-label="Breadcrumb">
+            <a href="${pageContext.request.contextPath}/home">Home</a>
+            <span aria-hidden="true">/</span>
+            <span aria-current="page">
+                <c:choose>
+                    <c:when test="${not empty keyword}">Search results</c:when>
+                    <c:when test="${not empty genreID}"><c:out value="${genreMap[genreID]}" /></c:when>
+                    <c:when test="${not empty selectedGenreIDs}">Selected genres</c:when>
+                    <c:otherwise>All Books</c:otherwise>
+                </c:choose>
+            </span>
+        </nav>
+        <h1 class="hs-catalog-title">
+            <c:choose>
+                <c:when test="${not empty keyword}">Results for &ldquo;<em><c:out value="${keyword}" /></em>&rdquo;</c:when>
+                <c:when test="${not empty genreID}"><c:out value="${genreMap[genreID]}" /></c:when>
+                <c:when test="${not empty selectedGenreIDs}">Selected Genres</c:when>
+>>>>>>> Stashed changes
                 <c:otherwise>All Books</c:otherwise>
             </c:choose>
         </h1>
@@ -47,6 +68,7 @@
             </div>
         </div>
 
+<<<<<<< Updated upstream
         <div class="filter-card">
             <h3 class="text-[14px] font-bold text-gray-700 mb-3 uppercase tracking-wide">Price Range</h3>
             <form method="get" action="${pageContext.request.contextPath}/products" id="priceForm">
@@ -59,6 +81,24 @@
                     <input type="number" name="maxPrice" value="${maxPrice}" placeholder="Max (VND)"
                            class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-primary outline-none" min="0" step="1000">
                     <button type="submit" class="w-full bg-primary text-white text-sm font-bold py-2 rounded-lg hover:bg-primary-dark transition-colors">
+=======
+            <div class="filter-card">
+                <h3 class="catalog-filter-title">Price Range (VND)</h3>
+                <div class="price-input-row">
+                    <input type="number" name="minPrice" value="${minPrice}" placeholder="Min"
+                           class="price-filter-input border border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-primary outline-none"
+                           min="0" step="1000" aria-describedby="priceRangeError">
+                    <span class="price-input-divider" aria-hidden="true">&mdash;</span>
+                    <input type="number" name="maxPrice" value="${maxPrice}" placeholder="Max"
+                           class="price-filter-input border border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-primary outline-none"
+                           min="0" step="1000" aria-describedby="priceRangeError">
+                </div>
+                <p id="priceRangeError"
+                   class="price-range-error<c:if test='${not empty priceRangeError}'> is-visible</c:if>"
+                   role="alert" aria-live="polite"><c:out value="${priceRangeError}" /></p>
+                <div class="price-filter-actions">
+                    <button type="submit" class="price-filter-submit bg-primary text-white text-sm font-bold py-2 rounded-lg hover:bg-primary-dark transition-colors">
+>>>>>>> Stashed changes
                         Apply Price Filter
                     </button>
                     <c:if test="${not empty minPrice or not empty maxPrice}">
@@ -66,13 +106,77 @@
                            class="text-center text-xs text-gray-400 hover:text-red-500">✕ Clear Price Filter</a>
                     </c:if>
                 </div>
+<<<<<<< Updated upstream
             </form>
         </div>
+=======
+                <c:if test="${hasActiveFilters}">
+                    <a href="${clearFilterUrl}"
+                       class="price-filter-clear text-xs text-gray-400 hover:text-red-500">&times; Clear filter</a>
+                </c:if>
+            </div>
+
+            <div class="filter-card">
+                <h3 class="catalog-filter-title">Genre</h3>
+                <div class="catalog-filter-options">
+                    <c:forEach var="entry" items="${genreMap}">
+                        <c:set var="genreChecked" value="false" />
+                        <c:forEach var="selectedGenre" items="${selectedGenreIDs}">
+                            <c:if test="${selectedGenre == entry.key}"><c:set var="genreChecked" value="true" /></c:if>
+                        </c:forEach>
+                        <label class="catalog-filter-option">
+                            <input type="checkbox" name="genre" value="${entry.key}"
+                                   <c:if test="${genreChecked}">checked</c:if>
+                                   onchange="this.form.requestSubmit()">
+                            <span><c:out value="${entry.value}" /></span>
+                        </label>
+                    </c:forEach>
+                </div>
+            </div>
+
+            <div class="filter-card">
+                <h3 class="catalog-filter-title">Author</h3>
+                <div class="catalog-filter-options catalog-filter-options-scroll">
+                    <c:forEach var="entry" items="${authorMap}">
+                        <c:set var="authorChecked" value="false" />
+                        <c:forEach var="selectedAuthor" items="${selectedAuthorIDs}">
+                            <c:if test="${selectedAuthor == entry.key}"><c:set var="authorChecked" value="true" /></c:if>
+                        </c:forEach>
+                        <label class="catalog-filter-option">
+                            <input type="checkbox" name="author" value="${entry.key}"
+                                   <c:if test="${authorChecked}">checked</c:if>
+                                   onchange="this.form.requestSubmit()">
+                            <span><c:out value="${entry.value}" /></span>
+                        </label>
+                    </c:forEach>
+                </div>
+            </div>
+
+            <div class="filter-card">
+                <h3 class="catalog-filter-title">Availability</h3>
+                <div class="catalog-filter-options">
+                    <label class="catalog-filter-option">
+                        <input type="checkbox" name="availability" value="available"
+                               <c:if test="${availabilityAvailable}">checked</c:if>
+                               onchange="this.form.requestSubmit()">
+                        <span>In stock</span>
+                    </label>
+                    <label class="catalog-filter-option">
+                        <input type="checkbox" name="availability" value="out_of_stock"
+                               <c:if test="${availabilityOutOfStock}">checked</c:if>
+                               onchange="this.form.requestSubmit()">
+                        <span>Out of stock</span>
+                    </label>
+                </div>
+            </div>
+        </form>
+>>>>>>> Stashed changes
     </aside>
 
   
     <div class="flex-1 min-w-0">
         
+<<<<<<< Updated upstream
         <div class="flex flex-wrap items-center gap-2 mb-6 bg-transparent border-y border-outline-variant px-0 py-4">
             <span class="text-sm font-semibold text-gray-500 mr-1">Sort by:</span>
             <a href="?<c:if test="${not empty keyword}">keyword=${keyword}&</c:if><c:if test="${not empty genreID}">genre=${genreID}&</c:if>sort=newest"
@@ -86,6 +190,35 @@
             <a href="?<c:if test="${not empty keyword}">keyword=${keyword}&</c:if><c:if test="${not empty genreID}">genre=${genreID}&</c:if>sort=name"
                class="sort-btn <c:if test="${sort == 'name'}">active</c:if>"> A→Z</a>
             <span class="ml-auto text-sm text-gray-400">${totalBooks} books</span>
+=======
+        <div class="catalog-sortbar mb-5 bg-[#fafafa] border border-outline-variant rounded-lg px-4 py-3">
+            <form method="get" action="${pageContext.request.contextPath}/products" class="catalog-sort-group">
+                <c:if test="${not empty keyword}"><input type="hidden" name="keyword" value="<c:out value='${keyword}' />"></c:if>
+                <c:if test="${not empty minPrice}"><input type="hidden" name="minPrice" value="${minPrice}"></c:if>
+                <c:if test="${not empty maxPrice}"><input type="hidden" name="maxPrice" value="${maxPrice}"></c:if>
+                <c:forEach var="selectedGenre" items="${selectedGenreIDs}">
+                    <input type="hidden" name="genre" value="${selectedGenre}">
+                </c:forEach>
+                <c:forEach var="selectedAuthor" items="${selectedAuthorIDs}">
+                    <input type="hidden" name="author" value="${selectedAuthor}">
+                </c:forEach>
+                <c:forEach var="availabilityValue" items="${availability}">
+                    <input type="hidden" name="availability" value="${availabilityValue}">
+                </c:forEach>
+                <span class="catalog-sort-label text-sm font-semibold text-gray-500">Sort by:</span>
+                <button type="submit" name="sort" value="newest"
+                        class="sort-btn <c:if test="${sort == 'newest' or empty sort}">active</c:if>">Newest</button>
+                <button type="submit" name="sort" value="popular"
+                        class="sort-btn <c:if test="${sort == 'popular'}">active</c:if>">Popular</button>
+                <button type="submit" name="sort" value="price_asc"
+                        class="sort-btn <c:if test="${sort == 'price_asc'}">active</c:if>">Lowest Price</button>
+                <button type="submit" name="sort" value="price_desc"
+                        class="sort-btn <c:if test="${sort == 'price_desc'}">active</c:if>">Highest Price</button>
+                <button type="submit" name="sort" value="name"
+                        class="sort-btn <c:if test="${sort == 'name'}">active</c:if>">A-Z</button>
+            </form>
+            <span class="catalog-result-count text-sm text-gray-400">${totalBooks} books</span>
+>>>>>>> Stashed changes
         </div>
 
       
@@ -131,8 +264,8 @@
                             <div class="text-[#FDD835] text-[11px] mb-1.5 flex items-center gap-0.5">
                                 <c:forEach begin="1" end="5" var="i">
                                     <c:choose>
-                                        <c:when test="${i <= book.avgRating}">★</c:when>
-                                        <c:otherwise><span class="text-gray-200">★</span></c:otherwise>
+                                        <c:when test="${i <= book.avgRating}">&#9733;</c:when>
+                                        <c:otherwise><span class="text-gray-200">&#9733;</span></c:otherwise>
                                     </c:choose>
                                 </c:forEach>
                                 <span class="text-gray-400 text-[10px] ml-0.5">(${book.reviewCount})</span>
@@ -153,7 +286,22 @@
                 <c:if test="${totalPages > 1}">
                 <nav class="flex justify-center items-center gap-1.5 flex-wrap">
                     <c:if test="${page > 1}">
+<<<<<<< Updated upstream
                         <a href="?page=${page-1}<c:if test="${not empty sort}">&sort=${sort}</c:if><c:if test="${not empty keyword}">&keyword=${keyword}</c:if><c:if test="${not empty genreID}">&genre=${genreID}</c:if><c:if test="${not empty minPrice}">&minPrice=${minPrice}</c:if><c:if test="${not empty maxPrice}">&maxPrice=${maxPrice}</c:if>"
+=======
+                        <c:url var="previousPageUrl" value="/products">
+                            <c:param name="page" value="${page - 1}" />
+                            <c:param name="size" value="${pageSize}" />
+                            <c:if test="${not empty sort}"><c:param name="sort" value="${sort}" /></c:if>
+                            <c:if test="${not empty keyword}"><c:param name="keyword" value="${keyword}" /></c:if>
+                            <c:if test="${not empty minPrice}"><c:param name="minPrice" value="${minPrice}" /></c:if>
+                            <c:if test="${not empty maxPrice}"><c:param name="maxPrice" value="${maxPrice}" /></c:if>
+                            <c:forEach var="selectedGenre" items="${selectedGenreIDs}"><c:param name="genre" value="${selectedGenre}" /></c:forEach>
+                            <c:forEach var="selectedAuthor" items="${selectedAuthorIDs}"><c:param name="author" value="${selectedAuthor}" /></c:forEach>
+                            <c:forEach var="availabilityValue" items="${availability}"><c:param name="availability" value="${availabilityValue}" /></c:forEach>
+                        </c:url>
+                        <a href="${previousPageUrl}"
+>>>>>>> Stashed changes
                            class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-600 hover:border-primary hover:text-primary transition-colors">
                             <i data-lucide="chevron-left" class="w-4 h-4"></i>
                         </a>
@@ -164,16 +312,47 @@
                                 <span class="w-9 h-9 flex items-center justify-center rounded-lg bg-primary text-white font-bold text-sm">${i}</span>
                             </c:when>
                             <c:when test="${i <= 2 or i >= totalPages-1 or (i >= page-2 and i <= page+2)}">
+<<<<<<< Updated upstream
                                 <a href="?page=${i}<c:if test="${not empty sort}">&sort=${sort}</c:if><c:if test="${not empty keyword}">&keyword=${keyword}</c:if><c:if test="${not empty genreID}">&genre=${genreID}</c:if><c:if test="${not empty minPrice}">&minPrice=${minPrice}</c:if><c:if test="${not empty maxPrice}">&maxPrice=${maxPrice}</c:if>"
                                    class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-600 hover:border-primary hover:text-primary transition-colors text-sm">${i}</a>
+=======
+                                <c:url var="numberedPageUrl" value="/products">
+                                    <c:param name="page" value="${i}" />
+                                    <c:param name="size" value="${pageSize}" />
+                                    <c:if test="${not empty sort}"><c:param name="sort" value="${sort}" /></c:if>
+                                    <c:if test="${not empty keyword}"><c:param name="keyword" value="${keyword}" /></c:if>
+                                    <c:if test="${not empty minPrice}"><c:param name="minPrice" value="${minPrice}" /></c:if>
+                                    <c:if test="${not empty maxPrice}"><c:param name="maxPrice" value="${maxPrice}" /></c:if>
+                                    <c:forEach var="selectedGenre" items="${selectedGenreIDs}"><c:param name="genre" value="${selectedGenre}" /></c:forEach>
+                                    <c:forEach var="selectedAuthor" items="${selectedAuthorIDs}"><c:param name="author" value="${selectedAuthor}" /></c:forEach>
+                                    <c:forEach var="availabilityValue" items="${availability}"><c:param name="availability" value="${availabilityValue}" /></c:forEach>
+                                </c:url>
+                                <a href="${numberedPageUrl}"
+                                    class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-600 hover:border-primary hover:text-primary transition-colors text-sm">${i}</a>
+>>>>>>> Stashed changes
                             </c:when>
                             <c:when test="${i == 3 and page > 5}">
-                                <span class="w-9 h-9 flex items-center justify-center text-gray-400">…</span>
+                                <span class="w-9 h-9 flex items-center justify-center text-gray-400">&hellip;</span>
                             </c:when>
                         </c:choose>
                     </c:forEach>
                     <c:if test="${page < totalPages}">
+<<<<<<< Updated upstream
                         <a href="?page=${page+1}<c:if test="${not empty sort}">&sort=${sort}</c:if><c:if test="${not empty keyword}">&keyword=${keyword}</c:if><c:if test="${not empty genreID}">&genre=${genreID}</c:if><c:if test="${not empty minPrice}">&minPrice=${minPrice}</c:if><c:if test="${not empty maxPrice}">&maxPrice=${maxPrice}</c:if>"
+=======
+                        <c:url var="nextPageUrl" value="/products">
+                            <c:param name="page" value="${page + 1}" />
+                            <c:param name="size" value="${pageSize}" />
+                            <c:if test="${not empty sort}"><c:param name="sort" value="${sort}" /></c:if>
+                            <c:if test="${not empty keyword}"><c:param name="keyword" value="${keyword}" /></c:if>
+                            <c:if test="${not empty minPrice}"><c:param name="minPrice" value="${minPrice}" /></c:if>
+                            <c:if test="${not empty maxPrice}"><c:param name="maxPrice" value="${maxPrice}" /></c:if>
+                            <c:forEach var="selectedGenre" items="${selectedGenreIDs}"><c:param name="genre" value="${selectedGenre}" /></c:forEach>
+                            <c:forEach var="selectedAuthor" items="${selectedAuthorIDs}"><c:param name="author" value="${selectedAuthor}" /></c:forEach>
+                            <c:forEach var="availabilityValue" items="${availability}"><c:param name="availability" value="${availabilityValue}" /></c:forEach>
+                        </c:url>
+                        <a href="${nextPageUrl}"
+>>>>>>> Stashed changes
                            class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-600 hover:border-primary hover:text-primary transition-colors">
                             <i data-lucide="chevron-right" class="w-4 h-4"></i>
                         </a>
@@ -184,8 +363,25 @@
             <c:otherwise>
                 <div class="text-center py-20 text-gray-400">
                     <i data-lucide="search-x" class="w-16 h-16 mx-auto mb-4 opacity-30"></i>
+<<<<<<< Updated upstream
                     <p class="text-lg font-semibold">No Books Found</p>
                     <p class="text-sm mt-1">Try changing your search term or filters.</p>
+=======
+                    <c:choose>
+                        <c:when test="${not empty keyword}">
+                            <p class="text-lg font-semibold">No results for &ldquo;<c:out value="${keyword}" />&rdquo;.</p>
+                            <p class="text-sm mt-1">Try a different keyword.</p>
+                        </c:when>
+                        <c:when test="${hasPriceFilter}">
+                            <p class="text-lg font-semibold">No books found in this price range.</p>
+                            <p class="text-sm mt-1">Try widening it.</p>
+                        </c:when>
+                        <c:otherwise>
+                            <p class="text-lg font-semibold">No Books Found</p>
+                            <p class="text-sm mt-1">Try changing your search term or filters.</p>
+                        </c:otherwise>
+                    </c:choose>
+>>>>>>> Stashed changes
                     <a href="${pageContext.request.contextPath}/products" class="hs-primary-button mt-4 inline-block px-6 py-2.5 text-sm font-bold">View All Books</a>
                 </div>
             </c:otherwise>

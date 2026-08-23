@@ -76,6 +76,44 @@
             .lookup-row .field-input {
                 flex:1;
             }
+            .genre-picker {
+                position:relative;
+                flex:1;
+            }
+            .genre-picker summary {
+                list-style:none;
+                cursor:pointer;
+                min-height:42px;
+                display:flex;
+                align-items:center;
+                justify-content:space-between;
+                gap:8px;
+                color:#5C5C5F;
+            }
+            .genre-picker summary::-webkit-details-marker { display:none; }
+            .genre-picker-options {
+                position:absolute;
+                left:0;
+                right:0;
+                top:calc(100% + 4px);
+                z-index:20;
+                max-height:220px;
+                overflow-y:auto;
+                padding:8px;
+                background:#fff;
+                border:1px solid #D9D9DC;
+                border-radius:8px;
+                box-shadow:0 10px 24px rgba(0,0,0,.12);
+            }
+            .genre-picker-option {
+                display:flex;
+                align-items:center;
+                gap:8px;
+                padding:7px 6px;
+                font-size:14px;
+                cursor:pointer;
+            }
+            .genre-picker-option:hover { background:#FDE8E9; }
             .lookup-add-btn {
                 width:42px;
                 min-width:42px;
@@ -171,7 +209,7 @@
                         <div>
                             <h2 class="font-bold text-lg">${formAction == 'create' ? 'Add New Book' : 'Edit Book'}</h2>
                             <p class="text-sm text-on-surface-variant">
-                                <c:if test="${formAction == 'update'}">ID: ${book.bookID} · </c:if>
+                                <c:if test="${formAction == 'update'}">ID: ${book.bookID} &middot; </c:if>
                                     Complete the information below
                                 </p>
                             </div>
@@ -219,12 +257,21 @@
                                     <p class="text-xs text-on-surface-variant mt-1.5">The main cover image appears in listings and on the product page.</p>
                                 </div>
                             </div>
+<<<<<<< Updated upstream
                             <%-- 3 ảnh phụ --%>
                             <div class="p-4 bg-blue-50/50 rounded-xl border border-blue-100">
                                 <p class="text-[12px] font-bold text-on-surface-variant uppercase tracking-wide mb-3">Additional Images (Product Gallery)</p>
                                 <div class="grid grid-cols-3 gap-3">
                                     <div>
                                         <div class="preview-img-sm mb-2" id="imgPreview2">
+=======
+                            <%-- 3 ÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚ÂºÃƒâ€šÃ‚Â£nh phÃƒÆ’Ã‚Â¡Ãƒâ€šÃ‚Â»Ãƒâ€šÃ‚Â¥ --%>
+                            <div class="mt-5">
+                                <p class="form-section-title">Additional Images (Product Gallery)</p>
+                                <div class="gallery-grid">
+                                    <div class="gallery-item">
+                                        <div class="preview-img-sm" id="imgPreview2">
+>>>>>>> Stashed changes
                                             <span class="material-symbols-outlined text-gray-300 text-2xl" id="imgPlaceholder2">image</span>
                                             <img id="imgThumb2" alt="" class="hidden w-full h-full object-cover">
                                         </div>
@@ -323,6 +370,7 @@
                             <div>
                                 <label class="field-label" for="genreID">Genre</label>
                                 <div class="lookup-row">
+<<<<<<< Updated upstream
                                     <select id="genreID" name="genreID" class="field-input">
                                         <option value="">-- Select Genre --</option>
                                         <c:forEach var="entry" items="${genreMap}">
@@ -330,6 +378,21 @@
                                         </c:forEach>
                                     </select>
                                     <button type="button" class="lookup-add-btn" data-lookup-type="genre" data-target-select="genreID" title="Add Genre">+</button>
+=======
+                                    <details class="genre-picker field-input" id="genrePicker">
+                                        <summary><span id="genrePickerLabel">-- Select Genre --</span><span class="material-symbols-outlined text-[18px]">expand_more</span></summary>
+                                        <div class="genre-picker-options" id="genreOptions">
+                                        <c:forEach var="entry" items="${genreMap}">
+                                            <label class="genre-picker-option">
+                                                <input type="checkbox" name="genreID" value="${entry.key}" data-genre-name="${entry.value}"
+                                                       <c:forEach var="selectedGenreID" items="${book.genreIDs}"><c:if test="${selectedGenreID == entry.key}">checked</c:if></c:forEach>>
+                                                <span>${entry.value}</span>
+                                            </label>
+                                        </c:forEach>
+                                        </div>
+                                    </details>
+                                    <button type="button" class="lookup-add-btn" data-lookup-type="genre" data-target-select="genreOptions" title="Add Genre">+</button>
+>>>>>>> Stashed changes
                                 </div>
                             </div>
                             <div>
@@ -637,7 +700,11 @@
             });
 
 
+<<<<<<< Updated upstream
             const lookupLabels = {genre: 'genre', content: 'format', origin: 'origin', series: 'series'};
+=======
+            const lookupLabels = {genre: 'Genre', content: 'format', origin: 'origin', series: 'series', publisher: 'publisher'};
+>>>>>>> Stashed changes
             let activeLookupType = '';
             let activeLookupSelectId = '';
 
@@ -658,20 +725,54 @@
             }
 
             function appendLookupOption(selectId, id, name) {
-                const select = document.getElementById(selectId);
-                if (!select)
+                const options = document.getElementById(selectId);
+                if (!options)
                     return;
-                const existing = Array.from(select.options).find(opt => String(opt.value) === String(id));
-                if (existing) {
-                    select.value = String(id);
+                if (options.tagName === 'SELECT') {
+                    const existingSelectOption = Array.from(options.options)
+                            .find(option => String(option.value) === String(id));
+                    if (existingSelectOption) {
+                        options.value = String(id);
+                        return;
+                    }
+                    const selectOption = document.createElement('option');
+                    selectOption.value = String(id);
+                    selectOption.textContent = name;
+                    options.appendChild(selectOption);
+                    options.value = String(id);
                     return;
                 }
-                const option = document.createElement('option');
-                option.value = String(id);
-                option.textContent = name;
-                select.appendChild(option);
-                select.value = String(id);
+                const existing = Array.from(options.querySelectorAll('input[name="genreID"]')).find(opt => String(opt.value) === String(id));
+                if (existing) {
+                    existing.checked = true;
+                    return;
+                }
+                const item = document.createElement('label');
+                item.className = 'genre-picker-option';
+                const input = document.createElement('input');
+                input.type = 'checkbox';
+                input.name = 'genreID';
+                input.value = String(id);
+                input.dataset.genreName = name;
+                input.checked = true;
+                item.appendChild(input);
+                const text = document.createElement('span');
+                text.textContent = name;
+                item.appendChild(text);
+                options.appendChild(item);
+                updateGenrePickerLabel();
             }
+
+            function updateGenrePickerLabel() {
+                const selected = Array.from(document.querySelectorAll('#genreOptions input[name="genreID"]:checked'));
+                const label = document.getElementById('genrePickerLabel');
+                if (label) {
+                    label.textContent = selected.length ? selected.map(input => input.dataset.genreName).join(', ') : '-- Select Genre --';
+                }
+            }
+
+            document.getElementById('genreOptions').addEventListener('change', updateGenrePickerLabel);
+            updateGenrePickerLabel();
 
             async function saveLookupItem() {
                 const name = document.getElementById('lookupModalInput').value.trim();

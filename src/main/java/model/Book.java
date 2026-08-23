@@ -22,8 +22,13 @@ public class Book {
     private String status;
 
     // FK info
+<<<<<<< Updated upstream
     private int genreID;
     private String genreName;
+=======
+    private List<Integer> genreIDs;
+    private List<String> genreNames;
+>>>>>>> Stashed changes
     private int contentID;
     private String contentName;
     private int seriesID;
@@ -122,6 +127,7 @@ public class Book {
         this.status = v;
     }
 
+<<<<<<< Updated upstream
     public int getGenreID() {
         return genreID;
     }
@@ -136,6 +142,30 @@ public class Book {
 
     public void setGenreName(String v) {
         this.genreName = v;
+=======
+    public List<Integer> getGenreIDs() {
+        return genreIDs;
+    }
+
+    public void setGenreIDs(List<Integer> v) {
+        this.genreIDs = v;
+    }
+
+    public List<String> getGenreNames() {
+        return genreNames;
+    }
+
+    public void setGenreNames(List<String> v) {
+        this.genreNames = v;
+    }
+
+    public int getGenreID() {
+        return genreIDs == null || genreIDs.isEmpty() ? 0 : genreIDs.get(0);
+    }
+
+    public String getGenreName() {
+        return genreNames == null ? "" : String.join(", ", genreNames);
+>>>>>>> Stashed changes
     }
 
     public int getContentID() {
