@@ -221,6 +221,10 @@ public class AddressDAO {
     }
 
     public void setDefaultAddress(int addressID, int customerID) {
+        // Business Rule: một customer chỉ có tối đa 1 địa chỉ mặc định.
+        // Bước 1: kiểm tra địa chỉ có thuộc customer hiện tại không.
+        // Bước 2: reset tất cả địa chỉ của customer về is_default = 0.
+        // Bước 3: bật is_default = 1 cho địa chỉ được chọn.
         try (Connection conn = db.getConnection()) {
             try (PreparedStatement check = conn.prepareStatement(
                     "SELECT addressID FROM Address WHERE addressID=? AND customerID=?")) {

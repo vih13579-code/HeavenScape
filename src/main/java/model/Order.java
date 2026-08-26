@@ -12,7 +12,7 @@ import java.util.List;
 
 /**
  *
- * @author VanThuong
+ * @author Kim Chi
  */
 public class Order {
 
@@ -29,6 +29,12 @@ public class Order {
     private String street;
     private String district;
     private String cancelReason;
+    private String cancelledBy;
+    private String cancelledByName;
+    private String refundBankName;
+    private String refundAccountNumber;
+    private String refundAccountHolder;
+    private Integer voucherID;
     private String customerName;
     private String customerEmail;
     private String customerPhone;
@@ -191,6 +197,54 @@ public class Order {
 
     public void setCancelReason(String cancelReason) {
         this.cancelReason = cancelReason;
+    }
+
+    public String getCancelledBy() {
+        return cancelledBy;
+    }
+
+    public void setCancelledBy(String cancelledBy) {
+        this.cancelledBy = cancelledBy;
+    }
+
+    public String getCancelledByName() {
+        return cancelledByName;
+    }
+
+    public void setCancelledByName(String cancelledByName) {
+        this.cancelledByName = cancelledByName;
+    }
+
+    public String getRefundBankName() {
+        return refundBankName;
+    }
+
+    public void setRefundBankName(String refundBankName) {
+        this.refundBankName = refundBankName;
+    }
+
+    public String getRefundAccountNumber() {
+        return refundAccountNumber;
+    }
+
+    public void setRefundAccountNumber(String refundAccountNumber) {
+        this.refundAccountNumber = refundAccountNumber;
+    }
+
+    public String getRefundAccountHolder() {
+        return refundAccountHolder;
+    }
+
+    public void setRefundAccountHolder(String refundAccountHolder) {
+        this.refundAccountHolder = refundAccountHolder;
+    }
+
+    public Integer getVoucherID() {
+        return voucherID;
+    }
+
+    public void setVoucherID(Integer voucherID) {
+        this.voucherID = voucherID;
     }
 
     public List<OrderDetail> getOrderDetails() {

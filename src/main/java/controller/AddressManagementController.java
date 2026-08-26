@@ -16,12 +16,20 @@ import model.Customer;
 
 public class AddressManagementController extends HttpServlet {
 
+    // Phần này tương ứng với backlog: "Address Management"
+    // - Create Address
+    // - View Address List
+    // - Update Address
+    // - Delete Address
+    // - Set Default Address
     private final AddressDAO addressDAO = new AddressDAO();
 
     @Override
     protected void doGet(HttpServletRequest request,
             HttpServletResponse response)
             throws ServletException, IOException {
+        // GET: hiển thị danh sách địa chỉ của khách hàng đang đăng nhập.
+        // Giao diện sẽ lấy dữ liệu từ request attribute và render ra /views/address/list.jsp.
 
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
@@ -58,18 +66,22 @@ public class AddressManagementController extends HttpServlet {
 
         switch (action) {
             case "addAddressAjax":
+                // Tạo địa chỉ mới cho khách hàng.
                 addAddressAjax(request, response, account.getId());
                 return;
 
             case "updateAddressAjax":
+                // Cập nhật địa chỉ đã có.
                 updateAddressAjax(request, response, account.getId());
                 return;
 
             case "deleteAddress":
+                // Xóa địa chỉ, sau đó redirect lại trang quản lý địa chỉ.
                 deleteAddress(request, response, account.getId());
                 return;
 
             case "setDefaultAddress":
+                // Đặt địa chỉ mặc định; logic ở DAO đảm bảo chỉ có 1 địa chỉ default cho customer.
                 setDefaultAddress(request, response, account.getId());
                 return;
 
@@ -82,9 +94,13 @@ public class AddressManagementController extends HttpServlet {
             HttpServletResponse response,
             int customerID) throws IOException {
 
+        // Bước 1: đọc dữ liệu địa chỉ từ form AJAX.
         String street = safeTrim(request.getParameter("street"));
         String district = safeTrim(request.getParameter("district"));
         String city = safeTrim(request.getParameter("city"));
+
+        // Bước 2: validate cơ bản dữ liệu đầu vào.
+        // Nếu thiếu thành phần thì trả về JSON lỗi để frontend hiện thông báo.
 
         String addressError = validateAddress(street, district, city);
         if (addressError != null) {
@@ -92,6 +108,8 @@ public class AddressManagementController extends HttpServlet {
             return;
         }
 
+        // Bước 3: lấy thông tin user để dùng làm tên người nhận và số điện thoại.
+        // Điều này tránh khách hàng tạo địa chỉ thiếu thông tin nhận hàng.
         Customer customer = new CustomerDAO().getCustomerById(customerID);
         if (customer == null) {
             writeJson(response, false, "Customer information not found");
@@ -101,8 +119,9 @@ public class AddressManagementController extends HttpServlet {
         String recipientName = safeTrim(customer.getFullname());
         String recipientPhone = safeTrim(customer.getPhone());
 
-        // Dùng cùng Business Rule với RegisterController để kiểm tra họ tên và SĐT.
-        // Trường hợp đăng nhập Google chưa cập nhật đủ hồ sơ thì không cho lưu địa chỉ.
+        // Bước 4: kiểm tra business rule.
+        // Nếu hồ sơ khách hàng chưa có họ tên hoặc số điện thoại hợp lệ thì không cho thêm địa chỉ.
+        // Đây là logic bảo đảm địa chỉ nhận hàng luôn đầy đủ và đúng chuẩn.
         if (!isValidFullName(recipientName)) {
             writeJson(response, false,
                     "Update your profile with a valid full name before adding an address");
@@ -115,6 +134,7 @@ public class AddressManagementController extends HttpServlet {
             return;
         }
 
+        // Bước 5: tạo đối tượng Address và lưu xuống database.
         Address address = new Address();
         address.setCustomerID(customerID);
         address.setStreet(street);
@@ -125,6 +145,7 @@ public class AddressManagementController extends HttpServlet {
         address.setRecipientName(recipientName);
         address.setRecipientPhone(recipientPhone);
 
+        // DAO trả về id mới nếu lưu thành công, dùng để frontend biết thêm thành công/thất bại.
         int newId = addressDAO.insertAddressAndReturnId(address);
         writeJson(response, newId > 0,
                 newId > 0 ? "Address added successfully" : "Could not add the address");
@@ -184,6 +205,8 @@ public class AddressManagementController extends HttpServlet {
             HttpServletResponse response,
             int customerID) throws IOException {
 
+        // Logic đặt địa chỉ mặc định: chỉ cho phép một địa chỉ default cho mỗi customer.
+        // DAO sẽ reset hết default cũ rồi bật default mới.
         Integer addressID = parsePositiveInt(request.getParameter("addressID"));
         HttpSession session = request.getSession();
 
@@ -218,6 +241,8 @@ public class AddressManagementController extends HttpServlet {
     }
 
     private String validateAddress(String street, String district, String city) {
+        // Kiểm tra dữ liệu địa chỉ trước khi lưu.
+        // Mục tiêu: tránh lưu thông tin rỗng hoặc không hợp lệ trên giao diện và database.
         if (city == null || city.trim().isEmpty()) {
             return "Please select a province or city.";
         }

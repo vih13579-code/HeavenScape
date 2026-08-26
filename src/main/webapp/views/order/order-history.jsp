@@ -1,9 +1,27 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ include file="/views/layout/homepage/header.jsp" %>
 <%@ include file="/views/layout/common/toast.jsp" %>
 
+<%--
+    File này là trang "My Orders" cho khách hàng.
+    Chức năng chính:
+    - lọc đơn hàng theo trạng thái
+    - hiển thị danh sách đơn theo phân trang
+    - xem chi tiết đơn
+    - hủy đơn nếu đang chờ xác nhận
+    - yêu cầu refund nếu đơn đã hoàn thành COD và đã thanh toán
+    - mua lại đơn hàng đã completed
+
+    Dữ liệu được Controller OrderHistoryController gửi qua request attribute:
+    - orders
+    - currentPage
+    - totalPages
+    - baseUrl
+    - status
+--%>
 <style>
     .oh-page { min-width: 0; padding-bottom: 28px; color: #333; }
     .oh-title { margin: 0 0 14px; color: #222; font-size: 21px; line-height: 1.3; font-weight: 800; text-transform: uppercase; }
@@ -39,6 +57,7 @@
     .oh-product-quantity { color: #444; font-weight: 600; }
     .oh-product-price { color: #c92127; font-size: 15px; font-weight: 800; text-align: right; white-space: nowrap; }
     .oh-card-footer { padding: 13px 18px 14px; border-top: 1px solid #e8e8e8; }
+    .oh-cancel-note { margin-bottom: 10px; padding: 9px 11px; border-radius: 5px; background: #fff2f3; color: #8f171b; font-size: 11px; line-height: 1.5; }
     .oh-footer-summary { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: 18px; }
     .oh-payment { color: #555; font-size: 11px; }
     .oh-payment strong { margin-right: 7px; color: #333; }
@@ -78,6 +97,10 @@
         <main class="oh-page">
             <h1 class="oh-title">My Orders</h1>
 
+            <%--
+                Phần tab lọc trạng thái đơn hàng.
+                Mỗi link gửi status theo query param để backend lọc danh sách.
+            --%>
             <nav class="oh-tabs" aria-label="Order status filters">
                 <a class="oh-tab ${empty status or status == '' ? 'active' : ''}" href="${pageContext.request.contextPath}/profile/order-history">All</a>
                 <a class="oh-tab ${status == 'pending' ? 'active' : ''}" href="${pageContext.request.contextPath}/profile/order-history?status=pending">Pending Confirmation</a>
@@ -87,6 +110,7 @@
                 <a class="oh-tab ${status == 'cancelled' ? 'active' : ''}" href="${pageContext.request.contextPath}/profile/order-history?status=cancelled">Cancelled</a>
                 <a class="oh-tab ${status == 'pending_refund' ? 'active' : ''}" href="${pageContext.request.contextPath}/profile/order-history?status=pending_refund">Refund Pending</a>
                 <a class="oh-tab ${status == 'refunded' ? 'active' : ''}" href="${pageContext.request.contextPath}/profile/order-history?status=refunded">Refunded</a>
+                <a class="oh-tab ${status == 'refund_rejected' ? 'active' : ''}" href="${pageContext.request.contextPath}/profile/order-history?status=refund_rejected">Refund Rejected</a>
             </nav>
 
             <section class="oh-list">
@@ -96,6 +120,15 @@
                     </c:when>
                     <c:otherwise>
                         <c:forEach var="order" items="${orders}">
+                            <%--
+                                Mỗi order là 1 card hiển thị thông tin đơn:
+                                - mã đơn
+                                - ngày tạo
+                                - trạng thái
+                                - danh sách sản phẩm
+                                - tổng tiền
+                                - nút hành động
+                            --%>
                             <article class="oh-card">
                                 <header class="oh-card-head">
                                     <div>
@@ -106,6 +139,7 @@
                                         <c:when test="${order.status == 'pending'}"><span class="oh-status pending">Pending Confirmation</span></c:when>
                                         <c:when test="${order.status == 'confirmed'}"><span class="oh-status processing">Processing</span></c:when>
                                         <c:when test="${order.status == 'shipping'}"><span class="oh-status shipping">Shipping</span></c:when>
+                                        <c:when test="${order.paymentStatus == 'refund_rejected'}"><span class="oh-status cancelled">Refund Rejected</span></c:when>
                                         <c:when test="${order.status == 'completed'}"><span class="oh-status completed">Completed</span></c:when>
                                         <c:when test="${order.status == 'cancelled' and order.paymentStatus == 'pending_refund'}"><span class="oh-status refund-pending">Refund Pending</span></c:when>
                                         <c:when test="${order.status == 'cancelled' and order.paymentStatus == 'refunded'}"><span class="oh-status refunded">Refunded</span></c:when>
@@ -153,6 +187,28 @@
                                 </div>
 
                                 <footer class="oh-card-footer">
+                                    <c:if test="${order.status == 'cancelled' or order.paymentStatus == 'refund_rejected'}">
+                                        <div class="oh-cancel-note">
+                                            <c:choose>
+                                                <c:when test="${order.status == 'completed'}">
+                                                    <strong>Refund request rejected:</strong>
+                                                    <c:out value="${fn:substringAfter(order.cancelReason, 'Refund rejected: ')}" />
+                                                </c:when>
+                                                <c:when test="${order.paymentStatus == 'refunded'}"><strong>Refund by:</strong> Staff</c:when>
+                                                <c:otherwise>
+                                                    <strong>Cancelled by:</strong>
+                                                    <c:choose>
+                                                        <c:when test="${not empty order.cancelledByName}"><c:out value="${order.cancelledByName}" /></c:when>
+                                                        <c:otherwise>Account unavailable</c:otherwise>
+                                                    </c:choose>
+                                                </c:otherwise>
+                                            </c:choose>
+                                            <c:if test="${order.status == 'cancelled'}">
+                                                <br><strong>Reason:</strong>
+                                                <c:choose><c:when test="${not empty order.cancelReason}"><c:out value="${order.cancelReason}" /></c:when><c:otherwise>No reason was recorded.</c:otherwise></c:choose>
+                                            </c:if>
+                                        </div>
+                                    </c:if>
                                     <div class="oh-footer-summary">
                                         <p class="oh-payment">
                                             <strong>Payment:</strong>
@@ -182,6 +238,9 @@
                                                     <input type="hidden" name="orderID" value="${order.orderID}" />
                                                     <input type="hidden" name="redirect" value="list" />
                                                     <input type="hidden" name="refundReason" id="refundReasonInput_${order.orderID}" value="" />
+                                                    <input type="hidden" name="refundBankName" id="refundBankNameInput_${order.orderID}" value="" />
+                                                    <input type="hidden" name="refundAccountNumber" id="refundAccountNumberInput_${order.orderID}" value="" />
+                                                    <input type="hidden" name="refundAccountHolder" id="refundAccountHolderInput_${order.orderID}" value="" />
                                                     <button type="button" class="oh-btn secondary" onclick="openCustomerRefundModalList(${order.orderID}, '${order.orderCode}')">Request Refund</button>
                                                 </form>
                                             </c:if>
@@ -247,7 +306,13 @@
         <h3 class="text-lg font-bold text-[#c92127] mb-2" id="cancelModalTitle">Cancel Order</h3>
         <p class="text-sm text-gray-500 mb-3" id="cancelModalDescription">Please enter the reason you want to cancel this order.</p>
         <div id="cancelModalError" class="hidden mb-3 px-3 py-2 bg-red-50 border border-red-300 text-red-600 text-sm rounded"></div>
+        <label for="customerCancelReasonText" class="mb-1 block text-sm font-semibold">Reason <span class="text-red-600 text-xs">*</span></label>
         <textarea id="customerCancelReasonText" rows="4" maxlength="50" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300" placeholder="Enter a cancellation reason (10-50 characters, including at least one letter)"></textarea>
+        <div id="refundBankFields" class="hidden mt-3 space-y-3">
+            <div><label for="refundBankNameText" class="mb-1 block text-sm font-semibold">Bank Name *</label><input id="refundBankNameText" maxlength="100" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="Example: Vietcombank" /></div>
+            <div><label for="refundAccountNumberText" class="mb-1 block text-sm font-semibold">Account Number *</label><input id="refundAccountNumberText" inputmode="numeric" maxlength="20" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="6-20 digits" /></div>
+            <div><label for="refundAccountHolderText" class="mb-1 block text-sm font-semibold">Account Holder *</label><input id="refundAccountHolderText" maxlength="100" class="w-full border border-gray-300 rounded px-3 py-2 text-sm uppercase" placeholder="NGUYEN VAN A" /></div>
+        </div>
         <div class="flex justify-end gap-3 mt-4">
             <button type="button" onclick="closeCustomerCancelModal()" class="px-4 py-2 border border-gray-300 rounded text-sm hover:bg-gray-100">Close</button>
             <button type="button" id="cancelModalSubmit" onclick="submitCustomerCancelFormList()" class="px-4 py-2 bg-[#c92127] text-white rounded text-sm font-semibold hover:bg-[#a8191f]">Confirm Cancellation</button>
@@ -265,6 +330,7 @@
         document.getElementById('cancelModalTitle').textContent = 'Cancel Order #' + orderCode;
         document.getElementById('cancelModalDescription').textContent = 'Please enter the reason you want to cancel this order.';
         document.getElementById('cancelModalSubmit').textContent = 'Confirm Cancellation';
+        document.getElementById('refundBankFields').classList.add('hidden');
         openCustomerOrderRequestModal();
     }
 
@@ -274,12 +340,14 @@
         document.getElementById('cancelModalTitle').textContent = 'Request Refund #' + orderCode;
         document.getElementById('cancelModalDescription').textContent = 'Please enter the reason for requesting a refund.';
         document.getElementById('cancelModalSubmit').textContent = 'Submit Refund Request';
+        document.getElementById('refundBankFields').classList.remove('hidden');
         openCustomerOrderRequestModal();
     }
 
     function openCustomerOrderRequestModal() {
         const reasonField = document.getElementById('customerCancelReasonText');
         reasonField.value = '';
+        ['refundBankNameText', 'refundAccountNumberText', 'refundAccountHolderText'].forEach(function (id) { document.getElementById(id).value = ''; });
         document.getElementById('cancelModalError').classList.add('hidden');
         const modal = document.getElementById('customerCancelModal');
         modal.classList.remove('hidden');
@@ -307,11 +375,22 @@
         if (!reason) { showCancelModalError('Please enter a ' + reasonName + '.'); return; }
         if (reason.length < 10 || reason.length > 50) { showCancelModalError('The ' + reasonName + ' must be 10-50 characters long.'); return; }
         if (!/\p{L}/u.test(reason)) { showCancelModalError('The ' + reasonName + ' must contain at least one letter.'); return; }
+        const bankName = document.getElementById('refundBankNameText').value.trim();
+        const accountNumber = document.getElementById('refundAccountNumberText').value.trim();
+        const accountHolder = document.getElementById('refundAccountHolderText').value.trim();
+        if (isRefund && (bankName.length < 2 || !/^[\p{L}0-9 .&()/-]+$/u.test(bankName))) { showCancelModalError('Please enter a valid bank name.'); return; }
+        if (isRefund && !/^[0-9]{6,20}$/.test(accountNumber)) { showCancelModalError('The account number must contain 6-20 digits.'); return; }
+        if (isRefund && (accountHolder.length < 2 || !/^[\p{L} .'-]+$/u.test(accountHolder))) { showCancelModalError('Please enter a valid account holder name.'); return; }
 
         const reasonInput = document.getElementById((isRefund ? 'refundReasonInput_' : 'cancelReasonInput_') + currentCancelOrderId);
         const form = document.getElementById((isRefund ? 'refundForm_' : 'cancelForm_') + currentCancelOrderId);
         if (reasonInput && form) {
             reasonInput.value = reason;
+            if (isRefund) {
+                document.getElementById('refundBankNameInput_' + currentCancelOrderId).value = bankName;
+                document.getElementById('refundAccountNumberInput_' + currentCancelOrderId).value = accountNumber;
+                document.getElementById('refundAccountHolderInput_' + currentCancelOrderId).value = accountHolder.toUpperCase();
+            }
             form.submit();
         }
     }

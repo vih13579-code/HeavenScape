@@ -16,6 +16,12 @@ import java.util.List;
 
 public class OrderHistoryController extends HttpServlet {
 
+    // Đây là phần tương ứng với backlog:
+    // - View My Orders
+    // - View My Order Detail
+    // - Cancel My Order
+    // - Request Refund with Evidence Image
+    // - Buy Again
     private static final int PAGE_SIZE = 5;
 
     private final OrderDAO orderDAO = new OrderDAO();
@@ -62,12 +68,15 @@ public class OrderHistoryController extends HttpServlet {
 
         switch (action) {
             case "cancel":
+                // Hủy đơn hàng của chính user.
                 handleCancel(request, response);
                 break;
             case "requestRefund":
+                // Yêu cầu hoàn tiền cho đơn COD đã thanh toán.
                 handleRefundRequest(request, response);
                 break;
             case "buyAgain":
+                // Mua lại các sản phẩm từ đơn đã hoàn thành.
                 handleBuyAgain(request, response);
                 break;
             default:
@@ -156,6 +165,8 @@ public class OrderHistoryController extends HttpServlet {
     private void handleCancel(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
 
+        // Hủy đơn hàng: kiểm tra lý do hủy, độ dài và chữ cái bắt buộc.
+        // Nếu là COD đã thanh toán thì đổi payment_status sang pending_refund để chờ admin xử lý.
         Account account = getAccount(request);
         int orderID = toInt(request.getParameter("orderID"), 0);
 
@@ -192,6 +203,8 @@ public class OrderHistoryController extends HttpServlet {
             return;
         }
 
+        // Bước 1: lấy thông tin đơn hàng hiện tại.
+        // Bước 2: gọi DAO để cập nhật trạng thái đơn và lý do hủy.
         Order order = orderDAO.getOrderByID(orderID);
         boolean ok = orderDAO.cancelOrder(orderID, account.getId(), cancelReason);
 
@@ -252,12 +265,16 @@ public class OrderHistoryController extends HttpServlet {
         int orderID = toInt(request.getParameter("orderID"), 0);
         String refundReason = request.getParameter("refundReason");
         refundReason = refundReason == null ? "" : refundReason.trim();
+        String bankName = clean(request.getParameter("refundBankName"));
+        String accountNumber = clean(request.getParameter("refundAccountNumber"));
+        String accountHolder = clean(request.getParameter("refundAccountHolder"));
 
         String redirectTarget = request.getParameter("redirect");
         String redirectUrl = "list".equalsIgnoreCase(redirectTarget)
                 ? request.getContextPath() + "/profile/order-history"
                 : request.getContextPath() + "/profile/order-history?action=detail&orderID=" + orderID;
 
+        // Refund request: bắt buộc phải nhập lý do hoàn tiền, tối thiểu 10 ký tự và phải có chữ cái.
         HttpSession session = request.getSession();
         if (refundReason.isEmpty()) {
             session.setAttribute("errorMessage", "Please enter a refund reason.");
@@ -274,9 +291,29 @@ public class OrderHistoryController extends HttpServlet {
             response.sendRedirect(redirectUrl);
             return;
         }
+        if (bankName.length() < 2 || bankName.length() > 100
+                || !bankName.matches("[\\p{L}0-9 .&()/-]+")) {
+            session.setAttribute("errorMessage", "Please enter a valid bank name (2-100 characters).");
+            response.sendRedirect(redirectUrl);
+            return;
+        }
+        if (!accountNumber.matches("[0-9]{6,20}")) {
+            session.setAttribute("errorMessage", "The bank account number must contain 6-20 digits.");
+            response.sendRedirect(redirectUrl);
+            return;
+        }
+        if (accountHolder.length() < 2 || accountHolder.length() > 100
+                || !accountHolder.matches("[\\p{L} .'-]+")) {
+            session.setAttribute("errorMessage", "Please enter a valid account holder name (2-100 characters).");
+            response.sendRedirect(redirectUrl);
+            return;
+        }
 
+        // Nếu đơn hàng hợp lệ (đã hoàn thành, COD, đã thanh toán), DAO sẽ đổi trạng thái thành cancelled + pending_refund.
+        // Sau đó admin sẽ xác nhận hoàn tiền.
         Order order = orderDAO.getOrderByID(orderID);
-        boolean ok = orderDAO.requestCodRefund(orderID, account.getId(), refundReason);
+        boolean ok = orderDAO.requestCodRefund(orderID, account.getId(), refundReason,
+                bankName, accountNumber, accountHolder);
 
         if (ok) {
             if (order != null && order.getCustomerEmail() != null) {
@@ -386,5 +423,9 @@ public class OrderHistoryController extends HttpServlet {
         } catch (NumberFormatException e) {
             return defaultVal;
         }
+    }
+
+    private String clean(String value) {
+        return value == null ? "" : value.trim();
     }
 }

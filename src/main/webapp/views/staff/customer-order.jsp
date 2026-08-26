@@ -1,9 +1,25 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html lang="en">
+<%--
+    File này là giao diện quản lý đơn hàng của staff/admin.
+    Chức năng chính:
+    - xem danh sách tất cả đơn hàng
+    - lọc theo trạng thái
+    - xem nhanh chi tiết đơn
+    - cập nhật trạng thái đơn
+    - xác nhận refund cho các đơn COD đang chờ hoàn tiền
 
+    Dữ liệu được Controller CustomerOrderController gửi qua:
+    - orderList
+    - status
+    - currentPage
+    - totalPages
+    - countPending, countConfirmed,...
+--%>
     <head>
         <meta charset="utf-8">
         <meta content="width=device-width, initial-scale=1.0" name="viewport">
@@ -62,6 +78,11 @@
 
                 <div class="bg-white rounded-xl shadow-sm border border-[#D9D9DC] overflow-hidden">
 
+                    <%--
+                        Thanh filter trạng thái của staff.
+                        Mỗi link gửi param status theo trạng thái muốn xem,
+                        ví dụ: all, pending, confirmed, shipping, completed, cancelled, pending_refund, refunded.
+                    --%>
                     <div
                         class="p-4 border-b border-[#D9D9DC] flex flex-wrap items-center justify-between gap-4 bg-gray-50">
                         <div class="flex items-center gap-2 overflow-x-auto no-scrollbar">
@@ -97,9 +118,24 @@
                                class="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ${status == 'refunded' ? 'bg-[#C92127] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors'}">
                                 Refunded
                             </a>
+                            <a href="${pageContext.request.contextPath}/dashboard/customer-order?status=refund_rejected&keyword=${keyword}"
+                               class="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ${status == 'refund_rejected' ? 'bg-[#C92127] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors'}">
+                                Refund Rejected
+                            </a>
                         </div>
                     </div>
 
+                    <%--
+                        Bảng hiển thị danh sách đơn hàng.
+                        Mỗi dòng đại diện cho 1 đơn hàng và có các thông tin:
+                        - mã đơn
+                        - tên khách
+                        - ngày đặt
+                        - phương thức thanh toán
+                        - tổng tiền
+                        - trạng thái
+                        - action
+                    --%>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse">
                             <thead>
@@ -185,6 +221,14 @@
                                                     <c:when test="${order.status == 'shipping'}">
                                                     <span
                                                         class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-indigo-50 text-[#134aa4] text-xs font-semibold">Shipping</span>
+                                                    </c:when>
+                                                    <c:when test="${order.paymentStatus == 'refund_rejected'}">
+                                                    <span
+                                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-red-100 text-[#D32F2F] text-xs font-semibold">Refund Rejected</span>
+                                                    <div class="mt-1 max-w-[220px] text-xs text-on-surface-variant">
+                                                        <strong>Reason:</strong>
+                                                        <c:out value="${fn:substringAfter(order.cancelReason, 'Refund rejected: ')}" />
+                                                    </div>
                                                     </c:when>
                                                     <c:when test="${order.status == 'completed'}">
                                                     <span
