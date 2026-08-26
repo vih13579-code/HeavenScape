@@ -47,7 +47,7 @@
         <%@ include file="/views/layout/homepage/header.jsp" %>
         <%@ include file="/views/layout/common/toast.jsp" %>
 
-        <main class="flex-grow pt-32 pb-12 px-4 md:px-16 max-w-[1280px] mx-auto w-full">
+        <main class="flex-grow pt-6 pb-12 px-4 md:px-16 max-w-[1280px] mx-auto w-full">
             <div class="max-w-2xl mx-auto flex flex-col items-center text-center">
 
                 <div class="success-checkmark-animation bg-green-100 rounded-full p-6 mb-6">
