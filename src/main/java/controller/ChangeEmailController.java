@@ -11,6 +11,8 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.Random;
 import model.Account;
+import java.util.Random;
+import utils.EmailUtil;
 
 public class ChangeEmailController extends HttpServlet {
 
@@ -100,6 +102,8 @@ public class ChangeEmailController extends HttpServlet {
         }
 
         response.sendRedirect(request.getContextPath() + "/otp");
+
+
     }
 
     @Override

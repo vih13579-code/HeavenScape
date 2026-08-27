@@ -10,6 +10,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import model.Account;
+import java.util.Random;
+import utils.EmailUtil;
 
 public class ChangePasswordController extends HttpServlet {
 
@@ -101,39 +103,81 @@ public class ChangePasswordController extends HttpServlet {
                 );
                 return;
             }
+            if ("customer".equalsIgnoreCase(acc.getRole())){
+                    boolean currentPasswordOk = customerDAO.checkCurrentPassword(
+            acc.getId(),
+            currentPassword.trim()
+    );
 
-            boolean success;
+    if (!currentPasswordOk) {
+        out.write("{\"success\":false,\"message\":\"Current password is incorrect\"}");
+        return;
+    }
+            String otp = String.format("%06d", new Random().nextInt(999999));
+            Long now = System.currentTimeMillis();
 
-            if ("customer".equalsIgnoreCase(acc.getRole())) {
-
-                success = customerDAO.changePassword(
-                        acc.getId(),
-                        currentPassword.trim(),
-                        newPassword
+            session.setAttribute("otp_flow", "change_password");
+            session.setAttribute("otp_code", otp);
+            session.setAttribute("otp_created", now);
+            session.setAttribute("otp_resend_at", now);
+            session.setAttribute("otp_email", acc.getEmail());
+            session.setAttribute("otp_target_id", acc.getId());
+            session.setAttribute("otp_target_role", acc.getRole());
+            session.setAttribute("otp_current_password", currentPassword.trim());
+            session.setAttribute("otp_new_password", newPassword);
+            session.removeAttribute("otp_attempts");
+            try {
+                EmailUtil.sendChangePasswordOtp(acc.getEmail(), otp);
+                out.write(
+                    "{\"success\":true,\"message\":\"OTP sent to your email. Please check your inbox.\"}"
                 );
+            } catch (Exception e) {
+                e.printStackTrace();
 
-            } else {
-
-                success = accountDAO.changePassword(
-                        acc.getId(),
-                        currentPassword.trim(),
-                        newPassword
-                );
+                out.write("{\"success\":false,\"message\":\"Could not send OTP email\"}");
             }
-
+        }
+         else{
+            boolean success = accountDAO.changePassword(acc.getId(), currentPassword.trim(), newPassword);
             if (success) {
-
                 session.invalidate();
-                out.write(
-                        "{\"success\":true,\"message\":\"Password changed successfully\"}"
-                );
-
+                out.write("{\"success\":true,\"message\":\"Password changed successfully\"}");
             } else {
-
-                out.write(
-                        "{\"success\":false,\"message\":\"Current password is incorrect\"}"
-                );
+                out.write("{\"success\":false,\"message\":\"Current password is incorrect\"}");
             }
+        }
+            // boolean success;
+
+            // if ("customer".equalsIgnoreCase(acc.getRole())) {
+
+            //     success = customerDAO.changePassword(
+            //             acc.getId(),
+            //             currentPassword.trim(),
+            //             newPassword
+            //     );
+
+            // } else {
+
+            //     success = accountDAO.changePassword(
+            //             acc.getId(),
+            //             currentPassword.trim(),
+            //             newPassword
+            //     );
+            // }
+
+            // if (success) {
+
+            //     session.invalidate();
+            //     out.write(
+            //             "{\"success\":true,\"message\":\"Password changed successfully\"}"
+            //     );
+
+            // } else {
+
+            //     out.write(
+            //             "{\"success\":false,\"message\":\"Current password is incorrect\"}"
+            //     );
+            // }
 
         } catch (Exception e) {
 

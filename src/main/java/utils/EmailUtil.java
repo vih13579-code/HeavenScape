@@ -2,6 +2,8 @@ package utils;
 
 import jakarta.mail.*;
 import jakarta.mail.internet.*;
+import jakarta.security.auth.message.AuthException;
+
 import java.io.UnsupportedEncodingException;
 import java.util.Properties;
 
@@ -567,4 +569,92 @@ public class EmailUtil {
                 + "</div>";
     }
 
+    public static void sendPasswordChangeNotification(String toEmail)
+            throws MessagingException, UnsupportedEncodingException {
+        Properties props = new Properties();
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.port", "587");
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+
+        Session mailSession = Session.getInstance(props, new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(FROM_EMAIL, APP_PASSWORD);
+            }
+        });
+        Message message = new MimeMessage(mailSession);
+        message.setFrom(new InternetAddress(
+                FROM_EMAIL,
+                "HeavenScape Support",
+                "UTF-8"));
+        message.setRecipients(
+                Message.RecipientType.TO,
+                InternetAddress.parse(toEmail));
+        message.setSubject(
+                "HeavenScape - Password Change Notification");
+        message.setText(
+                "Your HeavenScape password has been changed successfully.\n\n"
+                        + "If you did not make this change, please contact support immediately."
+
+        );
+
+        Transport.send(message);
+
+    }
+
+    public static void sendChangePasswordOtp(String toEmail, String otp)
+            throws MessagingException, UnsupportedEncodingException {
+
+        Properties props = new Properties();
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.port", "587");
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+
+        Session session = Session.getInstance(props, new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(FROM_EMAIL, APP_PASSWORD);
+            }
+        });
+
+        Message message = new MimeMessage(session);
+        message.setFrom(new InternetAddress(FROM_EMAIL, "HeavenScape Support", "UTF-8"));
+        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail));
+        message.setSubject("HeavenScape - Password Change Verification Code");
+        message.setContent(buildChangePasswordOtpHtml(otp), "text/html; charset=UTF-8");
+
+        Transport.send(message);
+    }
+
+    private static String buildChangePasswordOtpHtml(String otp) {
+        return "<div style=\"font-family: Arial, sans-serif; background-color: " + PAGE_BG
+                + "; margin: 0; padding: 30px 0;\">"
+                + "  <div style=\"max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 4px; overflow: hidden; border: 1px solid "
+                + CARD_BORDER + ";\">"
+                + emailHeader()
+                + "    <div style=\"padding: 30px 40px;\">"
+                + "      <h2 style=\"color: " + TEXT_DARK
+                + "; font-size: 20px; margin-top: 0;\">Verify Password Change</h2>"
+                + "      <p style=\"color: #555555; font-size: 15px; line-height: 1.6;\">"
+                + "        Hello,<br><br>"
+                + "        You requested to change your HeavenScape password. Use the OTP below to confirm this action:"
+                + "      </p>"
+                + "      <div style=\"text-align: center; margin: 35px 0;\">"
+                + "        <span style=\"display: inline-block; font-size: 34px; font-weight: bold; color: " + BRAND_RED
+                + "; background-color: #fdecec; padding: 15px 40px; border-radius: 4px; letter-spacing: 6px; border: 1px dashed "
+                + BRAND_RED + ";\">"
+                + otp
+                + "        </span>"
+                + "      </div>"
+                + "      <p style=\"color: #555555; font-size: 15px; line-height: 1.6;\">"
+                + "        <strong>Note:</strong> This code is valid for 5 minutes. If you did not request this, do not share the code with anyone."
+                + "      </p>"
+                + "    </div>"
+                + emailFooter()
+                + "  </div>"
+                + "</div>";
+    }
+    
 }

@@ -133,7 +133,29 @@ public class CustomerDAO {
 
         return null;
     }
+public boolean checkCurrentPassword(
+        int customerId,
+        String currentPassword
+) {
+    String sql = "SELECT 1 FROM Customer "
+            + "WHERE customerID = ? AND password = ?";
 
+    try (Connection conn = new DBContext().getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+
+        ps.setInt(1, customerId);
+        ps.setString(2, HashMD5.hash(currentPassword));
+
+        try (ResultSet rs = ps.executeQuery()) {
+            return rs.next();
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return false;
+}
     // Đồng nhất với AccountDAO.changePassword(): thực hiện trong một câu UPDATE
     // duy nhất kèm điều kiện password cũ, tránh phải SELECT rồi so sánh riêng.
     public boolean changePassword(
