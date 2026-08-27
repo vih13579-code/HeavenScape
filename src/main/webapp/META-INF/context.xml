@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Context path="">
-    <Parameter />
-    <Parameter />
+    <Parameter name="GOOGLE_CLIENT_ID"
+               value="YOUR_CLIENT_ID"
+               override="false"/>
+    <Parameter name="GOOGLE_CLIENT_SECRET"
+               value="YOUR_CLIENT_SECRET"
+               override="false"/>
 </Context>

@@ -18,7 +18,7 @@ public class DBContext {
             String dbURL = "jdbc:sqlserver://localhost:1433;"
                     + "databaseName=HeavenScape_finalDB;"
                     + "user=sa;"
-                    + "password=0606;"
+                    + "password=123456;"
                     + "encrypt=true;trustServerCertificate=true;";
             return DriverManager.getConnection(dbURL);
         } catch (Exception e) {
