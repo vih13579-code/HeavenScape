@@ -245,7 +245,6 @@
 <div class="wishlist-page">
     <section class="wishlist-hero">
         <div class="wishlist-shell">
-            <div class="wishlist-eyebrow">Wishlist</div>
             <h1 class="wishlist-title">My Wishlist</h1>
             <p class="wishlist-count">${wishlistCount} books in this list</p>
         </div>

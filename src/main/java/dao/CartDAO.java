@@ -27,13 +27,27 @@ public class CartDAO {
 
     public List<CartItem> getCartItems(int customerID) {
         deleteDiscontinuedCartItems(customerID);
+        return loadCartItems(customerID, false);
+    }
+
+    /**
+     * Checkout must keep unavailable rows visible so final validation can report
+     * the exact book instead of silently deleting it from the cart.
+     */
+    public List<CartItem> getCartItemsForCheckout(int customerID) {
+        return loadCartItems(customerID, true);
+    }
+
+    private List<CartItem> loadCartItems(int customerID, boolean preserveMissingBooks) {
         List<CartItem> cartItemList = new ArrayList<>();
 
         String sql = "SELECT CartItem.cartItemID, CartItem.cartID, CartItem.bookID, CartItem.quantity, "
                 + "Book.title, Book.thumbnail, Book.price, Book.stock_quantity, Book.status "
                 + "FROM Cart "
                 + "JOIN CartItem ON CartItem.cartID = Cart.cartID "
-                + "JOIN Book ON Book.bookID = CartItem.bookID "
+                + (preserveMissingBooks
+                    ? "LEFT JOIN Book ON Book.bookID = CartItem.bookID "
+                    : "JOIN Book ON Book.bookID = CartItem.bookID ")
                 + "WHERE Cart.customerID = ? AND Cart.status = 'active' "
                 + "ORDER BY CartItem.added_at DESC";
 
@@ -48,7 +62,8 @@ public class CartDAO {
                     item.setCartID(rs.getInt("cartID"));
                     item.setBookID(rs.getInt("bookID"));
                     item.setQuantity(rs.getInt("quantity"));
-                    item.setTitle(rs.getString("title"));
+                    String title = rs.getString("title");
+                    item.setTitle(title == null ? "Book #" + item.getBookID() : title);
                     item.setThumbnail(rs.getString("thumbnail"));
                     item.setPrice(rs.getBigDecimal("price"));
                     item.setStockQuantity(rs.getInt("stock_quantity"));

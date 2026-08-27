@@ -5,7 +5,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Category Details - HeavenScape</title>
+        <title>Genre Details - HeavenScape</title>
         <link rel="icon" type="image/png" href="https://res.cloudinary.com/llfxqkny/image/upload/v1787226687/heavenscape/favicon/heavenscape_favicon.png">
         <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -19,7 +19,7 @@
         <%@ include file="/views/layout/dashboard/sidebar.jsp" %>
         <main class="flex-1 md:ml-64 min-h-screen">
             <div class="px-6 py-8 max-w-3xl mx-auto space-y-6">
-                <a href="${pageContext.request.contextPath}/dashboard/category-management" class="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline">
+                <a href="${pageContext.request.contextPath}/dashboard/genre-management" class="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline">
                     <span class="material-symbols-outlined text-[18px]">arrow_back</span>
                     Back to List
                 </a>
@@ -29,10 +29,10 @@
                 <section class="bg-surface rounded-2xl border border-outline-variant shadow-card overflow-hidden">
                     <div class="px-6 py-5 border-b border-outline-variant flex items-center justify-between">
                         <div>
-                            <h1 class="text-2xl font-bold">Category Details</h1>
-                            <p class="text-sm text-on-surface-variant mt-1">Detailed information about this book category.</p>
+                            <h1 class="text-2xl font-bold">Genre Details</h1>
+                            <p class="text-sm text-on-surface-variant mt-1">Detailed information about this book genre.</p>
                         </div>
-                        <c:if test="${canManageCategory}">
+                        <c:if test="${canManageGenre}">
                             <button type="button" onclick="openUpdateModal()"
                                     class="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-white hover:bg-[#8E171B] transition">
                                 <span class="material-symbols-outlined text-[18px]">edit</span>
@@ -43,16 +43,16 @@
 
                     <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div class="rounded-xl bg-surface-container-low p-5">
-                            <p class="text-sm font-semibold text-on-surface-variant">Category ID</p>
-                            <p class="text-2xl font-extrabold text-primary mt-2">HSC-${category.categoryID}</p>
+                            <p class="text-sm font-semibold text-on-surface-variant">Genre ID</p>
+                            <p class="text-2xl font-extrabold text-primary mt-2">HSC-${genre.genreID}</p>
                         </div>
                         <div class="rounded-xl bg-surface-container-low p-5 md:col-span-2">
-                            <p class="text-sm font-semibold text-on-surface-variant">Category Name</p>
-                            <p class="text-2xl font-extrabold mt-2">${category.categoryName}</p>
+                            <p class="text-sm font-semibold text-on-surface-variant">Genre Name</p>
+                            <p class="text-2xl font-extrabold mt-2">${genre.genreName}</p>
                         </div>
                         <div class="rounded-xl bg-surface-container-low p-5 md:col-span-3">
-                            <p class="text-sm font-semibold text-on-surface-variant">Books in This Category</p>
-                            <p class="text-2xl font-extrabold mt-2">${category.bookCount}</p>
+                            <p class="text-sm font-semibold text-on-surface-variant">Books in This Genre</p>
+                            <p class="text-2xl font-extrabold mt-2">${genre.bookCount}</p>
                         </div>
                     </div>
                 </section>
@@ -62,7 +62,7 @@
                     <div class="w-full max-w-lg rounded-2xl bg-white shadow-2xl overflow-hidden">
                         <div class="px-6 py-5 border-b border-outline-variant flex items-center justify-between">
                             <div>
-                                <h2 class="text-xl font-bold">Update Category</h2>
+                                <h2 class="text-xl font-bold">Update Genre</h2>
                                 <p class="text-sm text-on-surface-variant mt-1">
                             </div>
                             <button type="button" onclick="closeUpdateModal()" class="w-9 h-9 rounded-lg hover:bg-surface-container-low flex items-center justify-center">
@@ -70,15 +70,15 @@
                             </button>
                         </div>
 
-                        <form action="${pageContext.request.contextPath}/dashboard/category-management" method="post" class="p-6 space-y-5">
+                        <form action="${pageContext.request.contextPath}/dashboard/genre-management" method="post" class="p-6 space-y-5">
                             <input type="hidden" name="action" value="update">
-                            <input type="hidden" name="id" value="${category.categoryID}">
+                            <input type="hidden" name="id" value="${genre.genreID}">
 
                             <div>
-                                <label class="block text-sm font-bold mb-2">Category Name <span class="text-red-600 text-xs">*</span></label>
-                                <input type="text" name="category_name" required maxlength="100" value="${category.categoryName}"
+                                <label class="block text-sm font-bold mb-2">Genre Name <span class="text-red-600 text-xs">*</span></label>
+                                <input type="text" name="genre_name" required maxlength="100" value="${genre.genreName}"
                                        class="w-full rounded-xl border-outline-variant bg-surface-container-low px-4 py-3 text-sm focus:border-primary focus:ring-primary">
-                                <p class="text-xs text-on-surface-variant mt-2">The category name is required and must be unique.</p>
+                                <p class="text-xs text-on-surface-variant mt-2">The genre name is required and must be unique.</p>
                             </div>
 
                             <div class="flex justify-end gap-3 pt-2">

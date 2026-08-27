@@ -77,6 +77,50 @@
             .lookup-row .field-input {
                 flex:1;
             }
+            .genre-checklist {
+                flex:1;
+                max-height:146px;
+                overflow-y:auto;
+                border:1px solid #D9D9DC;
+                border-radius:8px;
+                background:#fff;
+                padding:5px;
+                transition:border .18s, box-shadow .18s;
+            }
+            .genre-checklist:focus-within {
+                border-color:#C92127;
+                box-shadow:0 0 0 3px rgba(201,33,39,.1);
+            }
+            .genre-checklist.error {
+                border-color:#D32F2F;
+                box-shadow:0 0 0 3px rgba(211,47,47,.08);
+            }
+            .genre-option {
+                display:flex;
+                align-items:center;
+                gap:9px;
+                padding:7px 8px;
+                border-radius:6px;
+                color:#1B1B1B;
+                font-size:14px;
+                cursor:pointer;
+                transition:background .15s;
+            }
+            .genre-option:hover {
+                background:#FDE8E9;
+            }
+            .genre-option input {
+                width:17px;
+                height:17px;
+                flex:none;
+                border-color:#B8B8BC;
+                border-radius:4px;
+                color:#C92127;
+                cursor:pointer;
+            }
+            .genre-option input:focus {
+                box-shadow:0 0 0 3px rgba(201,33,39,.14);
+            }
             .lookup-add-btn {
                 width:42px;
                 min-width:42px;
@@ -390,16 +434,25 @@
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label class="field-label" for="categoryID">Category</label>
+                                <label class="field-label" id="genreLabel">Genres <span class="text-error">*</span></label>
                                 <div class="lookup-row">
-                                    <select id="categoryID" name="categoryID" class="field-input">
-                                        <option value="">-- Select Category --</option>
-                                        <c:forEach var="entry" items="${categoryMap}">
-                                            <option value="${entry.key}" <c:if test="${book.categoryID == entry.key}">selected</c:if>>${entry.value}</option>
+                                    <div id="genreID" class="genre-checklist" role="group" aria-labelledby="genreLabel" aria-describedby="genreIDHint genreIDErr">
+                                        <c:forEach var="entry" items="${genreMap}">
+                                            <c:set var="genreSelected" value="false" />
+                                            <c:forEach var="selectedGenreID" items="${selectedGenreIDs}">
+                                                <c:if test="${selectedGenreID == entry.key}"><c:set var="genreSelected" value="true" /></c:if>
+                                            </c:forEach>
+                                            <label class="genre-option" for="genre-${entry.key}">
+                                                <input type="checkbox" id="genre-${entry.key}" name="genreID" value="${entry.key}"
+                                                       <c:if test="${genreSelected}">checked</c:if>>
+                                                <span>${entry.value}</span>
+                                            </label>
                                         </c:forEach>
-                                    </select>
-                                    <button type="button" class="lookup-add-btn" data-lookup-type="category" data-target-select="categoryID" title="Add Category">+</button>
+                                    </div>
+                                    <button type="button" class="lookup-add-btn" data-lookup-type="genre" data-target-select="genreID" title="Add Genre">+</button>
                                 </div>
+                                <p class="text-xs text-on-surface-variant mt-1" id="genreIDHint">Select one or more genres.</p>
+                                <p class="err-msg" id="genreIDErr">Please select at least one genre</p>
                             </div>
                             <div>
                                 <label class="field-label" for="contentID">Format</label>
@@ -667,9 +720,20 @@
                     statusErr.classList.remove('show');
                 }
 
+                const genreGroup = document.getElementById('genreID');
+                const genreErr = document.getElementById('genreIDErr');
+                if (!genreGroup.querySelector('input[name="genreID"]:checked')) {
+                    genreGroup.classList.add('error');
+                    genreErr.classList.add('show');
+                    valid = false;
+                } else {
+                    genreGroup.classList.remove('error');
+                    genreErr.classList.remove('show');
+                }
+
                 if (!valid) {
                     e.preventDefault();
-                    document.querySelector('.field-input.error')?.scrollIntoView({behavior: 'smooth', block: 'center'});
+                    document.querySelector('.field-input.error, .genre-checklist.error')?.scrollIntoView({behavior: 'smooth', block: 'center'});
                 } else {
                     document.getElementById('submitBtn').disabled = true;
                     document.getElementById('submitBtn').textContent = 'Saving...';
@@ -685,6 +749,13 @@
                     if (err)
                         err.classList.remove('show');
                 });
+            });
+
+            document.getElementById('genreID').addEventListener('change', function (e) {
+                if (e.target.matches('input[name="genreID"]')) {
+                    this.classList.remove('error');
+                    document.getElementById('genreIDErr').classList.remove('show');
+                }
             });
 
             function checkStatusVsStock() {
@@ -718,7 +789,7 @@
             });
 
 
-            const lookupLabels = {category: 'category', content: 'format', origin: 'origin', series: 'series', publisher: 'publisher'};
+            const lookupLabels = {genre: 'genre', content: 'format', origin: 'origin', series: 'series', publisher: 'publisher'};
             let activeLookupType = '';
             let activeLookupSelectId = '';
 
@@ -739,19 +810,52 @@
             }
 
             function appendLookupOption(selectId, id, name) {
-                const select = document.getElementById(selectId);
-                if (!select)
+                const target = document.getElementById(selectId);
+                if (!target)
                     return;
+                if (selectId === 'genreID') {
+                    const existing = Array.from(target.querySelectorAll('input[name="genreID"]'))
+                            .find(input => String(input.value) === String(id));
+                    if (existing) {
+                        existing.checked = true;
+                        existing.dispatchEvent(new Event('change', {bubbles: true}));
+                        return;
+                    }
+                    const optionLabel = document.createElement('label');
+                    const input = document.createElement('input');
+                    const optionText = document.createElement('span');
+                    input.type = 'checkbox';
+                    input.id = 'genre-' + id;
+                    input.name = 'genreID';
+                    input.value = String(id);
+                    input.checked = true;
+                    optionLabel.className = 'genre-option';
+                    optionLabel.htmlFor = input.id;
+                    optionText.textContent = name;
+                    optionLabel.append(input, optionText);
+                    target.appendChild(optionLabel);
+                    target.classList.remove('error');
+                    document.getElementById('genreIDErr').classList.remove('show');
+                    return;
+                }
+                const select = target;
                 const existing = Array.from(select.options).find(opt => String(opt.value) === String(id));
                 if (existing) {
-                    select.value = String(id);
+                    if (select.multiple) {
+                        existing.selected = true;
+                    } else {
+                        select.value = String(id);
+                    }
                     return;
                 }
                 const option = document.createElement('option');
                 option.value = String(id);
                 option.textContent = name;
+                option.selected = true;
                 select.appendChild(option);
-                select.value = String(id);
+                if (!select.multiple) {
+                    select.value = String(id);
+                }
             }
 
             async function saveLookupItem() {

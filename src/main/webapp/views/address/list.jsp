@@ -2,6 +2,22 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ include file="/views/layout/homepage/header.jsp" %>
+
+<%--
+    File này là giao diện "My Addresses" dành cho khách hàng.
+    Chức năng chính:
+    - hiển thị danh sách địa chỉ đã lưu
+    - thêm mới địa chỉ
+    - sửa địa chỉ
+    - xóa địa chỉ
+    - đặt địa chỉ mặc định
+
+    Luồng dữ liệu:
+    1. Controller AddressManagementController gửi danh sách addresses qua request attribute.
+    2. JSP lặp qua từng địa chỉ để render ra card UI.
+    3. Người dùng click Edit/Delete/Set Default -> gửi action về controller.
+    4. Controller xử lý nghiệp vụ và trả về thông báo success/error.
+--%>
 <style>
     .address-list{
         display:grid;
@@ -243,6 +259,12 @@
             </c:if>
 
             <div class="profile-card p-8">
+                <%--
+                    Phần header của trang địa chỉ:
+                    - tiêu đề "My Addresses"
+                    - mô tả ngắn
+                    - nút "+ Add New" mở modal thêm mới
+                --%>
                 <div class="address-header-row">
                     <div>
                         <h1 class="text-3xl font-bold">My Addresses</h1>
@@ -258,6 +280,14 @@
 
                 <c:choose>
                     <c:when test="${not empty addresses}">
+                        <%--
+                            Khi có danh sách địa chỉ, lặp qua từng đối tượng address.
+                            Mỗi card địa chỉ bao gồm:
+                            - địa chỉ hiển thị
+                            - trạng thái default hoặc nút Set as Default
+                            - nút Edit
+                            - nút Delete
+                        --%>
                         <div class="address-list">
                         <c:forEach var="address" items="${addresses}">
                             <div class="address-item" id="address-row-${address.addressID}">
@@ -330,6 +360,11 @@
     </div>
 </div>
 
+<%--
+    Popup modal dùng để thêm hoặc sửa địa chỉ.
+    Modal này không submit form kiểu truyền thống, mà dùng JavaScript để gọi AJAX.
+    Mục đích: UI thân thiện, không reload trang khi update địa chỉ.
+--%>
 <div id="editAddressModal" class="modal-overlay hidden">
     <div class="address-modal">
         <h2 class="modal-title" id="addressModalTitle">Edit Address</h2>
@@ -395,6 +430,11 @@
 <%@ include file="/views/layout/common/toast.jsp" %>
 
 <script>
+    // JS bên dưới xử lý:
+    // - load danh sách tỉnh/thành và phường/xã từ API provinces.open-api.vn
+    // - mở modal thêm/sửa địa chỉ
+    // - validate dữ liệu trước khi gửi lên server
+    // - gửi request AJAX đến controller
     var vietnamProvinces = [];
     var pendingDeleteAddressForm = null;
 

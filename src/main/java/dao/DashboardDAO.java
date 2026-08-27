@@ -21,9 +21,9 @@ public class DashboardDAO {
         return conn;
     }
 
-    public BigDecimal getTotalRevenue(String fromDate, String toDate, Integer categoryID) {
+    public BigDecimal getTotalRevenue(String fromDate, String toDate, Integer genreID) {
         String sql;
-        if (categoryID == null) {
+        if (genreID == null) {
             sql = "SELECT ISNULL(SUM(o.total_price), 0) AS totalRevenue "
                     + "FROM [Order] o "
                     + "WHERE LOWER(LTRIM(RTRIM(o.status))) = 'completed' "
@@ -35,11 +35,11 @@ public class DashboardDAO {
                     + "JOIN Book b ON b.bookID = od.bookID "
                     + "WHERE LOWER(LTRIM(RTRIM(o.status))) = 'completed' "
                     + buildDateFilter()
-                    + buildCategoryFilter(categoryID);
+                    + buildGenreFilter(genreID);
         }
 
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            setCommonParams(ps, fromDate, toDate, categoryID);
+            setCommonParams(ps, fromDate, toDate, genreID);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return rs.getBigDecimal("totalRevenue");
@@ -50,16 +50,16 @@ public class DashboardDAO {
         return BigDecimal.ZERO;
     }
 
-    public int getTotalOrders(String fromDate, String toDate, Integer categoryID) {
+    public int getTotalOrders(String fromDate, String toDate, Integer genreID) {
         String sql = "SELECT COUNT(DISTINCT o.orderID) AS totalOrders "
                 + "FROM [Order] o "
-                + buildOrderDetailJoin(categoryID)
+                + buildOrderDetailJoin(genreID)
                 + "WHERE 1 = 1 "
                 + buildDateFilter()
-                + buildCategoryFilter(categoryID);
+                + buildGenreFilter(genreID);
 
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            setCommonParams(ps, fromDate, toDate, categoryID);
+            setCommonParams(ps, fromDate, toDate, genreID);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return rs.getInt("totalOrders");
@@ -70,16 +70,16 @@ public class DashboardDAO {
         return 0;
     }
 
-    public int getTotalCustomers(String fromDate, String toDate, Integer categoryID) {
+    public int getTotalCustomers(String fromDate, String toDate, Integer genreID) {
         String sql = "SELECT COUNT(DISTINCT o.customerID) AS totalCustomers "
                 + "FROM [Order] o "
-                + buildOrderDetailJoin(categoryID)
+                + buildOrderDetailJoin(genreID)
                 + "WHERE LOWER(LTRIM(RTRIM(o.status))) = 'completed' "
                 + buildDateFilter()
-                + buildCategoryFilter(categoryID);
+                + buildGenreFilter(genreID);
 
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            setCommonParams(ps, fromDate, toDate, categoryID);
+            setCommonParams(ps, fromDate, toDate, genreID);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return rs.getInt("totalCustomers");
@@ -90,13 +90,15 @@ public class DashboardDAO {
         return 0;
     }
 
-    public int getTotalBooks(Integer categoryID) {
-        String sql = "SELECT COUNT(*) AS totalBooks FROM Book WHERE 1 = 1 "
-                + (categoryID != null ? "AND categoryID = ? " : "");
+    public int getTotalBooks(Integer genreID) {
+        String sql = "SELECT COUNT(*) AS totalBooks FROM Book b WHERE 1 = 1 "
+                + (genreID != null
+                        ? "AND EXISTS (SELECT 1 FROM BookGenre bg WHERE bg.bookID = b.bookID AND bg.genreID = ?) "
+                        : "");
 
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            if (categoryID != null) {
-                ps.setInt(1, categoryID);
+            if (genreID != null) {
+                ps.setInt(1, genreID);
             }
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -108,17 +110,17 @@ public class DashboardDAO {
         return 0;
     }
 
-    public int getTotalSoldBooks(String fromDate, String toDate, Integer categoryID) {
+    public int getTotalSoldBooks(String fromDate, String toDate, Integer genreID) {
         String sql = "SELECT ISNULL(SUM(od.quantity), 0) AS totalSold "
                 + "FROM [Order] o "
                 + "JOIN OrderDetail od ON od.orderID = o.orderID "
                 + "JOIN Book b ON b.bookID = od.bookID "
                 + "WHERE LOWER(LTRIM(RTRIM(o.status))) = 'completed' "
                 + buildDateFilter()
-                + buildCategoryFilter(categoryID);
+                + buildGenreFilter(genreID);
 
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            setCommonParams(ps, fromDate, toDate, categoryID);
+            setCommonParams(ps, fromDate, toDate, genreID);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return rs.getInt("totalSold");
@@ -134,7 +136,7 @@ public class DashboardDAO {
      * Không hard-code pending, processing, shipping, completed...
      */
     public Map<String, Integer> getOrderStatusSummary(
-            String fromDate, String toDate, Integer categoryID) {
+            String fromDate, String toDate, Integer genreID) {
 
         Map<String, Integer> result = new LinkedHashMap<>();
 
@@ -145,10 +147,10 @@ public class DashboardDAO {
                 + "END AS statusName, "
                 + "COUNT(DISTINCT o.orderID) AS total "
                 + "FROM [Order] o "
-                + buildOrderDetailJoin(categoryID)
+                + buildOrderDetailJoin(genreID)
                 + "WHERE 1 = 1 "
                 + buildDateFilter()
-                + buildCategoryFilter(categoryID)
+                + buildGenreFilter(genreID)
                 + "GROUP BY CASE "
                 + "WHEN o.status IS NULL OR LTRIM(RTRIM(o.status)) = '' THEN 'unknown' "
                 + "ELSE LOWER(LTRIM(RTRIM(o.status))) "
@@ -158,7 +160,7 @@ public class DashboardDAO {
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            setCommonParams(ps, fromDate, toDate, categoryID);
+            setCommonParams(ps, fromDate, toDate, genreID);
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -172,25 +174,26 @@ public class DashboardDAO {
         return result;
     }
 
-    public List<Map<String, Object>> getRevenueByCategory(String fromDate, String toDate, Integer categoryID) {
+    public List<Map<String, Object>> getRevenueByGenre(String fromDate, String toDate, Integer genreID) {
         List<Map<String, Object>> list = new ArrayList<>();
-        String sql = "SELECT TOP 6 g.category_name, ISNULL(SUM(od.quantity * od.unit_price), 0) AS revenue "
+        String sql = "SELECT TOP 6 g.genre_name, ISNULL(SUM(od.quantity * od.unit_price), 0) AS revenue "
                 + "FROM [Order] o "
                 + "JOIN OrderDetail od ON od.orderID = o.orderID "
                 + "JOIN Book b ON b.bookID = od.bookID "
-                + "LEFT JOIN Category g ON g.categoryID = b.categoryID "
+                + "JOIN BookGenre bg ON bg.bookID = b.bookID "
+                + "JOIN Genre g ON g.genreID = bg.genreID "
                 + "WHERE LOWER(LTRIM(RTRIM(o.status))) = 'completed' "
                 + buildDateFilter()
-                + buildCategoryFilter(categoryID)
-                + "GROUP BY g.category_name "
+                + buildGenreFilter(genreID)
+                + "GROUP BY g.genre_name "
                 + "ORDER BY revenue DESC";
 
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            setCommonParams(ps, fromDate, toDate, categoryID);
+            setCommonParams(ps, fromDate, toDate, genreID);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Map<String, Object> row = new LinkedHashMap<>();
-                row.put("categoryName", rs.getString("category_name") == null ? "Other" : rs.getString("category_name"));
+                row.put("genreName", rs.getString("genre_name") == null ? "Other" : rs.getString("genre_name"));
                 row.put("revenue", rs.getBigDecimal("revenue"));
                 list.add(row);
             }
@@ -200,28 +203,26 @@ public class DashboardDAO {
         return list;
     }
 
-    public List<Map<String, Object>> getTopSellingBooks(String fromDate, String toDate, Integer categoryID) {
+    public List<Map<String, Object>> getTopSellingBooks(String fromDate, String toDate, Integer genreID) {
         List<Map<String, Object>> list = new ArrayList<>();
-        String sql = "SELECT TOP 5 b.bookID, b.title, g.category_name, ISNULL(SUM(od.quantity), 0) AS soldQuantity, "
+        String sql = "SELECT TOP 5 b.bookID, b.title, ISNULL(SUM(od.quantity), 0) AS soldQuantity, "
                 + "ISNULL(SUM(od.quantity * od.unit_price), 0) AS revenue "
                 + "FROM [Order] o "
                 + "JOIN OrderDetail od ON od.orderID = o.orderID "
                 + "JOIN Book b ON b.bookID = od.bookID "
-                + "LEFT JOIN Category g ON g.categoryID = b.categoryID "
                 + "WHERE LOWER(LTRIM(RTRIM(o.status))) = 'completed' "
                 + buildDateFilter()
-                + buildCategoryFilter(categoryID)
-                + "GROUP BY b.bookID, b.title, g.category_name "
+                + buildGenreFilter(genreID)
+                + "GROUP BY b.bookID, b.title "
                 + "ORDER BY soldQuantity DESC, revenue DESC";
 
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            setCommonParams(ps, fromDate, toDate, categoryID);
+            setCommonParams(ps, fromDate, toDate, genreID);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Map<String, Object> row = new LinkedHashMap<>();
                 row.put("bookID", rs.getInt("bookID"));
                 row.put("title", rs.getString("title"));
-                row.put("categoryName", rs.getString("category_name") == null ? "Other" : rs.getString("category_name"));
                 row.put("soldQuantity", rs.getInt("soldQuantity"));
                 row.put("revenue", rs.getBigDecimal("revenue"));
                 list.add(row);
@@ -260,22 +261,22 @@ public class DashboardDAO {
      * Lấy toàn bộ đơn hàng theo bộ lọc hiện tại.
      * Unlimited TOP 5 và không loại bỏ trạng thái completed/cancelled.
      */
-    public List<Map<String, Object>> getAllOrders(String fromDate, String toDate, Integer categoryID) {
+    public List<Map<String, Object>> getAllOrders(String fromDate, String toDate, Integer genreID) {
         List<Map<String, Object>> list = new ArrayList<>();
 
         String sql = "SELECT DISTINCT o.orderID, o.created_at, o.total_price, o.status, c.fullname "
                 + "FROM [Order] o "
                 + "LEFT JOIN Customer c ON c.customerID = o.customerID "
-                + buildOrderDetailJoin(categoryID)
+                + buildOrderDetailJoin(genreID)
                 + "WHERE 1 = 1 "
                 + buildDateFilter()
-                + buildCategoryFilter(categoryID)
+                + buildGenreFilter(genreID)
                 + "ORDER BY o.created_at DESC, o.orderID DESC";
 
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            setCommonParams(ps, fromDate, toDate, categoryID);
+            setCommonParams(ps, fromDate, toDate, genreID);
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -301,12 +302,12 @@ public class DashboardDAO {
     /**
      * Giữ lại để những chỗ code cũ đang gọi không bị lỗi biên dịch.
      */
-    public List<Map<String, Object>> getRecentOrders(String fromDate, String toDate, Integer categoryID) {
-        return getAllOrders(fromDate, toDate, categoryID);
+    public List<Map<String, Object>> getRecentOrders(String fromDate, String toDate, Integer genreID) {
+        return getAllOrders(fromDate, toDate, genreID);
     }
 
-    private String buildOrderDetailJoin(Integer categoryID) {
-        if (categoryID == null) {
+    private String buildOrderDetailJoin(Integer genreID) {
+        if (genreID == null) {
             return "";
         }
         return "JOIN OrderDetail od ON od.orderID = o.orderID JOIN Book b ON b.bookID = od.bookID ";
@@ -317,11 +318,14 @@ public class DashboardDAO {
                 + "AND (? IS NULL OR CAST(o.created_at AS DATE) <= ?) ";
     }
 
-    private String buildCategoryFilter(Integer categoryID) {
-        return categoryID != null ? "AND b.categoryID = ? " : "";
+    private String buildGenreFilter(Integer genreID) {
+        return genreID != null
+                ? "AND EXISTS (SELECT 1 FROM BookGenre filterGenre "
+                        + "WHERE filterGenre.bookID = b.bookID AND filterGenre.genreID = ?) "
+                : "";
     }
 
-    private void setCommonParams(PreparedStatement ps, String fromDate, String toDate, Integer categoryID) throws Exception {
+    private void setCommonParams(PreparedStatement ps, String fromDate, String toDate, Integer genreID) throws Exception {
         Date from = parseDate(fromDate);
         Date to = parseDate(toDate);
         int index = 1;
@@ -329,8 +333,8 @@ public class DashboardDAO {
         ps.setDate(index++, from);
         ps.setDate(index++, to);
         ps.setDate(index++, to);
-        if (categoryID != null) {
-            ps.setInt(index, categoryID);
+        if (genreID != null) {
+            ps.setInt(index, genreID);
         }
     }
 

@@ -245,10 +245,11 @@
     <nav class="flex flex-wrap items-center gap-2 text-sm text-on-surface-variant" aria-label="Breadcrumb">
         <a href="${pageContext.request.contextPath}/home" class="hover:text-primary">Home</a>
         <i data-lucide="chevron-right" class="w-4 h-4"></i>
-        <c:if test="${not empty book.categoryName}">
-            <a href="${pageContext.request.contextPath}/products?category=${book.categoryID}" class="hover:text-primary">${book.categoryName}</a>
-            <i data-lucide="chevron-right" class="w-4 h-4"></i>
-        </c:if>
+        <c:forEach var="genre" items="${book.genres}" varStatus="genreStatus">
+            <a href="${pageContext.request.contextPath}/products?genre=${genre.genreID}" class="hover:text-primary">${genre.genreName}</a>
+            <c:if test="${!genreStatus.last}"><span>/</span></c:if>
+        </c:forEach>
+        <c:if test="${not empty book.genres}"><i data-lucide="chevron-right" class="w-4 h-4"></i></c:if>
         <span class="text-on-surface line-clamp-1">${book.title}</span>
     </nav>
 
@@ -372,10 +373,10 @@
 
             <!-- Tags -->
             <div class="flex flex-wrap gap-2">
-                <c:if test="${not empty book.categoryName}">
+                <c:forEach var="genre" items="${book.genres}">
                     <span
-                        class="bg-primary/10 text-primary text-[12px] font-bold px-3 py-1 rounded-full uppercase tracking-wide">${book.categoryName}</span>
-                </c:if>
+                        class="bg-primary/10 text-primary text-[12px] font-bold px-3 py-1 rounded-full uppercase tracking-wide">${genre.genreName}</span>
+                </c:forEach>
                 <c:if test="${book.featured}">
                     <span
                         class="bg-secondary/20 text-primary text-[12px] font-bold px-3 py-1 rounded-full uppercase tracking-wide">🔥
@@ -810,7 +811,7 @@
                 <c:otherwise>
                     <div
                         class="bg-white border border-dashed border-gray-300 rounded-xl p-10 text-center">
-                        <div class="text-5xl mb-3">⭐</div>
+                        <div class="text-5xl mb-3">☆</div>
                         <div class="font-semibold text-gray-600">No Reviews Yet</div>
                         <div class="text-gray-400 mt-2">Be the first to read and review this book.</div>
                     </div>

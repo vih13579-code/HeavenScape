@@ -6,6 +6,8 @@ package model;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Book {
@@ -21,9 +23,8 @@ public class Book {
     private BigDecimal weight;
     private String status;
 
-    // FK info
-    private int categoryID;
-    private String categoryName;
+    // Relationship and FK info
+    private List<Genre> genres = new ArrayList<>();
     private int contentID;
     private String contentName;
     private int seriesID;
@@ -124,20 +125,12 @@ public class Book {
         this.status = v;
     }
 
-    public int getCategoryID() {
-        return categoryID;
+    public List<Genre> getGenres() {
+        return Collections.unmodifiableList(genres);
     }
 
-    public void setCategoryID(int v) {
-        this.categoryID = v;
-    }
-
-    public String getCategoryName() {
-        return categoryName;
-    }
-
-    public void setCategoryName(String v) {
-        this.categoryName = v;
+    public void setGenres(List<Genre> genres) {
+        this.genres = genres == null ? new ArrayList<>() : new ArrayList<>(genres);
     }
 
     public int getContentID() {

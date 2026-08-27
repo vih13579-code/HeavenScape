@@ -19,6 +19,15 @@
     </button>
 </div>
 
+<c:if test="${not empty sessionScope.checkoutIssueMessages}">
+    <div id="checkoutIssueMessages" class="hidden" style="display:none" aria-hidden="true">
+        <c:forEach var="issueMessage" items="${sessionScope.checkoutIssueMessages}">
+            <span class="checkout-issue-message">${fn:escapeXml(issueMessage)}</span>
+        </c:forEach>
+    </div>
+    <c:remove var="checkoutIssueMessages" scope="session"/>
+</c:if>
+
 <script>
 function showToast(msg, isError, isWarning) {
     isError   = isError   || false;
@@ -65,9 +74,19 @@ function hideToast() {
 </c:if>
 window.addEventListener('load', function () {
     var t = document.getElementById('toast');
-    if (!t.dataset.flashMsg) return;
-    var type = t.dataset.flashType;
-    if (type === 'warning') showToast(t.dataset.flashMsg, false, true);
-    else showToast(t.dataset.flashMsg, type === 'error');
+    var hasFlashMessage = Boolean(t.dataset.flashMsg);
+    if (hasFlashMessage) {
+        var type = t.dataset.flashType;
+        if (type === 'warning') showToast(t.dataset.flashMsg, false, true);
+        else showToast(t.dataset.flashMsg, type === 'error');
+    }
+
+    var issueElements = document.querySelectorAll('.checkout-issue-message');
+    var initialDelay = hasFlashMessage ? 5200 : 0;
+    issueElements.forEach(function (element, index) {
+        setTimeout(function () {
+            showToast(element.textContent, false, true);
+        }, initialDelay + index * 5200);
+    });
 });
 </script>

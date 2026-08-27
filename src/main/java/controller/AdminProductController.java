@@ -10,9 +10,13 @@ import jakarta.servlet.http.HttpSession;
 import model.Account;
 import utils.RoleGuard;
 import model.Book;
+import model.Genre;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -91,16 +95,16 @@ public class AdminProductController extends HttpServlet {
         int page = parsePage(req.getParameter("page"));
         String keyword = req.getParameter("keyword");
         String status = req.getParameter("status");
-        Integer categoryID = parseIntParam(req.getParameter("category"));
+        Integer genreID = parseIntParam(req.getParameter("genre"));
 
-        int total = bookDAO.countBooksAdmin(keyword, status, categoryID);
+        int total = bookDAO.countBooksAdmin(keyword, status, genreID);
         int totalPages = Math.max(1, (int) Math.ceil((double) total / PAGE_SIZE));
         if (page > totalPages) {
             page = totalPages;
         }
 
-        List<Book> books = bookDAO.getBooksAdmin((page - 1) * PAGE_SIZE, PAGE_SIZE, keyword, status, categoryID);
-        Map<Integer, String> categoryMap = bookDAO.getCategoryMap();
+        List<Book> books = bookDAO.getBooksAdmin((page - 1) * PAGE_SIZE, PAGE_SIZE, keyword, status, genreID);
+        Map<Integer, String> genreMap = bookDAO.getGenreMap();
 
         req.setAttribute("books", books);
         req.setAttribute("total", total);
@@ -108,8 +112,8 @@ public class AdminProductController extends HttpServlet {
         req.setAttribute("totalPages", totalPages);
         req.setAttribute("keyword", keyword);
         req.setAttribute("status", status);
-        req.setAttribute("categoryID", categoryID);
-        req.setAttribute("categoryMap", categoryMap);
+        req.setAttribute("genreID", genreID);
+        req.setAttribute("genreMap", genreMap);
 
         req.getRequestDispatcher("/views/admin/product/product-management.jsp").forward(req, resp);
     }
@@ -120,7 +124,8 @@ public class AdminProductController extends HttpServlet {
         req.setAttribute("activeMenu", "product-management");
         lookupDAO.ensureDefaultLookups();
         req.setAttribute("book", book);
-        req.setAttribute("categoryMap", bookDAO.getCategoryMap());
+        req.setAttribute("genreMap", bookDAO.getGenreMap());
+        req.setAttribute("selectedGenreIDs", Collections.emptyList());
         req.setAttribute("originMap", bookDAO.getOriginMap());
         req.setAttribute("contentMap", bookDAO.getContentMap());
         req.setAttribute("seriesMap", bookDAO.getSeriesMap());
@@ -158,7 +163,12 @@ public class AdminProductController extends HttpServlet {
 
         lookupDAO.ensureDefaultLookups();
         req.setAttribute("book", book);
-        req.setAttribute("categoryMap", bookDAO.getCategoryMap());
+        req.setAttribute("genreMap", bookDAO.getGenreMap());
+        List<Integer> selectedGenreIDs = new ArrayList<>();
+        for (Genre genre : book.getGenres()) {
+            selectedGenreIDs.add(genre.getGenreID());
+        }
+        req.setAttribute("selectedGenreIDs", selectedGenreIDs);
         req.setAttribute("originMap", bookDAO.getOriginMap());
         req.setAttribute("contentMap", bookDAO.getContentMap());
         req.setAttribute("seriesMap", bookDAO.getSeriesMap());
@@ -170,6 +180,13 @@ public class AdminProductController extends HttpServlet {
     private void handleCreate(HttpServletRequest req, HttpServletResponse resp, Account account)
             throws IOException {
         HttpSession session = req.getSession();
+        List<Integer> genreIDs = parseGenreIDs(req.getParameterValues("genreID"));
+        String genreError = validateGenres(genreIDs);
+        if (genreError != null) {
+            session.setAttribute("errorMessage", genreError);
+            resp.sendRedirect(req.getContextPath() + "/dashboard/product-management?action=create");
+            return;
+        }
         String stockError = validateStockQuantity(req.getParameter("stockQuantity"));
         if (stockError != null) {
             session.setAttribute("errorMessage", stockError);
@@ -189,6 +206,7 @@ public class AdminProductController extends HttpServlet {
             return;
         }
         Book b = buildBookFromRequest(req);
+        b.setGenres(toGenres(genreIDs));
         String authors = req.getParameter("authors");
         boolean ok = bookDAO.createBook(b, authors, account.getId());
         if (ok) {
@@ -207,6 +225,13 @@ public class AdminProductController extends HttpServlet {
             return;
         }
         HttpSession session = req.getSession();
+        List<Integer> genreIDs = parseGenreIDs(req.getParameterValues("genreID"));
+        String genreError = validateGenres(genreIDs);
+        if (genreError != null) {
+            session.setAttribute("errorMessage", genreError);
+            resp.sendRedirect(req.getContextPath() + "/dashboard/product-management?action=edit&id=" + bookID);
+            return;
+        }
         String stockError = validateStockQuantity(req.getParameter("stockQuantity"));
         if (stockError != null) {
             session.setAttribute("errorMessage", stockError);
@@ -227,6 +252,7 @@ public class AdminProductController extends HttpServlet {
         }
         Book b = buildBookFromRequest(req);
         b.setBookID(bookID);
+        b.setGenres(toGenres(genreIDs));
         String authors = req.getParameter("authors");
         boolean ok = bookDAO.updateBook(b, authors, account.getId());
         if (ok) {
@@ -302,6 +328,41 @@ public class AdminProductController extends HttpServlet {
         return null;
     }
 
+    private String validateGenres(List<Integer> genreIDs) {
+        if (genreIDs.isEmpty()) {
+            return "Please select at least one genre!";
+        }
+        Map<Integer, String> genreMap = bookDAO.getGenreMap();
+        for (Integer genreID : genreIDs) {
+            if (!genreMap.containsKey(genreID)) {
+                return "Please select only valid genres!";
+            }
+        }
+        return null;
+    }
+
+    private List<Genre> toGenres(List<Integer> genreIDs) {
+        Map<Integer, String> genreMap = bookDAO.getGenreMap();
+        List<Genre> genres = new ArrayList<>();
+        for (Integer genreID : genreIDs) {
+            genres.add(new Genre(genreID, genreMap.get(genreID)));
+        }
+        return genres;
+    }
+
+    private List<Integer> parseGenreIDs(String[] values) {
+        LinkedHashSet<Integer> uniqueIDs = new LinkedHashSet<>();
+        if (values != null) {
+            for (String value : values) {
+                Integer id = parseIntParam(value);
+                if (id != null) {
+                    uniqueIDs.add(id);
+                }
+            }
+        }
+        return new ArrayList<>(uniqueIDs);
+    }
+
     private Book buildBookFromRequest(HttpServletRequest req) {
         Book b = new Book();
         b.setTitle(req.getParameter("title"));
@@ -360,10 +421,6 @@ public class AdminProductController extends HttpServlet {
             status = !requestedStatus.isEmpty() ? requestedStatus : "available";
         }
         b.setStatus(status);
-        Integer gid = parseIntParam(req.getParameter("categoryID"));
-        if (gid != null) {
-            b.setCategoryID(gid);
-        }
         Integer cid = parseIntParam(req.getParameter("contentID"));
         if (cid != null) {
             b.setContentID(cid);

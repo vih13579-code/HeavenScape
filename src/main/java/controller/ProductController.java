@@ -65,10 +65,10 @@ public class ProductController extends HttpServlet {
         String keyword = normalizeText(req.getParameter("keyword"));
         String order   = buildOrderClause(sort);
 
-        List<Integer> selectedCategoryIDs = parsePositiveIntParams(req.getParameterValues("category"));
+        List<Integer> selectedGenreIDs = parsePositiveIntParams(req.getParameterValues("genre"));
         List<Integer> selectedAuthorIDs = parsePositiveIntParams(req.getParameterValues("author"));
         List<String> availability = parseAvailability(req.getParameterValues("availability"));
-        Integer categoryID = selectedCategoryIDs.size() == 1 ? selectedCategoryIDs.get(0) : null;
+        Integer genreID = selectedGenreIDs.size() == 1 ? selectedGenreIDs.get(0) : null;
         BigDecimal minPrice = parsePriceParam(req.getParameter("minPrice"));
         BigDecimal maxPrice = parsePriceParam(req.getParameter("maxPrice"));
         String priceRangeError = null;
@@ -78,7 +78,7 @@ public class ProductController extends HttpServlet {
             maxPrice = null;
         }
 
-        int totalBooks = bookDAO.countBooksFiltered(keyword, selectedCategoryIDs,
+        int totalBooks = bookDAO.countBooksFiltered(keyword, selectedGenreIDs,
                 selectedAuthorIDs, minPrice, maxPrice, availability);
         int totalPages = (int) Math.ceil((double) totalBooks / pageSize);
         if (totalPages == 0) totalPages = 1;
@@ -89,10 +89,10 @@ public class ProductController extends HttpServlet {
 
         int offset = (page - 1) * pageSize;
         List<Book> books = bookDAO.getBooksFiltered(offset, pageSize, order,
-                keyword, selectedCategoryIDs, selectedAuthorIDs, minPrice, maxPrice,
+                keyword, selectedGenreIDs, selectedAuthorIDs, minPrice, maxPrice,
                 availability);
 
-        Map<Integer, String> categoryMap = bookDAO.getCategoryMap();
+        Map<Integer, String> genreMap = bookDAO.getGenreMap();
         Map<Integer, String> authorMap = bookDAO.getCatalogAuthorMap();
 
         HttpSession session = req.getSession(false);
@@ -114,8 +114,8 @@ public class ProductController extends HttpServlet {
         req.setAttribute("totalBooks",      totalBooks);
         req.setAttribute("sort",            sort);
         req.setAttribute("keyword",         keyword);
-        req.setAttribute("categoryID",         categoryID);
-        req.setAttribute("selectedCategoryIDs", selectedCategoryIDs);
+        req.setAttribute("genreID",         genreID);
+        req.setAttribute("selectedGenreIDs", selectedGenreIDs);
         req.setAttribute("selectedAuthorIDs", selectedAuthorIDs);
         req.setAttribute("availability",    availability);
         req.setAttribute("availabilityAvailable", availability.contains("available"));
@@ -124,10 +124,10 @@ public class ProductController extends HttpServlet {
         req.setAttribute("maxPrice",        maxPrice);
         req.setAttribute("priceRangeError", priceRangeError);
         req.setAttribute("hasPriceFilter",  minPrice != null || maxPrice != null);
-        req.setAttribute("hasActiveFilters", !selectedCategoryIDs.isEmpty()
+        req.setAttribute("hasActiveFilters", !selectedGenreIDs.isEmpty()
                 || !selectedAuthorIDs.isEmpty() || !availability.isEmpty()
                 || minPrice != null || maxPrice != null);
-        req.setAttribute("categoryMap",        categoryMap);
+        req.setAttribute("genreMap",        genreMap);
         req.setAttribute("authorMap",       authorMap);
         req.setAttribute("wishlistBookIds", wishlistBookIds);
 
@@ -144,7 +144,7 @@ public class ProductController extends HttpServlet {
         Book book = bookDAO.getBookByID(bookID);
         if (book == null) { show404(req, resp, "No book found with ID = " + bookID); return; }
 
-        List<Book> relatedBooks = bookDAO.getRelatedBooks(bookID, book.getCategoryID(), 4);
+        List<Book> relatedBooks = bookDAO.getRelatedBooks(bookID, 4);
 
         ReviewDAO reviewDAO = new ReviewDAO();
         List<Review> reviews = reviewDAO.getReviewsByBook(bookID);
@@ -199,7 +199,7 @@ public class ProductController extends HttpServlet {
             throws ServletException, IOException {
 
         List<Book> featuredBooks = bookDAO.getFeaturedByOrders(10);
-        Map<Integer, String> categoryMap = bookDAO.getCategoryMap();
+        Map<Integer, String> genreMap = bookDAO.getGenreMap();
         Map<Integer, String> authorMap = bookDAO.getCatalogAuthorMap();
 
         req.setAttribute("featuredBooks", featuredBooks);
@@ -209,9 +209,9 @@ public class ProductController extends HttpServlet {
         req.setAttribute("totalPages",    1);
         req.setAttribute("totalBooks",    featuredBooks.size());
         req.setAttribute("sort",          "popular");
-        req.setAttribute("categoryMap",      categoryMap);
+        req.setAttribute("genreMap",      genreMap);
         req.setAttribute("authorMap",     authorMap);
-        req.setAttribute("selectedCategoryIDs", Collections.emptyList());
+        req.setAttribute("selectedGenreIDs", Collections.emptyList());
         req.setAttribute("selectedAuthorIDs", Collections.emptyList());
         req.setAttribute("availability",  Collections.emptyList());
         req.setAttribute("availabilityAvailable", false);
