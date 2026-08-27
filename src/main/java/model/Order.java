@@ -31,6 +31,9 @@ public class Order {
     private String cancelReason;
     private String cancelledBy;
     private String cancelledByName;
+    private String refundBankName;
+    private String refundAccountNumber;
+    private String refundAccountHolder;
     private Integer voucherID;
     private String customerName;
     private String customerEmail;
@@ -210,6 +213,30 @@ public class Order {
 
     public void setCancelledByName(String cancelledByName) {
         this.cancelledByName = cancelledByName;
+    }
+
+    public String getRefundBankName() {
+        return refundBankName;
+    }
+
+    public void setRefundBankName(String refundBankName) {
+        this.refundBankName = refundBankName;
+    }
+
+    public String getRefundAccountNumber() {
+        return refundAccountNumber;
+    }
+
+    public void setRefundAccountNumber(String refundAccountNumber) {
+        this.refundAccountNumber = refundAccountNumber;
+    }
+
+    public String getRefundAccountHolder() {
+        return refundAccountHolder;
+    }
+
+    public void setRefundAccountHolder(String refundAccountHolder) {
+        this.refundAccountHolder = refundAccountHolder;
     }
 
     public Integer getVoucherID() {

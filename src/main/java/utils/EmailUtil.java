@@ -162,6 +162,33 @@ public class EmailUtil {
         Transport.send(message);
     }
 
+    public static void sendRefundRejectedEmail(String toEmail, model.Order order, String rejectReason)
+            throws MessagingException, UnsupportedEncodingException {
+        Properties props = new Properties();
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.port", "587");
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.connectiontimeout", "10000");
+        props.put("mail.smtp.timeout", "10000");
+        props.put("mail.smtp.writetimeout", "10000");
+
+        Session session = Session.getInstance(props, new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(FROM_EMAIL, APP_PASSWORD);
+            }
+        });
+
+        Message message = new MimeMessage(session);
+        message.setFrom(new InternetAddress(FROM_EMAIL, "HeavenScape Support", "UTF-8"));
+        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail));
+        message.setSubject("HeavenScape - Refund Request Declined for Order " + order.getOrderCode());
+        message.setContent(buildRefundRejectedEmailHtml(order, rejectReason), "text/html; charset=UTF-8");
+
+        Transport.send(message);
+    }
+
     private static String buildRefundPendingEmailHtml(model.Order order) {
         java.text.NumberFormat nf = java.text.NumberFormat.getInstance(java.util.Locale.US);
         String formattedPrice = nf.format(order.getTotalPrice()) + " VND";
@@ -262,6 +289,60 @@ public class EmailUtil {
                 + "      <p style=\"color: #555555; font-size: 15px; line-height: 1.6;\">"
                 + "        The refund is now available in your HeavenScape internal wallet "
                 + "        and can be used immediately for future orders."
+                + "      </p>"
+                + "      <div style=\"border-top: 1px solid #eeeeee; margin-top: 30px; padding-top: 20px;\">"
+                + "        <p style=\"color: #888888; font-size: 13px; line-height: 1.5; margin: 0;\">Thank you for choosing HeavenScape.</p>"
+                + "      </div>"
+                + "    </div>"
+                + emailFooter()
+                + "  </div>"
+                + "</div>";
+    }
+
+    private static String buildRefundRejectedEmailHtml(model.Order order, String rejectReason) {
+        java.text.NumberFormat nf = java.text.NumberFormat.getInstance(java.util.Locale.US);
+        String formattedPrice = nf.format(order.getTotalPrice()) + " VND";
+        String reason = (rejectReason != null && !rejectReason.trim().isEmpty())
+                ? rejectReason.trim()
+                : "No reason provided";
+
+        return "<div style=\"font-family: Arial, sans-serif; background-color: " + PAGE_BG
+                + "; margin: 0; padding: 30px 0;\">"
+                + "  <div style=\"max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 4px; overflow: hidden; border: 1px solid "
+                + CARD_BORDER + ";\">"
+                + emailHeader()
+                + "    <div style=\"padding: 30px 40px;\">"
+                + "      <h2 style=\"color: #D32F2F; font-size: 20px; margin-top: 0;\">Refund Request Declined</h2>"
+                + "      <p style=\"color: #555555; font-size: 15px; line-height: 1.6;\">"
+                + "        Hello,<br><br>"
+                + "        The refund request for order <strong>" + order.getOrderCode()
+                + "</strong> was declined by our staff."
+                + "      </p>"
+                + "      <div style=\"background-color: #fff5f5; padding: 15px; border-radius: 4px; margin: 20px 0; border: 1px solid #ffcdd2;\">"
+                + "        <table style=\"width: 100%; border-collapse: collapse; font-size: 14px;\">"
+                + "          <tr>"
+                + "            <td style=\"padding: 5px 0; color: #777777;\">Order Code:</td>"
+                + "            <td style=\"padding: 5px 0; font-weight: bold; text-align: right;\">"
+                + order.getOrderCode() + "</td>"
+                + "          </tr>"
+                + "          <tr>"
+                + "            <td style=\"padding: 5px 0; color: #777777;\">Amount:</td>"
+                + "            <td style=\"padding: 5px 0; font-weight: bold; text-align: right;\">"
+                + formattedPrice + "</td>"
+                + "          </tr>"
+                + "          <tr>"
+                + "            <td style=\"padding: 5px 0; color: #777777;\">Status:</td>"
+                + "            <td style=\"padding: 5px 0; font-weight: bold; color: #D32F2F; text-align: right;\">Declined</td>"
+                + "          </tr>"
+                + "          <tr>"
+                + "            <td style=\"padding: 5px 0; color: #777777;\">Reason:</td>"
+                + "            <td style=\"padding: 5px 0; font-weight: bold; color: #D32F2F; text-align: right;\">"
+                + reason + "</td>"
+                + "          </tr>"
+                + "        </table>"
+                + "      </div>"
+                + "      <p style=\"color: #555555; font-size: 15px; line-height: 1.6;\">"
+                + "        If you have any questions, please contact HeavenScape support."
                 + "      </p>"
                 + "      <div style=\"border-top: 1px solid #eeeeee; margin-top: 30px; padding-top: 20px;\">"
                 + "        <p style=\"color: #888888; font-size: 13px; line-height: 1.5; margin: 0;\">Thank you for choosing HeavenScape.</p>"

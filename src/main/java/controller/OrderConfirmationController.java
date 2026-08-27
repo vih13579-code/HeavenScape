@@ -25,14 +25,14 @@ public class OrderConfirmationController extends HttpServlet {
 
         Account account = getAccount(request);
         int orderID = toInt(request.getParameter("orderID"), 0);
-        request.getSession().removeAttribute("just_placed_order_id");
+
+        HttpSession session = request.getSession();
+        Integer justPlacedOrderID = (Integer) session.getAttribute("just_placed_order_id");
+        session.removeAttribute("just_placed_order_id");
 
         Order order = orderDAO.getOrderByID(orderID);
 
-        // The confirmation page must remain accessible on browser Back/Forward
-        // and Refresh. Ownership is the authorization boundary; a one-time
-        // session flag would incorrectly turn a valid revisit into a 404.
-        if (order == null || order.getCustomerID() != account.getId()) {
+        if (justPlacedOrderID == null || justPlacedOrderID != orderID || order == null || order.getCustomerID() != account.getId()) {
             request.getRequestDispatcher("/views/error/404.jsp").forward(request, response);
             return;
         }

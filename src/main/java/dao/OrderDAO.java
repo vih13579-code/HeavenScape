@@ -23,8 +23,7 @@ import java.util.Objects;
 
 public class OrderDAO {
 
-    private static final String CANCELLED_BY_NAME_SELECT
-            = "CASE "
+    private static final String CANCELLED_BY_NAME_SELECT = "CASE "
             + "WHEN LOWER(LTRIM(RTRIM(o.cancelled_by))) = 'system' THEN 'System' "
             + "WHEN LOWER(LTRIM(RTRIM(o.cancelled_by))) = 'staff' THEN 'Staff' "
             + "WHEN LOWER(LTRIM(RTRIM(o.cancelled_by))) = 'user' THEN c.fullname "
@@ -32,10 +31,9 @@ public class OrderDAO {
             + "WHEN LOWER(LTRIM(RTRIM(o.status))) = 'cancelled' THEN c.fullname "
             + "ELSE NULL END AS cancelledByName, ";
 
-    private static final String BASE_SELECT_ORDER
-            = "SELECT o.orderID, o.customerID, o.addressID, o.processed_by, o.status, "
+    private static final String BASE_SELECT_ORDER = "SELECT o.orderID, o.customerID, o.addressID, o.processed_by, o.status, "
             + "       o.payment_method, o.payment_status, o.total_price, o.created_at, o.cancel_reason, "
-            + "       o.cancelled_by, o.voucherID, "
+            + "       o.cancelled_by, o.voucherID, o.refund_bank_name, o.refund_account_number, o.refund_account_holder, "
             + CANCELLED_BY_NAME_SELECT
             + "       a.street, a.district, a.city, a.recipient_name, a.recipient_phone "
             + "FROM [Order] o "
@@ -51,7 +49,8 @@ public class OrderDAO {
 
         String paymentStatus = "unpaid";
 
-        try (Connection conn = new DBContext().getConnection(); PreparedStatement ps = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+        try (Connection conn = new DBContext().getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
 
             ps.setInt(1, customerID);
             ps.setInt(2, addressID);
@@ -128,7 +127,7 @@ public class OrderDAO {
     public Order getOrderByID(int orderID) {
         String sql = "SELECT o.orderID, o.customerID, o.addressID, o.processed_by, o.status, "
                 + "       o.payment_method, o.payment_status, o.total_price, o.created_at, o.cancel_reason, "
-                + "       o.cancelled_by, o.voucherID, "
+                + "       o.cancelled_by, o.voucherID, o.refund_bank_name, o.refund_account_number, o.refund_account_holder, "
                 + CANCELLED_BY_NAME_SELECT
                 + "       a.street, a.district, a.city, a.recipient_name, a.recipient_phone, "
                 + "       c.fullname AS customerName, "
@@ -163,7 +162,8 @@ public class OrderDAO {
     public int countOrdersByCustomerFiltered(int customerID, String status) {
         boolean isPendingRefund = "pending_refund".equalsIgnoreCase(status);
         boolean isRefunded = "refunded".equalsIgnoreCase(status);
-        boolean isRefundStatus = isPendingRefund || isRefunded;
+        boolean isRefundRejected = "refund_rejected".equalsIgnoreCase(status);
+        boolean isRefundStatus = isPendingRefund || isRefunded || isRefundRejected;
         boolean statusIsNull = (status == null);
         boolean statusIsEmpty;
         if (statusIsNull) {
@@ -205,7 +205,8 @@ public class OrderDAO {
         List<Order> orders = new ArrayList<>();
         boolean isPendingRefund = "pending_refund".equalsIgnoreCase(status);
         boolean isRefunded = "refunded".equalsIgnoreCase(status);
-        boolean isRefundStatus = isPendingRefund || isRefunded;
+        boolean isRefundRejected = "refund_rejected".equalsIgnoreCase(status);
+        boolean isRefundStatus = isPendingRefund || isRefunded || isRefundRejected;
         boolean statusIsNull = (status == null);
         boolean statusIsEmpty;
         if (statusIsNull) {
@@ -311,51 +312,31 @@ public class OrderDAO {
         return false;
     }
 
-    public boolean requestCodRefund(int orderID, int customerID, String refundReason) {
+    public boolean requestCodRefund(int orderID, int customerID, String refundReason,
+            String bankName, String accountNumber, String accountHolder) {
+        // Dùng cho chức năng: "Request Refund with Evidence Image" / hoàn tiền COD.
+        // Điều kiện: đơn đã completed, payment_method = cod, payment_status = paid.
+        // Khi hợp lệ, cập nhật trạng thái đơn -> cancelled và payment_status ->
+        // pending_refund.
         String sql = "UPDATE [Order] "
-                + "SET status = 'cancelled', payment_status = 'pending_refund', cancel_reason = ?, cancelled_by = 'user' "
+                + "SET status = 'cancelled', payment_status = 'pending_refund', cancel_reason = ?, cancelled_by = 'user', "
+                + "refund_bank_name = ?, refund_account_number = ?, refund_account_holder = ? "
                 + "WHERE orderID = ? AND customerID = ? "
                 + "AND status = 'completed' AND payment_method = 'cod' AND payment_status = 'paid'";
 
-        Connection conn = null;
-        try {
-            conn = new DBContext().getConnection();
-            conn.setAutoCommit(false);
-
-            try (PreparedStatement ps = conn.prepareStatement(sql)) {
-                ps.setString(1, refundReason);
-                ps.setInt(2, orderID);
-                ps.setInt(3, customerID);
-
-                if (ps.executeUpdate() == 0) {
-                    conn.rollback();
-                    return false;
-                }
-            }
-
-            if (!restoreStock(conn, orderID)) {
-                conn.rollback();
-                return false;
-            }
-
-            conn.commit();
-            return true;
+        try (Connection conn = new DBContext().getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, refundReason);
+            ps.setString(2, bankName);
+            ps.setString(3, accountNumber);
+            ps.setString(4, accountHolder);
+            ps.setInt(5, orderID);
+            ps.setInt(6, customerID);
+            // Stock is restored only after staff approves the refund. Restoring it
+            // here would make a later rejection corrupt inventory.
+            return ps.executeUpdate() > 0;
         } catch (Exception e) {
-            if (conn != null) {
-                try {
-                    conn.rollback();
-                } catch (Exception ignored) {
-                }
-            }
             e.printStackTrace();
-        } finally {
-            if (conn != null) {
-                try {
-                    conn.setAutoCommit(true);
-                    conn.close();
-                } catch (Exception ignored) {
-                }
-            }
         }
         return false;
     }
@@ -394,6 +375,12 @@ public class OrderDAO {
         } catch (Exception ignored) {
         }
         try {
+            order.setRefundBankName(rs.getString("refund_bank_name"));
+            order.setRefundAccountNumber(rs.getString("refund_account_number"));
+            order.setRefundAccountHolder(rs.getString("refund_account_holder"));
+        } catch (Exception ignored) {
+        }
+        try {
             int voucherID = rs.getInt("voucherID");
             order.setVoucherID(rs.wasNull() ? null : voucherID);
         } catch (Exception ignored) {
@@ -414,15 +401,70 @@ public class OrderDAO {
     }
 
     public boolean confirmRefund(int orderID) {
+        // Dùng cho chức năng: "Approve Refund Request".
+        // Admin xác nhận refund thì set payment_status = refunded.
+        // Chỉ chấp nhận khi đơn đang ở trạng thái pending_refund.
         String sql = "UPDATE [Order] SET payment_status = 'refunded' "
                 + "WHERE orderID = ? AND payment_method = 'cod' AND payment_status = 'pending_refund'";
-        try (Connection conn = new DBContext().getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, orderID);
-            return ps.executeUpdate() > 0;
+        Connection conn = null;
+        try {
+            conn = new DBContext().getConnection();
+            conn.setAutoCommit(false);
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setInt(1, orderID);
+                if (ps.executeUpdate() == 0) {
+                    conn.rollback();
+                    return false;
+                }
+            }
+            if (!restoreStock(conn, orderID)) {
+                conn.rollback();
+                return false;
+            }
+            conn.commit();
+            return true;
         } catch (Exception e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException ignored) {
+                }
+            }
             e.printStackTrace();
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (SQLException ignored) {
+                }
+            }
         }
         return false;
+    }
+
+    public boolean rejectRefund(int orderID, String rejectReason) {
+        // Keep the fulfilled order completed, but expose a dedicated refund
+        // outcome so both staff and customer can see/filter the rejection.
+        String sql = "UPDATE [Order] "
+                + "SET status = 'completed', payment_status = 'refund_rejected', "
+                + "cancel_reason = ?, cancelled_by = 'staff' "
+                + "WHERE orderID = ? "
+                + "AND payment_method = 'cod' "
+                + "AND payment_status = 'pending_refund'";
+
+        try (Connection conn = new DBContext().getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, "Refund rejected: " + rejectReason);
+            ps.setInt(2, orderID);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     public List<Order> getAllOrders(String status, int offset, int pageSize) {
@@ -431,7 +473,9 @@ public class OrderDAO {
         String sqlGetOverdue = "SELECT orderID FROM [Order] "
                 + "WHERE status = 'pending' "
                 + "AND created_at < DATEADD(DAY, -2, GETDATE())";
-        try (Connection conn = new DBContext().getConnection(); PreparedStatement psGet = conn.prepareStatement(sqlGetOverdue); ResultSet rsGet = psGet.executeQuery()) {
+        try (Connection conn = new DBContext().getConnection();
+                PreparedStatement psGet = conn.prepareStatement(sqlGetOverdue);
+                ResultSet rsGet = psGet.executeQuery()) {
 
             while (rsGet.next()) {
                 int overdueOrderID = rsGet.getInt("orderID");
@@ -442,7 +486,8 @@ public class OrderDAO {
                     if (isCod && isPaid) {
                         String autoCancelReason = "Order was not approved within two days";
                         String sqlAutoCancel = "UPDATE [Order] SET status = 'cancelled', cancel_reason = ?, cancelled_by = 'system' WHERE orderID = ?";
-                        try (Connection connAC = new DBContext().getConnection(); PreparedStatement psAC = connAC.prepareStatement(sqlAutoCancel)) {
+                        try (Connection connAC = new DBContext().getConnection();
+                                PreparedStatement psAC = connAC.prepareStatement(sqlAutoCancel)) {
                             psAC.setString(1, autoCancelReason);
                             psAC.setInt(2, overdueOrderID);
                             psAC.executeUpdate();
@@ -465,7 +510,8 @@ public class OrderDAO {
                     } else {
                         String autoCancelReason = "Order was not approved within two days";
                         String sqlAutoCancel = "UPDATE [Order] SET status = 'cancelled', cancel_reason = ?, cancelled_by = 'system' WHERE orderID = ?";
-                        try (Connection connAC = new DBContext().getConnection(); PreparedStatement psAC = connAC.prepareStatement(sqlAutoCancel)) {
+                        try (Connection connAC = new DBContext().getConnection();
+                                PreparedStatement psAC = connAC.prepareStatement(sqlAutoCancel)) {
                             psAC.setString(1, autoCancelReason);
                             psAC.setInt(2, overdueOrderID);
                             psAC.executeUpdate();
@@ -479,7 +525,8 @@ public class OrderDAO {
                             @Override
                             public void run() {
                                 try {
-                                    utils.EmailUtil.sendOrderCancelledEmail(finalOverdueOrder.getCustomerEmail(), finalOverdueOrder, finalReason);
+                                    utils.EmailUtil.sendOrderCancelledEmail(finalOverdueOrder.getCustomerEmail(),
+                                            finalOverdueOrder, finalReason);
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
@@ -494,7 +541,8 @@ public class OrderDAO {
 
         boolean isPendingRefund = "pending_refund".equalsIgnoreCase(status);
         boolean isRefunded = "refunded".equalsIgnoreCase(status);
-        boolean isRefundStatus = isPendingRefund || isRefunded;
+        boolean isRefundRejected = "refund_rejected".equalsIgnoreCase(status);
+        boolean isRefundStatus = isPendingRefund || isRefunded || isRefundRejected;
         boolean statusIsNull = (status == null);
         boolean statusIsEmpty;
         if (statusIsNull) {
@@ -515,7 +563,7 @@ public class OrderDAO {
         if (isRefundStatus) {
             sql = "SELECT o.orderID, o.customerID, o.addressID, o.processed_by, o.status, "
                     + "       o.payment_method, o.payment_status, o.total_price, o.created_at, o.cancel_reason, "
-                    + "       o.cancelled_by, o.voucherID, "
+                    + "       o.cancelled_by, o.voucherID, o.refund_bank_name, o.refund_account_number, o.refund_account_holder, "
                     + CANCELLED_BY_NAME_SELECT
                     + "       a.street, a.district, a.city, a.recipient_name, a.recipient_phone, "
                     + "       c.fullname AS customerName, "
@@ -528,7 +576,7 @@ public class OrderDAO {
         } else {
             sql = "SELECT o.orderID, o.customerID, o.addressID, o.processed_by, o.status, "
                     + "       o.payment_method, o.payment_status, o.total_price, o.created_at, o.cancel_reason, "
-                    + "       o.cancelled_by, o.voucherID, "
+                    + "       o.cancelled_by, o.voucherID, o.refund_bank_name, o.refund_account_number, o.refund_account_holder, "
                     + CANCELLED_BY_NAME_SELECT
                     + "       a.street, a.district, a.city, a.recipient_name, a.recipient_phone, "
                     + "       c.fullname AS customerName, "
@@ -566,7 +614,8 @@ public class OrderDAO {
     public int countFilteredOrders(String status) {
         boolean isPendingRefund = "pending_refund".equalsIgnoreCase(status);
         boolean isRefunded = "refunded".equalsIgnoreCase(status);
-        boolean isRefundStatus = isPendingRefund || isRefunded;
+        boolean isRefundRejected = "refund_rejected".equalsIgnoreCase(status);
+        boolean isRefundStatus = isPendingRefund || isRefunded || isRefundRejected;
         boolean statusIsNull = (status == null);
         boolean statusIsEmpty;
         if (statusIsNull) {
@@ -611,7 +660,8 @@ public class OrderDAO {
 
     public int countOrdersByStatus(String status) {
         String sql;
-        if ("pending_refund".equalsIgnoreCase(status) || "refunded".equalsIgnoreCase(status)) {
+        if ("pending_refund".equalsIgnoreCase(status) || "refunded".equalsIgnoreCase(status)
+                || "refund_rejected".equalsIgnoreCase(status)) {
             sql = "SELECT COUNT(*) FROM [Order] WHERE payment_status = ?";
         } else {
             sql = "SELECT COUNT(*) FROM [Order] WHERE status = ?";
@@ -661,7 +711,8 @@ public class OrderDAO {
     }
 
     public int getTotalOrdersByCustomer(int customerId) {
-        // Chỉ đếm đơn đã được xác nhận trở đi ko lấy status pending vì chưa chắc chắn, cancelled vì đã hủy
+        // Chỉ đếm đơn đã được xác nhận trở đi ko lấy status pending vì chưa chắc chắn,
+        // cancelled vì đã hủy
         String sql = "SELECT COUNT(*) FROM [Order] "
                 + "WHERE customerID = ? "
                 + "AND status IN ('confirmed', 'shipping', 'completed')";
@@ -685,12 +736,11 @@ public class OrderDAO {
 
     public double getTotalSpentByCustomer(int customerId) {
         // Chỉ tính tiền của đơn đã hoàn tất và đã thanh toán thành công
-        String sql
-                = "SELECT ISNULL(SUM(total_price),0) "
+        String sql = "SELECT ISNULL(SUM(total_price),0) "
                 + "FROM [Order] "
                 + "WHERE customerID = ? "
                 + "AND status = 'completed' "
-                + "AND payment_status = 'paid'";
+                + "AND payment_status IN ('paid', 'refund_rejected')";
 
         try (Connection conn = new DBContext().getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -736,7 +786,8 @@ public class OrderDAO {
                     conn, customerID, expected, currentSubtotal, issues);
 
             BigDecimal currentDiscount = voucher == null
-                    ? BigDecimal.ZERO : voucher.discount;
+                    ? BigDecimal.ZERO
+                    : voucher.discount;
             BigDecimal currentTotal = currentSubtotal.subtract(currentDiscount).max(BigDecimal.ZERO);
 
             CheckoutSnapshot current = buildCurrentSnapshot(
@@ -1228,12 +1279,14 @@ public class OrderDAO {
                         boolean invalid = !rs.next();
                         if (!invalid) {
                             invalid = !"active".equalsIgnoreCase(rs.getString("status"))
-                                    || (rs.getTimestamp("start_date") != null && rs.getTimestamp("start_date").after(now))
+                                    || (rs.getTimestamp("start_date") != null
+                                            && rs.getTimestamp("start_date").after(now))
                                     || (rs.getTimestamp("end_date") != null && rs.getTimestamp("end_date").before(now))
-                                    || (rs.getObject("quantity") != null && rs.getInt("used_count") >= rs.getInt("quantity"))
+                                    || (rs.getObject("quantity") != null
+                                            && rs.getInt("used_count") >= rs.getInt("quantity"))
                                     || rs.getInt("customer_used") > 0
                                     || (rs.getBigDecimal("min_order_value") != null
-                                        && subtotal.compareTo(rs.getBigDecimal("min_order_value")) < 0);
+                                            && subtotal.compareTo(rs.getBigDecimal("min_order_value")) < 0);
                         }
                         if (invalid) {
                             conn.rollback();

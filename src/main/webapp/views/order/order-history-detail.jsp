@@ -5,8 +5,21 @@
 <%@ include file="/views/layout/homepage/header.jsp" %>
 <%@ include file="/views/layout/common/toast.jsp" %>
 
+<%--
+    File này là trang chi tiết đơn hàng của khách hàng.
+    Chức năng chính:
+    - hiển thị thông tin cơ bản của đơn
+    - hiện trạng thái tiến độ đơn hàng
+    - hiển thị người nhận và địa chỉ giao hàng
+    - hiển thị danh sách sản phẩm trong đơn
+    - có các nút hủy đơn / refund / mua lại
+
+    Dữ liệu được Controller OrderHistoryController gửi qua:
+    - order
+    - orderDetails
+--%>
 <style>
-    .od-page { min-width: 0; padding-bottom: 28px; color: #27272a; }
+    .od-page { width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 34px 0 42px; color: #27272a; }
     .od-title { margin: 0 0 18px; font-size: 22px; line-height: 1.3; font-weight: 800; text-transform: uppercase; }
     .od-section-title { margin: 22px 0 10px; font-size: 14px; line-height: 1.3; font-weight: 800; text-transform: uppercase; }
     .od-card { border: 1px solid #dedfe2; border-radius: 7px; background: #fff; overflow: hidden; }
@@ -90,6 +103,7 @@
     }
 
     @media (max-width: 620px) {
+        .od-page { width: min(100% - 20px, 1180px); padding-top: 24px; }
         .od-overview, .od-shipping { grid-template-columns: 1fr; }
         .od-overview-cell:nth-child(2) { grid-column: auto; grid-row: auto; }
         .od-overview-cell + .od-overview-cell, .od-overview-cell:nth-child(3), .od-info-cell + .od-info-cell { border-top: 1px solid #e5e5e7; border-left: 0; }
@@ -115,14 +129,13 @@
     <c:set var="totalQuantity" value="${totalQuantity + detail.quantity}" />
 </c:forEach>
 
-<div class="fhs-page-inner">
-    <div class="grid grid-cols-1 lg:grid-cols-[250px_minmax(0,1fr)] gap-4">
-        <c:set var="activeMenu" value="orders" scope="request" />
-        <%@ include file="/views/layout/profile/sidebar.jsp" %>
-
-        <main class="od-page">
+<main class="od-page">
     <h1 class="od-title">Order Details</h1>
 
+    <%--
+        Phần overview của đơn hàng: mã đơn, ngày đặt, trạng thái, thanh toán, tổng tiền.
+        Đây là phần thông tin nhanh nhất ở đầu trang.
+    --%>
     <section class="od-card od-overview">
         <div class="od-overview-cell">
             <p class="od-label">Order Code</p>
@@ -139,6 +152,7 @@
                 <c:when test="${order.status == 'pending'}"><p class="od-status pending">Pending Confirmation</p></c:when>
                 <c:when test="${order.status == 'confirmed'}"><p class="od-status processing">Processing</p></c:when>
                 <c:when test="${order.status == 'shipping'}"><p class="od-status shipping">Shipping</p></c:when>
+                <c:when test="${order.paymentStatus == 'refund_rejected'}"><p class="od-status cancelled">Refund Rejected</p></c:when>
                 <c:when test="${order.status == 'completed'}"><p class="od-status completed">Completed</p></c:when>
                 <c:when test="${order.status == 'cancelled' and order.paymentStatus == 'pending_refund'}"><p class="od-status refund-pending">Refund Pending</p></c:when>
                 <c:when test="${order.status == 'cancelled' and order.paymentStatus == 'refunded'}"><p class="od-status refunded">Refunded</p></c:when>
@@ -146,19 +160,16 @@
                 <c:otherwise><p class="od-status"><c:out value="${order.status}" /></p></c:otherwise>
             </c:choose>
 
+            <c:if test="${order.paymentStatus == 'refund_rejected'}">
+                <div class="od-cancel-info">
+                    <strong>Refund request rejected:</strong>
+                    <c:out value="${fn:substringAfter(order.cancelReason, 'Refund rejected: ')}" />
+                </div>
+            </c:if>
+
             <c:choose>
                 <c:when test="${order.status == 'cancelled'}">
                     <div class="od-cancel-info">
-                        <c:choose>
-                            <c:when test="${order.paymentStatus == 'refunded'}"><strong>Refund by:</strong> Staff</c:when>
-                            <c:otherwise>
-                                <strong>Cancelled by:</strong>
-                                <c:choose>
-                                    <c:when test="${not empty order.cancelledByName}"><c:out value="${order.cancelledByName}" /></c:when>
-                                    <c:otherwise>Account unavailable</c:otherwise>
-                                </c:choose>
-                            </c:otherwise>
-                        </c:choose><br>
                         <c:choose>
                             <c:when test="${not empty order.cancelReason}"><strong>Cancellation reason:</strong> <c:out value="${order.cancelReason}" /></c:when>
                             <c:otherwise>This order was cancelled.</c:otherwise>
@@ -210,6 +221,10 @@
         </div>
     </section>
 
+    <%--
+        Phần shipping info cho biết người nhận và địa chỉ giao hàng.
+        Rất quan trọng để kiểm tra việc giao hàng đúng thông tin hay không.
+    --%>
     <h2 class="od-section-title">Shipping Information</h2>
     <section class="od-card od-shipping">
         <div class="od-info-cell">
@@ -224,6 +239,11 @@
         </div>
     </section>
 
+    <%--
+        Phần danh sách sản phẩm trong đơn hàng.
+        Mỗi item trong orderDetails tương ứng với 1 sản phẩm đặt mua.
+        Ở đây hiển thị title, hình ảnh, đơn giá, số lượng, thành tiền.
+    --%>
     <h2 class="od-section-title">Ordered Items (${fn:length(orderDetails)})</h2>
     <section class="od-card">
         <div class="od-items-head">
@@ -289,6 +309,9 @@
                             <input type="hidden" name="action" value="requestRefund" />
                             <input type="hidden" name="orderID" value="${order.orderID}" />
                             <input type="hidden" name="refundReason" id="customerRefundReasonInput" value="" />
+                            <input type="hidden" name="refundBankName" id="customerRefundBankNameInput" value="" />
+                            <input type="hidden" name="refundAccountNumber" id="customerRefundAccountNumberInput" value="" />
+                            <input type="hidden" name="refundAccountHolder" id="customerRefundAccountHolderInput" value="" />
                             <button type="button" class="od-btn secondary" onclick="openCustomerRefundModal()">Request Refund</button>
                         </form>
                     </c:if>
@@ -301,10 +324,12 @@
             </div>
         </div>
     </section>
-        </main>
-    </div>
-</div>
+</main>
 
+<%--
+    Modal xác nhận hủy đơn / refund theo trạng thái đơn.
+    Đây là UX flow: user bấm nút -> popup -> nhập lý do -> submit -> controller xử lý.
+--%>
 <c:if test="${order.status == 'pending' or (order.status == 'completed' and order.paymentMethod == 'cod' and order.paymentStatus == 'paid')}">
     <div id="customerCancelModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-[200] p-4">
         <div class="bg-white w-full max-w-[460px] rounded-lg p-6 relative shadow-xl">
@@ -312,8 +337,12 @@
             <h3 class="text-lg font-bold text-[#c92127] mb-2" id="customerOrderModalTitle">Cancel Order</h3>
             <p class="text-sm text-gray-500 mb-3" id="customerOrderModalDescription">Please enter the reason you want to cancel this order.</p>
             <div id="cancelModalError" class="hidden mb-3 px-3 py-2 bg-red-50 border border-red-300 text-red-600 text-sm rounded"></div>
-            <label for="customerCancelReasonText" class="mb-1 block text-sm font-semibold">Reason <span class="text-red-600 text-xs">*</span></label>
             <textarea id="customerCancelReasonText" rows="4" maxlength="50" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300" placeholder="Enter a cancellation reason (10-50 characters, including at least one letter)"></textarea>
+            <div id="customerRefundBankFields" class="hidden mt-3 space-y-3">
+                <div><label for="customerRefundBankNameText" class="mb-1 block text-sm font-semibold">Bank Name *</label><input id="customerRefundBankNameText" maxlength="100" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="Example: Vietcombank" /></div>
+                <div><label for="customerRefundAccountNumberText" class="mb-1 block text-sm font-semibold">Account Number *</label><input id="customerRefundAccountNumberText" inputmode="numeric" maxlength="20" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="6-20 digits" /></div>
+                <div><label for="customerRefundAccountHolderText" class="mb-1 block text-sm font-semibold">Account Holder *</label><input id="customerRefundAccountHolderText" maxlength="100" class="w-full border border-gray-300 rounded px-3 py-2 text-sm uppercase" placeholder="NGUYEN VAN A" /></div>
+            </div>
             <div class="flex justify-end gap-3 mt-4">
                 <button type="button" onclick="closeCustomerCancelModal()" class="px-4 py-2 border border-gray-300 rounded text-sm hover:bg-gray-100">Close</button>
                 <button type="button" id="customerOrderModalSubmit" onclick="submitCustomerCancelForm()" class="px-4 py-2 bg-[#c92127] text-white rounded text-sm font-semibold hover:bg-[#a8191f]">Confirm Cancellation</button>
@@ -329,6 +358,7 @@
             document.getElementById('customerOrderModalTitle').textContent = 'Cancel Order';
             document.getElementById('customerOrderModalDescription').textContent = 'Please enter the reason you want to cancel this order.';
             document.getElementById('customerOrderModalSubmit').textContent = 'Confirm Cancellation';
+            document.getElementById('customerRefundBankFields').classList.add('hidden');
             openCustomerOrderRequestModal();
         }
 
@@ -337,6 +367,7 @@
             document.getElementById('customerOrderModalTitle').textContent = 'Request Refund';
             document.getElementById('customerOrderModalDescription').textContent = 'Please enter the reason for requesting a refund.';
             document.getElementById('customerOrderModalSubmit').textContent = 'Submit Refund Request';
+            document.getElementById('customerRefundBankFields').classList.remove('hidden');
             openCustomerOrderRequestModal();
         }
 
@@ -344,6 +375,7 @@
             const modal = document.getElementById('customerCancelModal');
             const reasonField = document.getElementById('customerCancelReasonText');
             reasonField.value = '';
+            ['customerRefundBankNameText', 'customerRefundAccountNumberText', 'customerRefundAccountHolderText'].forEach(function (id) { document.getElementById(id).value = ''; });
             document.getElementById('cancelModalError').classList.add('hidden');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
@@ -369,8 +401,19 @@
             if (!reason) { showCancelModalError('Please enter a ' + reasonName + '.'); return; }
             if (reason.length < 10 || reason.length > 50) { showCancelModalError('The ' + reasonName + ' must be 10-50 characters long.'); return; }
             if (!/\p{L}/u.test(reason)) { showCancelModalError('The ' + reasonName + ' must contain at least one letter.'); return; }
+            const bankName = document.getElementById('customerRefundBankNameText').value.trim();
+            const accountNumber = document.getElementById('customerRefundAccountNumberText').value.trim();
+            const accountHolder = document.getElementById('customerRefundAccountHolderText').value.trim();
+            if (isRefund && (bankName.length < 2 || !/^[\p{L}0-9 .&()/-]+$/u.test(bankName))) { showCancelModalError('Please enter a valid bank name.'); return; }
+            if (isRefund && !/^[0-9]{6,20}$/.test(accountNumber)) { showCancelModalError('The account number must contain 6-20 digits.'); return; }
+            if (isRefund && (accountHolder.length < 2 || !/^[\p{L} .'-]+$/u.test(accountHolder))) { showCancelModalError('Please enter a valid account holder name.'); return; }
 
             document.getElementById(isRefund ? 'customerRefundReasonInput' : 'customerCancelReasonInput').value = reason;
+            if (isRefund) {
+                document.getElementById('customerRefundBankNameInput').value = bankName;
+                document.getElementById('customerRefundAccountNumberInput').value = accountNumber;
+                document.getElementById('customerRefundAccountHolderInput').value = accountHolder.toUpperCase();
+            }
             document.getElementById(isRefund ? 'refundOrderForm' : 'cancelOrderForm').submit();
         }
 
